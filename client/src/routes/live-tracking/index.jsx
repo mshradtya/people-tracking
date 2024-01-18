@@ -7,8 +7,10 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import WorkerIcon from "./WorkerIcon";
 import FullscreenLayout from "./FullscreenLayout";
 import SelectFloor from "./SelectFloor";
+import useLiveTracking from "../../hooks/useLiveTracking";
 
 export default function LiveTracking() {
+  const { layoutName } = useLiveTracking();
   const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
   const [open, setOpen] = React.useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -110,7 +112,7 @@ export default function LiveTracking() {
                 <TransformComponent>
                   <div>
                     <img
-                      src="/layout.jpg"
+                      src={`/${layoutName}.jpg`}
                       alt="test"
                       className="rounded-lg h-[calc(100vh-120px)]"
                     />
