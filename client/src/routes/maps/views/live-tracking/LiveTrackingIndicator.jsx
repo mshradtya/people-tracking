@@ -3,7 +3,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 
-export default function WorkerIcon({ circlePosition, showAlert }) {
+export default function LiveTrackingIndicator({ circlePosition, showAlert }) {
   const [blinking, setBlinking] = useState(false);
   const [index, setIndex] = useState(-2);
   const alerts = [

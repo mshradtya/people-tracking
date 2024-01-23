@@ -13,7 +13,7 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
+import MapIcon from "@mui/icons-material/Map";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import PersonIcon from "@mui/icons-material/Person";
 
@@ -61,26 +61,24 @@ function Layout({ children }) {
         </ListItem>
         <ListItem
           disablePadding
-          className={
-            pathname === "/live-tracking" ? "text-red-500 bg-red-100" : ""
-          }
+          className={pathname === "/maps" ? "text-red-500 bg-red-100" : ""}
           onClick={() => {
-            navigate("/live-tracking");
+            navigate("/maps");
           }}
         >
           <ListItemButton>
             <ListItemIcon
               sx={{
                 color: `${
-                  "/live-tracking"
+                  "/maps"
                     ? "rgb(239 68 68 / var(--tw-text-opacity))"
                     : "rgb(51 65 85)"
                 }`,
               }}
             >
-              <LocationSearchingIcon />
+              <MapIcon />
             </ListItemIcon>
-            <ListItemText primary="Live Tracking" />
+            <ListItemText primary="Maps" />
           </ListItemButton>
         </ListItem>
         <ListItem
@@ -103,6 +101,28 @@ function Layout({ children }) {
               <PersonIcon />
             </ListItemIcon>
             <ListItemText primary="Users" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem
+          disablePadding
+          className={pathname === "/test" ? "text-red-500 bg-red-100" : ""}
+          onClick={() => {
+            navigate("/test");
+          }}
+        >
+          <ListItemButton>
+            <ListItemIcon
+              sx={{
+                color: `${
+                  "/test"
+                    ? "rgb(239 68 68 / var(--tw-text-opacity))"
+                    : "rgb(51 65 85)"
+                }`,
+              }}
+            >
+              <PersonIcon />
+            </ListItemIcon>
+            <ListItemText primary="Test" />
           </ListItemButton>
         </ListItem>
       </List>

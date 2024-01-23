@@ -5,14 +5,15 @@ import Root from "@/routes/root";
 import PersistLogin from "@/components/auth/PersistLogin";
 import Login from "./routes/auth/login";
 import Dashboard from "@/routes/dashboard";
-import LiveTracking from "@/routes/live-tracking";
+import Maps from "@/routes/maps";
 import Users from "@/routes/users";
 import Unauthorized from "@/routes/auth/unauthorized";
 import RequireAuth from "@/components/auth/RequireAuth";
 import ErrorPage from "@/routes/root/ErrorPage";
 import { SnackbarProvider } from "@/context/SnackbarContext";
 import { AuthProvider } from "./context/AuthContext";
-import { LiveTrackingProvider } from "./context/LiveTrackingContext";
+import { MapProvider } from "./context/MapContext";
+import Test from "./routes/test";
 import "./index.css";
 // import Missing from "./pages/Missing";
 
@@ -34,8 +35,9 @@ const router = createBrowserRouter([
             element: <RequireAuth allowedRoles={["SuperAdmin"]} />,
             children: [
               { path: "", element: <Dashboard /> },
-              { path: "live-tracking", element: <LiveTracking /> },
+              { path: "maps", element: <Maps /> },
               { path: "users", element: <Users /> },
+              { path: "test", element: <Test /> },
             ],
           },
         ],
@@ -49,11 +51,11 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <LiveTrackingProvider>
+      <MapProvider>
         <SnackbarProvider>
           <RouterProvider router={router} />
         </SnackbarProvider>
-      </LiveTrackingProvider>
+      </MapProvider>
     </AuthProvider>
   </React.StrictMode>
 );

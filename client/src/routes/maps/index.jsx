@@ -1,49 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import WorkerIcon from "./WorkerIcon";
-import FullscreenLayout from "./FullscreenLayout";
-import SelectFloor from "./SelectFloor";
-import useLiveTracking from "../../hooks/useLiveTracking";
+import FullscreenLayout from "./views/full-screen/FullscreenLayout";
+import MapOptions from "./options";
+import LiveTracking from "./views/live-tracking/LiveTracking";
+import PathTracking from "./views/path-tracking/PathTracking";
+import useMap from "@/hooks/useMap";
 
-export default function LiveTracking() {
-  const { layoutName } = useLiveTracking();
-  const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
-  const [open, setOpen] = React.useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-
+export default function Maps() {
+  const { mapName, mapView } = useMap();
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (!showAlert) {
-        const newX = Math.random() * 500;
-        const newY = Math.random() * 500;
-        setCirclePosition({ x: newX, y: newY });
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [showAlert]);
-
-  useEffect(() => {
-    const alertInterval = setInterval(() => {
-      setShowAlert(true);
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000); // Alert will be shown for 3 seconds
-    }, 7000); // Repeat every 8 seconds
-
-    return () => clearInterval(alertInterval);
-  }, []);
+  const views = {
+    "live-tracking": <LiveTracking />,
+    "path-tracking": <PathTracking />,
+  };
 
   return (
     <div>
-      <SelectFloor />
+      <MapOptions />
       <div
         style={{
           position: "relative",
@@ -55,7 +35,10 @@ export default function LiveTracking() {
       >
         <div
           className="h-[calc(100vh-120px)] rounded-lg border-2 relative"
-          style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
+          style={{
+            boxShadow:
+              "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
+          }}
         >
           <TransformWrapper>
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
@@ -112,14 +95,11 @@ export default function LiveTracking() {
                 <TransformComponent>
                   <div>
                     <img
-                      src={`/${layoutName}.jpg`}
+                      src={`/${mapName}.jpg`}
                       alt="test"
                       className="rounded-lg h-[calc(100vh-120px)]"
                     />
-                    <WorkerIcon
-                      circlePosition={circlePosition}
-                      showAlert={showAlert}
-                    />
+                    {views[mapView]}
                   </div>
                 </TransformComponent>
               </>
