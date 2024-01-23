@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import LiveTrackingIndicator from "./LiveTrackingIndicator";
+import useMap from "@/hooks/useMap";
 
 export default function LiveTracking() {
+  const { mapName } = useMap();
   const [circlePosition, setCirclePosition] = useState({ x: 50, y: 50 });
   const [showAlert, setShowAlert] = useState(false);
 
@@ -29,9 +31,16 @@ export default function LiveTracking() {
   }, []);
 
   return (
-    <LiveTrackingIndicator
-      circlePosition={circlePosition}
-      showAlert={showAlert}
-    />
+    <div>
+      <img
+        src={`/${mapName}.jpg`}
+        alt="test"
+        className="rounded-lg h-[calc(100vh-120px)]"
+      />
+      <LiveTrackingIndicator
+        circlePosition={circlePosition}
+        showAlert={showAlert}
+      />
+    </div>
   );
 }

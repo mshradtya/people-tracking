@@ -8,6 +8,7 @@ import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
 import LiveTracking from "./views/live-tracking/LiveTracking";
 import PathTracking from "./views/path-tracking/PathTracking";
+import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
 
 export default function Maps() {
@@ -19,6 +20,7 @@ export default function Maps() {
   const views = {
     "live-tracking": <LiveTracking />,
     "path-tracking": <PathTracking />,
+    heatmap: <Heatmap />,
   };
 
   return (
@@ -92,16 +94,7 @@ export default function Maps() {
                     <RemoveIcon />
                   </IconButton>
                 </div>
-                <TransformComponent>
-                  <div>
-                    <img
-                      src={`/${mapName}.jpg`}
-                      alt="test"
-                      className="rounded-lg h-[calc(100vh-120px)]"
-                    />
-                    {views[mapView]}
-                  </div>
-                </TransformComponent>
+                <TransformComponent>{views[mapView]}</TransformComponent>
               </>
             )}
           </TransformWrapper>

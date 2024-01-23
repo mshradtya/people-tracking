@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import h337 from "heatmap.js";
+import useMap from "@/hooks/useMap";
 
-const Test = () => {
+export default function Heatmap() {
+  const { mapName } = useMap();
+
   useEffect(() => {
     var heatmapInstance = h337.create({
       container: document.querySelector(".heatmap-container"),
@@ -10,8 +13,8 @@ const Test = () => {
     var points = [];
     var max = 0;
     var width = 840;
-    var height = 400;
-    var len = 100;
+    var height = 600;
+    var len = 20;
 
     while (len--) {
       var val = Math.floor(Math.random() * 100);
@@ -33,17 +36,12 @@ const Test = () => {
   }, []);
 
   return (
-    <div
-      className="heatmap-container"
-      style={{ position: "relative", width: "200vh", height: "100vh" }}
-    >
+    <div className="heatmap-container">
       <img
-        src="/map1.jpg" // replace with the actual image URL
-        alt="Your Image"
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        src={`/${mapName}.jpg`}
+        alt="test"
+        className="rounded-lg h-[calc(100vh-120px)]"
       />
     </div>
   );
-};
-
-export default Test;
+}
