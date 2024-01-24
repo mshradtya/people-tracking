@@ -10,22 +10,13 @@ export default function Heatmap() {
       container: document.querySelector(".heatmap-container"),
     });
 
-    var points = [];
-    var max = 0;
-    var width = 840;
-    var height = 600;
-    var len = 20;
+    var points = [
+      { x: 100, y: 150, value: 60 },
+      { x: 700, y: 160, value: 30 },
+      { x: 100, y: 400, value: 70 },
+    ];
 
-    while (len--) {
-      var val = Math.floor(Math.random() * 100);
-      max = Math.max(max, val);
-      var point = {
-        x: Math.floor(Math.random() * width),
-        y: Math.floor(Math.random() * height),
-        value: val,
-      };
-      points.push(point);
-    }
+    var max = Math.max(...points.map((point) => point.value));
 
     var data = {
       max: max,

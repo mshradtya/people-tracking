@@ -1,47 +1,80 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { Stage, Layer, Image, Line } from "react-konva";
 import PersonIcon from "@mui/icons-material/Person";
 import { Tooltip } from "@mui/material";
+
 import useMap from "@/hooks/useMap";
-import { Stage, Layer, Shape } from "react-konva";
 
-export default function CombinedPathTracking() {
+export default function PathTracking() {
   const { mapName } = useMap();
-  const indicatorsData = [
-    { position: { x: 100, y: 100 }, color: "green" },
-    { position: { x: 350, y: 200 }, color: "purple" },
-    { position: { x: 450, y: 200 }, color: "blue" },
-  ];
+  const [image, setImage] = useState(null);
+  const [canvasMeasures, setCanvasMeasures] = useState({
+    width: 0,
+    height: 0,
+  });
+  const indicatorsData = [{ position: { x: 135, y: 100 }, color: "green" }];
 
-  const handleIndicatorClick = () => {
-    window.alert("hello");
-  };
+  useEffect(() => {
+    const imageToLoad = new window.Image();
+    imageToLoad.src = `${mapName}.jpg`;
+    imageToLoad.width = window.innerWidth - 750;
+    imageToLoad.height = window.innerHeight - 120;
+
+    imageToLoad.onload = () => {
+      setImage(imageToLoad);
+      setCanvasMeasures({
+        width: imageToLoad.width,
+        height: imageToLoad.height,
+      });
+    };
+
+    return () => {
+      // Clean up
+      imageToLoad.onload = null;
+    };
+  }, [mapName]);
 
   return (
-    <>
-      <div>
-        <img
-          src={`/${mapName}.jpg`}
-          alt="test"
-          className="rounded-lg h-[calc(100vh-120px)]"
-        />
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: "20px",
+      }}
+    >
+      <div
+        className="h-[calc(100vh-120px)] rounded-lg border-2 relative"
+        style={{
+          boxShadow:
+            "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
+        }}
+      >
+        <Stage width={canvasMeasures.width} height={canvasMeasures.height}>
+          <Layer>
+            <Image image={image} />
+            {/* Dummy path */}
+            <Line
+              points={[150, 120, 150, 460, 400, 460, 400, 200, 600, 200]}
+              stroke="green"
+              strokeWidth={4}
+            />
+          </Layer>
+        </Stage>
         {indicatorsData.map((data, index) => (
           <PathTrackingIndicator
             key={index}
             circlePosition={data.position}
             color={data.color}
-            handleIndicatorClick={handleIndicatorClick}
           />
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
-function PathTrackingIndicator({
-  circlePosition,
-  color,
-  handleIndicatorClick,
-}) {
+function PathTrackingIndicator({ circlePosition, color }) {
   return (
     <div
       style={{
@@ -60,7 +93,6 @@ function PathTrackingIndicator({
           "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
         borderRadius: "20px",
       }}
-      onClick={handleIndicatorClick}
     >
       <Tooltip title="30 minutes">
         <PersonIcon />
