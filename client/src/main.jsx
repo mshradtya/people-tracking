@@ -14,6 +14,7 @@ import { SnackbarProvider } from "@/context/SnackbarContext";
 import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
 import Test from "./routes/test";
+import Devices from "./routes/devices";
 import "./index.css";
 // import Missing from "./pages/Missing";
 
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
             children: [
               { path: "", element: <Dashboard /> },
               { path: "maps", element: <Maps /> },
+              { path: "devices", element: <Devices /> },
               { path: "users", element: <Users /> },
               { path: "test", element: <Test /> },
             ],

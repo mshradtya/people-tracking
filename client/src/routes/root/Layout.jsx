@@ -16,6 +16,8 @@ import Typography from "@mui/material/Typography";
 import MapIcon from "@mui/icons-material/Map";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import PersonIcon from "@mui/icons-material/Person";
+import WifiIcon from "@mui/icons-material/Wifi";
+import ConstructionIcon from "@mui/icons-material/Construction";
 
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 
@@ -83,6 +85,28 @@ function Layout({ children }) {
         </ListItem>
         <ListItem
           disablePadding
+          className={pathname === "/devices" ? "text-red-500 bg-red-100" : ""}
+          onClick={() => {
+            navigate("/devices");
+          }}
+        >
+          <ListItemButton>
+            <ListItemIcon
+              sx={{
+                color: `${
+                  "/devices"
+                    ? "rgb(239 68 68 / var(--tw-text-opacity))"
+                    : "rgb(51 65 85)"
+                }`,
+              }}
+            >
+              <WifiIcon />
+            </ListItemIcon>
+            <ListItemText primary="Devices" />
+          </ListItemButton>
+        </ListItem>
+        <ListItem
+          disablePadding
           className={pathname === "/users" ? "text-red-500 bg-red-100" : ""}
           onClick={() => {
             navigate("/users");
@@ -120,7 +144,7 @@ function Layout({ children }) {
                 }`,
               }}
             >
-              <PersonIcon />
+              <ConstructionIcon />
             </ListItemIcon>
             <ListItemText primary="Test" />
           </ListItemButton>
