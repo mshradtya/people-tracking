@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import { Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
+import useMap from "@/hooks/useMap";
 
 export default function PersonIndicator({ circlePosition, showAlert }) {
+  const { scale } = useMap();
   const [blinking, setBlinking] = useState(false);
   const [index, setIndex] = useState(-2);
   const alerts = [
@@ -47,6 +49,7 @@ export default function PersonIndicator({ circlePosition, showAlert }) {
         transition:
           "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
         borderRadius: "20px",
+        transform: `scale(${1 / scale})`,
       }}
     >
       {showAlert && (
@@ -58,7 +61,9 @@ export default function PersonIndicator({ circlePosition, showAlert }) {
       )}
       <Tooltip title="ID: 202">
         <PersonIcon
-          style={{ color: showAlert ? (blinking ? "white" : "red") : "white" }}
+          style={{
+            color: showAlert ? (blinking ? "white" : "red") : "white",
+          }}
         />
       </Tooltip>
     </div>

@@ -12,7 +12,8 @@ import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
 
 export default function Maps() {
-  const { mapName, mapView, addingRepeaters, addingGateways } = useMap();
+  const { mapName, mapView, addingRepeaters, addingGateways, scale, setScale } =
+    useMap();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -22,6 +23,11 @@ export default function Maps() {
     "path-tracking": <PathTracking />,
     heatmap: <Heatmap />,
   };
+
+  function handleScaleChange(event) {
+    // console.log(event.instance.transformState.scale);
+    setScale(event.instance.transformState.scale);
+  }
 
   return (
     <div>
@@ -44,6 +50,10 @@ export default function Maps() {
         >
           <TransformWrapper
             disabled={addingRepeaters || addingGateways ? true : false}
+            onTransformed={(e) => handleScaleChange(e)}
+            initialScale={scale}
+            minScale={1}
+            maxScale={4}
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
