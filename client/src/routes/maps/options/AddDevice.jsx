@@ -24,6 +24,7 @@ export default function AddDevice() {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const addingDevice = addingRepeaters || addingGateways;
 
   const handleClick = () => {
     if (options[selectedIndex] === "Add Repeaters") {
@@ -56,25 +57,16 @@ export default function AddDevice() {
         <Button
           onClick={handleClick}
           startIcon={
-            addingRepeaters || addingGateways ? (
-              <CheckCircleIcon />
-            ) : (
-              <AddCircleRoundedIcon />
-            )
+            addingDevice ? <CheckCircleIcon /> : <AddCircleRoundedIcon />
           }
-          color={addingRepeaters || addingGateways ? "success" : "primary"}
+          color={addingDevice ? "success" : "primary"}
         >
-          {addingRepeaters
-            ? "Repeaters Added"
-            : addingGateways
-            ? "Gateways Added"
-            : options[selectedIndex]}
+          {options[selectedIndex]}
         </Button>
         <Button
           size="small"
-          onClick={handleToggle}
-          color={addingRepeaters || addingGateways ? "success" : "primary"}
-          disabled={addingRepeaters || addingGateways ? true : false}
+          onClick={addingDevice ? "" : handleToggle}
+          color={addingDevice ? "success" : "primary"}
         >
           <ArrowDropDownIcon />
         </Button>
