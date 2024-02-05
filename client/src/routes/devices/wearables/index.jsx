@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import WearablesTable from "./WearablesTable";
-import AddNewWearableModal from "./modals/AddNewWearableModal";
+import AddNewWearableModal from "@/components/modals/AddNewWearableModal";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import axios from "axios";

@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 
-export default function WearablesTable({ usersData, getUsersData }) {
+export default function RepeatersTable({ usersData, getUsersData }) {
   const { showSnackbar } = useSnackbar();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);

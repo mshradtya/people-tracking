@@ -24,7 +24,7 @@ const schema = yup
   })
   .required();
 
-export default function AddNewWearableModal({
+export default function AddNewRepeaterModal({
   handleCloseUserDetails,
   getUsersData,
 }) {
@@ -69,7 +69,7 @@ export default function AddNewWearableModal({
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>User Details</DialogTitle>
+      <DialogTitle>Repeater Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid sm:grid-rows-1 md:grid-rows-3 gap-5 mb-4">

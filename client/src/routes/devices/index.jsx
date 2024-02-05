@@ -5,6 +5,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 
 import Wearables from "./wearables";
+import Gateways from "./gateways";
+import Repeaters from "./repeaters";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -53,18 +55,18 @@ export default function Devices() {
           }}
         >
           <Tabs value={value} onChange={handleChange} centered>
-            <Tab label="Wearables" {...a11yProps(0)} />
+            <Tab label="Gateways" {...a11yProps(0)} />
             <Tab label="Repeaters" {...a11yProps(1)} />
-            <Tab label="Gateways" {...a11yProps(2)} />
+            <Tab label="Wearables" {...a11yProps(2)} />
           </Tabs>
         </div>
       </div>
       <div>
         <CustomTabPanel value={value} index={0}>
-          <Wearables />
+          <Gateways />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <Wearables />
+          <Repeaters />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
           <Wearables />

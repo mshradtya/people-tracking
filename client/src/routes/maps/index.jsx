@@ -46,6 +46,7 @@ export default function Maps() {
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
                 <div
+                  // onClick={() => alert("hello world")}
                   style={{
                     position: "absolute",
                     bottom: "15px",
