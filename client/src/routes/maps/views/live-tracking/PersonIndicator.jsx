@@ -3,7 +3,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 
-export default function LiveTrackingIndicator({ circlePosition, showAlert }) {
+export default function PersonIndicator({ circlePosition, showAlert }) {
   const [blinking, setBlinking] = useState(false);
   const [index, setIndex] = useState(-2);
   const alerts = [
@@ -11,7 +11,7 @@ export default function LiveTrackingIndicator({ circlePosition, showAlert }) {
     "Fall Detection",
     "Abnormal Body Temperature",
     "Abnormal Heart Beat",
-    "Unusual Idlenes Detected",
+    "Unusual Idleness Detected",
   ];
 
   useEffect(() => {

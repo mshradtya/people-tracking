@@ -6,13 +6,13 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
-import LiveTracking from "./views/live-tracking/LiveTracking";
+import LiveTracking from "./views/live-tracking";
 import PathTracking from "./views/path-tracking/PathTracking";
 import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
 
 export default function Maps() {
-  const { mapName, mapView } = useMap();
+  const { mapName, mapView, addingRepeaters, addingGateways } = useMap();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -42,11 +42,12 @@ export default function Maps() {
               "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
           }}
         >
-          <TransformWrapper>
+          <TransformWrapper
+            disabled={addingRepeaters || addingGateways ? true : false}
+          >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
                 <div
-                  // onClick={() => alert("hello world")}
                   style={{
                     position: "absolute",
                     bottom: "15px",
@@ -56,7 +57,7 @@ export default function Maps() {
                     zIndex: 999,
                   }}
                 >
-                  <IconButton
+                  {/* <IconButton
                     onClick={() => handleOpen()}
                     color="primary"
                     sx={{
@@ -67,7 +68,7 @@ export default function Maps() {
                     }}
                   >
                     <OpenInFullIcon />
-                  </IconButton>
+                  </IconButton> */}
                   <IconButton
                     onClick={() => zoomIn()}
                     color="primary"
@@ -78,6 +79,7 @@ export default function Maps() {
                       marginTop: "5px",
                       backgroundColor: "#fff",
                     }}
+                    disabled={addingRepeaters || addingGateways ? true : false}
                   >
                     <AddIcon />
                   </IconButton>
@@ -91,6 +93,7 @@ export default function Maps() {
                       backgroundColor: "#fff",
                       borderRadius: "8px",
                     }}
+                    disabled={addingRepeaters || addingGateways ? true : false}
                   >
                     <RemoveIcon />
                   </IconButton>
