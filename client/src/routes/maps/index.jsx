@@ -53,7 +53,7 @@ export default function Maps() {
             onTransformed={(e) => handleScaleChange(e)}
             initialScale={scale}
             minScale={1}
-            maxScale={4}
+            maxScale={2.5}
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>

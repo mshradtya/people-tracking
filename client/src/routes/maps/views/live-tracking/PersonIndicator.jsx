@@ -41,7 +41,7 @@ export default function PersonIndicator({ circlePosition, showAlert }) {
         top: `${circlePosition.y}px`,
         width: "30px",
         height: "30px",
-        background: showAlert ? (blinking ? "red" : "white") : "green",
+        background: showAlert ? (blinking ? "red" : "white") : "#11ba3b",
         boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
         display: "flex",
         alignItems: "center",
