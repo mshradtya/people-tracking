@@ -8,7 +8,7 @@ const db = process.env.MONGO_URI;
 
 mongoose
   .connect(db, {
-    dbName: "fedb",
+    dbName: "people-tracking",
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

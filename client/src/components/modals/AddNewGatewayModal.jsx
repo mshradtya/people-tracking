@@ -1,10 +1,6 @@
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -13,28 +9,25 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
 
 const schema = yup
   .object({
-    name: yup.string().required("Please Enter Name"),
-    email: yup
-      .string()
-      .email("Email Must Be Valid")
-      .required("Please Enter Email"),
+    id: yup.number().required("Please Enter Gateway ID"),
   })
   .required();
 
 export default function AddNewGatewayModal({
-  handleCloseUserDetails,
-  getUsersData,
+  handleCloseGatewayDetails,
+  fetchGateways,
 }) {
+  const axiosPrivate = useAxiosPrivate();
   const { showSnackbar } = useSnackbar();
-  const [type, setType] = useState("user");
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseUserDetails();
+    handleCloseGatewayDetails();
   };
 
   const {
@@ -45,26 +38,29 @@ export default function AddNewGatewayModal({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data, e) => {
-    Object.assign(data, { type: type });
-
-    axios
-      .post("/api/users", JSON.stringify(data))
-      .then((res) => {
-        if (res.status === 200) {
-          showSnackbar("success", "User Added Successfully");
-          e.target.reset();
-          getUsersData();
-          handleClose();
-        }
-      })
-      .catch((err) => {
-        showSnackbar("error", "Something went wrong");
+  const onSubmit = async (data, e) => {
+    try {
+      const response = await axiosPrivate.post("/gateway/register", {
+        gwid: data.id,
       });
-  };
 
-  const handleChange = (event) => {
-    setType(event.target.value);
+      // Clear form errors
+      e.target.reset();
+
+      // If the response is successful, close the modal and fetch gateways
+      if (response?.data?.status === 201) {
+        handleClose();
+        fetchGateways();
+        showSnackbar("success", "User Added Successfully");
+      } else {
+        showSnackbar("error", "Something went wrong");
+      }
+    } catch (error) {
+      showSnackbar(
+        "error",
+        error?.response?.data?.message || "Something went wrong"
+      );
+    }
   };
 
   return (
@@ -72,43 +68,16 @@ export default function AddNewGatewayModal({
       <DialogTitle>Gateway Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1 md:grid-rows-3 gap-5 mb-4">
+          <div className="grid sm:grid-rows-1 mb-4">
             <div>
               <TextField
                 fullWidth
-                label="Name"
+                label="Gateway ID"
                 size="small"
                 variant="outlined"
-                {...register("name")}
+                {...register("id")}
               />
-              <p className="text-orange-600 ">{errors.name?.message}</p>
-            </div>
-            <div>
-              <TextField
-                fullWidth
-                label="Email"
-                size="small"
-                variant="outlined"
-                {...register("email")}
-              />
-              <p className="text-orange-600 ">{errors.email?.message}</p>
-            </div>
-            <div>
-              <FormControl fullWidth>
-                <InputLabel>Role</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={type}
-                  label="Role"
-                  size="small"
-                  onChange={handleChange}
-                >
-                  <MenuItem value="user">User</MenuItem>
-                  <MenuItem value="mod">Moderator</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
-                </Select>
-              </FormControl>
+              <p className="text-orange-600 ">{errors.id?.message}</p>
             </div>
           </div>
           <div className="flex justify-center items-center w-full mb-4">

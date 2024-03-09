@@ -7,11 +7,17 @@ import {
   Button,
 } from "@mui/material";
 
-const ConfirmDeletionModal = ({ open, handleClose, handleConfirmDelete }) => {
+const ConfirmGatewayDeletionModal = ({
+  open,
+  handleClose,
+  handleConfirmDelete,
+}) => {
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Delete User</DialogTitle>
-      <DialogContent>Are you sure you want to delete this user?</DialogContent>
+      <DialogContent>
+        Are you sure you want to delete this gateway?
+      </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
@@ -26,4 +32,4 @@ const ConfirmDeletionModal = ({ open, handleClose, handleConfirmDelete }) => {
   );
 };
 
-export default ConfirmDeletionModal;
+export default ConfirmGatewayDeletionModal;

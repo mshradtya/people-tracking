@@ -12,17 +12,26 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { format } from "date-fns";
-import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
+import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import CircularProgress from "@mui/material/CircularProgress";
+import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
 
-export default function GatewaysTable({ usersData, getUsersData }) {
+export default function GatewaysTable({
+  gateways,
+  fetchGateways,
+  isLoading,
+  serialNumber,
+}) {
   const { showSnackbar } = useSnackbar();
+  const axiosPrivate = useAxiosPrivate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedGateway, setSelectedGateway] = useState(null);
+  const [isConfirmDeleteGatewayModalOpen, setConfirmDeleteGatewayModalOpen] =
+    useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -37,41 +46,37 @@ export default function GatewaysTable({ usersData, getUsersData }) {
     console.log(row);
   };
 
-  const handleDeleteUser = (row) => {
-    setSelectedUser(row);
-    setConfirmModalOpen(true);
+  const handleDeleteGateway = (row) => {
+    setSelectedGateway(row);
+    setConfirmDeleteGatewayModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (selectedUser) {
-      let data = JSON.stringify({ id: selectedUser.id });
-      let config = {
-        method: "delete",
-        url: "/api/users",
-        data: data,
-      };
+  const deleteGateway = async () => {
+    try {
+      const response = await axiosPrivate.delete(
+        `/gateway/delete/${selectedGateway.gwid}`
+      );
 
-      axios
-        .request(config)
-        .then((res) => {
-          if (res.status === 200) {
-            showSnackbar("success", "User deleted successfully");
-            getUsersData();
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          setConfirmModalOpen(false);
-          setSelectedUser(null);
-        });
+      if (response && response.data && response.data.status === 200) {
+        handleCloseConfirmDeleteGatewayModal();
+        fetchGateways();
+        showSnackbar("success", "Gateway deleted successfully!");
+      } else {
+        // Handle unexpected response structure or status
+        showSnackbar("error", "Unexpected response from the server.");
+      }
+    } catch (error) {
+      // Handle errors, including cases where the response is undefined
+      showSnackbar(
+        "error",
+        error?.response?.data?.message || "Something went wrong"
+      );
     }
   };
 
-  const handleCloseConfirmModal = () => {
-    setConfirmModalOpen(false);
-    setSelectedUser(null);
+  const handleCloseConfirmDeleteGatewayModal = () => {
+    setConfirmDeleteGatewayModalOpen(false);
+    setSelectedGateway(null);
   };
 
   const formatDate = (dateString) => {
@@ -82,71 +87,84 @@ export default function GatewaysTable({ usersData, getUsersData }) {
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                ID
-              </TableCell>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                Name
-              </TableCell>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                Email
-              </TableCell>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                Type
-              </TableCell>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                Created At
-              </TableCell>
-              <TableCell align="center" style={{ minWidth: 70 }}>
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {usersData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    <TableCell align="center">{row.id}</TableCell>
-                    <TableCell align="center">{row.name}</TableCell>
-                    <TableCell align="center">{row.email}</TableCell>
-                    <TableCell align="center">{row.type}</TableCell>
-                    <TableCell align="center">
-                      {formatDate(row.created_at)}
-                    </TableCell>
-                    <TableCell align="center">
-                      <div className="flex justify-center">
-                        <IconButton
-                          aria-label="edit"
-                          sx={{ color: "orange" }}
-                          onClick={() => handleEditUser(row)}
-                        >
-                          <EditIcon />
-                        </IconButton>
+        {isLoading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100px",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : (
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center" style={{ minWidth: 70 }}>
+                  Serial No.
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
+                  Gateway ID
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
+                  Beacons Assigned
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {gateways &&
+                gateways
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, index) => {
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={row.gwid}
+                      >
+                        <TableCell align="center">
+                          {serialNumber + index}
+                        </TableCell>
+                        <TableCell align="center">{row.gwid}</TableCell>
+                        <TableCell align="center">
+                          {row.beacons ? row.beacons.length : 0}
+                        </TableCell>
+                        <TableCell align="center">
+                          <div className="flex justify-center">
+                            {/* <IconButton
+                              aria-label="edit"
+                              sx={{ color: "orange" }}
+                              onClick={() => handleEditUser(row)}
+                            >
+                              <EditIcon />
+                            </IconButton> */}
 
-                        <IconButton
-                          aria-label="delete"
-                          sx={{ color: "red" }}
-                          onClick={() => handleDeleteUser(row)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
+                            <IconButton
+                              aria-label="delete"
+                              sx={{ color: "red" }}
+                              onClick={() => handleDeleteGateway(row)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={usersData.length}
+        count={gateways.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -154,10 +172,10 @@ export default function GatewaysTable({ usersData, getUsersData }) {
       />
 
       {/* Confirm Delete Modal */}
-      <ConfirmDeletionModal
-        open={isConfirmModalOpen}
-        handleClose={handleCloseConfirmModal}
-        handleConfirmDelete={handleConfirmDelete}
+      <ConfirmGatewayDeletionModal
+        open={isConfirmDeleteGatewayModalOpen}
+        handleClose={handleCloseConfirmDeleteGatewayModal}
+        handleConfirmDelete={deleteGateway}
       />
     </Paper>
   );

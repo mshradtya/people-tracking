@@ -12,10 +12,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { format } from "date-fns";
-import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
+// import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 
-export default function WearablesTable({ usersData, getUsersData }) {
+export default function BeaconsTable({ usersData, getUsersData }) {
   const { showSnackbar } = useSnackbar();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -154,11 +154,11 @@ export default function WearablesTable({ usersData, getUsersData }) {
       />
 
       {/* Confirm Delete Modal */}
-      <ConfirmDeletionModal
+      {/* <ConfirmDeletionModal
         open={isConfirmModalOpen}
         handleClose={handleCloseConfirmModal}
         handleConfirmDelete={handleConfirmDelete}
-      />
+      /> */}
     </Paper>
   );
 }

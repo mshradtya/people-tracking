@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import WearablesTable from "./WearablesTable";
 import AddNewWearableModal from "@/components/modals/AddNewWearableModal";
+import BeaconsTable from "./BeaconsTable";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import axios from "axios";
 
-export default function Wearables() {
+export default function Beacons() {
   const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
   const [usersData, setUsersData] = useState([]);
 
@@ -40,10 +40,10 @@ export default function Wearables() {
           startIcon={<AddCircleRoundedIcon />}
           onClick={handleAddUserClick}
         >
-          Add Wearable
+          Register Beacon
         </Button>
       </div>
-      <WearablesTable usersData={usersData} getUsersData={getUsersData} />
+      <BeaconsTable usersData={usersData} getUsersData={getUsersData} />
       {isUserDetailsOpen && (
         <AddNewWearableModal
           handleCloseUserDetails={handleCloseUserDetails}

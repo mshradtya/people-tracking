@@ -42,6 +42,7 @@ export default function SelectMapView() {
             <MenuItem value={"live-tracking"}>Live Tracking</MenuItem>
             <MenuItem value={"path-tracking"}>Path Tracking</MenuItem>
             <MenuItem value={"heatmap"}>Heatmap</MenuItem>
+            <MenuItem value={"geofencing"}>Geofencing</MenuItem>
           </Select>
         </FormControl>
       </Box>

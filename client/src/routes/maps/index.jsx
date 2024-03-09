@@ -10,6 +10,7 @@ import LiveTracking from "./views/live-tracking";
 import PathTracking from "./views/path-tracking/PathTracking";
 import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
+import GeoFencing from "./views/geofencing";
 
 export default function Maps() {
   const { mapName, mapView, addingRepeaters, addingGateways, scale, setScale } =
@@ -22,6 +23,7 @@ export default function Maps() {
     "live-tracking": <LiveTracking />,
     "path-tracking": <PathTracking />,
     heatmap: <Heatmap />,
+    geofencing: <GeoFencing />,
   };
 
   function handleScaleChange(event) {

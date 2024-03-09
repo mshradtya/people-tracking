@@ -3,33 +3,47 @@ import GatewaysTable from "./GatewaysTable";
 import AddNewGatewayModal from "@/components/modals/AddNewGatewayModal";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
-import axios from "axios";
+import useAuth from "../../../hooks/auth/useAuth";
+import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSnackbar } from "../../../hooks/useSnackbar";
 
 export default function Gateways() {
-  const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
-  const [usersData, setUsersData] = useState([]);
+  const [isGatewayDetailsOpen, setIsGatewayDetailsOpen] = useState(false);
+  const [gateways, setGateways] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [serialNumber, setSerialNumber] = useState(1);
+  const { showSnackbar } = useSnackbar();
+
+  // Context and hooks
+  const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Fetch devices from the server
+  const fetchGateways = async () => {
+    try {
+      const response = await axiosPrivate.get("/gateways");
+      setGateways(response.data.gateways);
+      setIsLoading(false);
+      setSerialNumber(1);
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+      navigate("/login", { state: location, replace: true });
+    }
+  };
 
   useEffect(() => {
-    getUsersData();
+    fetchGateways();
   }, []);
 
-  const getUsersData = () => {
-    axios
-      .get("/api/users")
-      .then((res) => {
-        setUsersData(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  const handleRegisterGateway = () => {
+    setIsGatewayDetailsOpen(true);
   };
 
-  const handleAddUserClick = () => {
-    setIsUserDetailsOpen(true);
-  };
-
-  const handleCloseUserDetails = () => {
-    setIsUserDetailsOpen(false);
+  const handleCloseGatewayDetails = () => {
+    setIsGatewayDetailsOpen(false);
   };
 
   return (
@@ -38,16 +52,21 @@ export default function Gateways() {
         <Button
           variant="outlined"
           startIcon={<AddCircleRoundedIcon />}
-          onClick={handleAddUserClick}
+          onClick={handleRegisterGateway}
         >
-          Add Gateway
+          Register Gateway
         </Button>
       </div>
-      <GatewaysTable usersData={usersData} getUsersData={getUsersData} />
-      {isUserDetailsOpen && (
+      <GatewaysTable
+        gateways={gateways}
+        fetchGateways={fetchGateways}
+        isLoading={isLoading}
+        serialNumber={serialNumber}
+      />
+      {isGatewayDetailsOpen && (
         <AddNewGatewayModal
-          handleCloseUserDetails={handleCloseUserDetails}
-          getUsersData={getUsersData}
+          handleCloseGatewayDetails={handleCloseGatewayDetails}
+          fetchGateways={fetchGateways}
         />
       )}
     </>
