@@ -1,15 +1,25 @@
 import useMap from "@/hooks/useMap";
 
-export default function GatewayIndicator({ key, coord }) {
+export default function GatewayIndicator({
+  index,
+  data,
+  removeGatewayFromMap,
+}) {
   const { scale } = useMap();
+  const handleDoubleClick = () => {
+    // Remove gateway indicator and send POST request
+    removeGatewayFromMap(data.gatewayId);
+  };
 
   return (
     <div
-      key={key}
+      onClick={() => console.log(data)}
+      onDoubleClick={handleDoubleClick}
+      key={index}
       style={{
         position: "absolute",
-        left: `${coord.x}px`,
-        top: `${coord.y}px`,
+        left: `${data.x}px`,
+        top: `${data.y}px`,
         width: "20px", // Increased the size for a larger, more popping circle
         height: "20px", // Increased the size for a larger, more popping circle
         borderRadius: "20%",

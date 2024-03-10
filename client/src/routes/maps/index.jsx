@@ -59,6 +59,7 @@ export default function Maps() {
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
+                {addingGateways || addingRepeaters ? resetTransform(1) : null}
                 <div
                   style={{
                     position: "absolute",
