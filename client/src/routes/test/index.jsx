@@ -17,7 +17,7 @@ export default function Test() {
   useEffect(() => {
     const imageToLoad = new window.Image();
     imageToLoad.src = `${mapName}.jpg`;
-    imageToLoad.width = window.innerWidth - 750;
+    imageToLoad.width = window.innerWidth - 350;
     imageToLoad.height = window.innerHeight - 120;
 
     imageToLoad.onload = () => {

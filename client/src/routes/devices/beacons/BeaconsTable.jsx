@@ -169,23 +169,23 @@ export default function BeaconsTable({
                           )}
                         </TableCell>
                         <TableCell align="center">
-                          <div className="flex justify-center">
-                            <IconButton
+                          {/* <div className="flex justify-center"> */}
+                          {/* <IconButton
                               aria-label="edit"
                               sx={{ color: "orange" }}
                               onClick={() => handleEditUser(row)}
                             >
                               <EditIcon />
-                            </IconButton>
+                            </IconButton> */}
 
-                            <IconButton
-                              aria-label="delete"
-                              sx={{ color: "red" }}
-                              onClick={() => handleDeleteUser(row)}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </div>
+                          <IconButton
+                            aria-label="delete"
+                            sx={{ color: "red" }}
+                            onClick={() => handleDeleteUser(row)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          {/* </div> */}
                         </TableCell>
                       </TableRow>
                     );

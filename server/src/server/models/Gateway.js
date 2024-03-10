@@ -9,6 +9,9 @@ const gatewaySchema = new mongoose.Schema(
       min: 201,
       max: 250,
     },
+    coords: {
+      type: [Number], // Array of two numbers [x, y]
+    },
     beacons: [
       {
         type: mongoose.Schema.Types.ObjectId,

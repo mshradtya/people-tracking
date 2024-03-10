@@ -15,24 +15,43 @@ export default function PathTracking() {
   const indicatorsData = [{ position: { x: 135, y: 100 }, color: "green" }];
 
   useEffect(() => {
+    const calculateCanvasMeasures = () => {
+      const maxWidth = window.innerWidth - 550;
+      const maxHeight = window.innerHeight - 120;
+      const aspectRatio = maxWidth / maxHeight;
+
+      let width, height;
+
+      if (aspectRatio > 1) {
+        // Landscape mode
+        width = maxHeight * aspectRatio;
+        height = maxHeight;
+      } else {
+        // Portrait mode
+        width = maxWidth;
+        height = maxWidth / aspectRatio;
+      }
+
+      return { width, height };
+    };
+
+    const { width, height } = calculateCanvasMeasures();
+    setCanvasMeasures({ width, height });
+
     const imageToLoad = new window.Image();
     imageToLoad.src = `${mapName}.jpg`;
-    imageToLoad.width = window.innerWidth - 750;
-    imageToLoad.height = window.innerHeight - 120;
+    imageToLoad.width = width;
+    imageToLoad.height = height;
 
     imageToLoad.onload = () => {
       setImage(imageToLoad);
-      setCanvasMeasures({
-        width: imageToLoad.width,
-        height: imageToLoad.height,
-      });
     };
 
     return () => {
       // Clean up
       imageToLoad.onload = null;
     };
-  }, [mapName]);
+  }, [mapName, canvasMeasures]);
 
   return (
     <div

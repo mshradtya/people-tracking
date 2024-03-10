@@ -26,6 +26,7 @@ const registerGateway = async (req, res) => {
     const { gwid } = req.body;
     const gatewayData = {
       gwid,
+      coords: [],
       beacons: null,
     };
     const gateway = await gatewayService.registerGateway(gatewayData);
