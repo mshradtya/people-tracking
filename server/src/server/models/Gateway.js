@@ -9,10 +9,12 @@ const gatewaySchema = new mongoose.Schema(
       min: 201,
       max: 250,
     },
-    beacons: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Beacon",
-    },
+    beacons: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Beacon",
+      },
+    ],
   },
   { versionKey: false }
 );

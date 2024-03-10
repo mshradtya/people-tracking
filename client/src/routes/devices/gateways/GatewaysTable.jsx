@@ -16,6 +16,7 @@ import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDelet
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function GatewaysTable({
   gateways,
@@ -145,13 +146,25 @@ export default function GatewaysTable({
                               <EditIcon />
                             </IconButton> */}
 
-                            <IconButton
-                              aria-label="delete"
-                              sx={{ color: "red" }}
-                              onClick={() => handleDeleteGateway(row)}
+                            <Tooltip
+                              title={
+                                row.beacons.length
+                                  ? "Cannot delete gateway with beacons assigned"
+                                  : ""
+                              }
+                              arrow
                             >
-                              <DeleteIcon />
-                            </IconButton>
+                              <span>
+                                <IconButton
+                                  aria-label="delete"
+                                  sx={{ color: "red" }}
+                                  onClick={() => handleDeleteGateway(row)}
+                                  disabled={row.beacons.length}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
                           </div>
                         </TableCell>
                       </TableRow>

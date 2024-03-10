@@ -3,7 +3,6 @@ import GatewaysTable from "./GatewaysTable";
 import AddNewGatewayModal from "@/components/modals/AddNewGatewayModal";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
-import useAuth from "../../../hooks/auth/useAuth";
 import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from "../../../hooks/useSnackbar";
@@ -16,7 +15,6 @@ export default function Gateways() {
   const { showSnackbar } = useSnackbar();
 
   // Context and hooks
-  const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();

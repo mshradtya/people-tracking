@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -11,30 +11,51 @@ import DialogContent from "@mui/material/DialogContent";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import axios from "axios";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
 
 const schema = yup
   .object({
-    name: yup.string().required("Please Enter Name"),
-    email: yup
-      .string()
-      .email("Email Must Be Valid")
-      .required("Please Enter Email"),
+    id: yup
+      .number()
+      .typeError("Please Enter Valid Beacon ID")
+      .required("Please Enter Valid Beacon ID"),
   })
   .required();
 
 export default function AddNewWearableModal({
-  handleCloseUserDetails,
-  getUsersData,
+  handleCloseBeaconDetails,
+  fetchBeacons,
 }) {
   const { showSnackbar } = useSnackbar();
-  const [type, setType] = useState("user");
+  const axiosPrivate = useAxiosPrivate();
+  const [gateway, setGateway] = useState(null);
+  const [selectedGwid, setSelectedGwid] = useState("");
+  const [gatewayIds, setGatewayIds] = useState([]);
   const [open, setOpen] = useState(true);
+
+  const fetchGateways = async () => {
+    try {
+      const response = await axiosPrivate.get("/gateways");
+      setGatewayIds(() => {
+        return response.data.gateways.map((gateway) => ({
+          gwid: gateway.gwid,
+          _id: gateway._id, // Assuming _id is the MongoDB ID field
+        }));
+      });
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+      navigate("/login", { state: location, replace: true });
+    }
+  };
+
+  useEffect(() => {
+    fetchGateways();
+  }, []);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseUserDetails();
+    handleCloseBeaconDetails();
   };
 
   const {
@@ -45,68 +66,71 @@ export default function AddNewWearableModal({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data, e) => {
-    Object.assign(data, { type: type });
-
-    axios
-      .post("/api/users", JSON.stringify(data))
-      .then((res) => {
-        if (res.status === 200) {
-          showSnackbar("success", "User Added Successfully");
-          e.target.reset();
-          getUsersData();
-          handleClose();
-        }
-      })
-      .catch((err) => {
-        showSnackbar("error", "Something went wrong");
+  const onSubmit = async (data, e) => {
+    try {
+      const response = await axiosPrivate.post("/beacon/register", {
+        bnid: data.id,
+        gateway: gateway._id,
       });
+
+      // Clear form errors
+      e.target.reset();
+
+      // If the response is successful, close the modal and fetch gateways
+      if (response?.data?.status === 201) {
+        handleClose();
+        fetchBeacons();
+        showSnackbar("success", "Gateway Added Successfully");
+      } else {
+        showSnackbar("error", "Something went wrong");
+      }
+    } catch (error) {
+      showSnackbar(
+        "error",
+        error?.response?.data?.message || "Something went wrong"
+      );
+    }
   };
 
   const handleChange = (event) => {
-    setType(event.target.value);
+    const selectedGateway = gatewayIds.find(
+      (item) => item.gwid === event.target.value
+    );
+    setGateway(selectedGateway);
+    setSelectedGwid(event.target.value);
   };
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>Wearable Details</DialogTitle>
+      <DialogTitle>Beacon Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1 md:grid-rows-3 gap-5 mb-4">
+          <div className="grid sm:grid-rows-1  gap-5 mb-4">
             <div>
               <TextField
                 fullWidth
-                label="Name"
+                label="Beacon ID"
                 size="small"
                 variant="outlined"
-                {...register("name")}
+                {...register("id")}
               />
-              <p className="text-orange-600 ">{errors.name?.message}</p>
-            </div>
-            <div>
-              <TextField
-                fullWidth
-                label="Email"
-                size="small"
-                variant="outlined"
-                {...register("email")}
-              />
-              <p className="text-orange-600 ">{errors.email?.message}</p>
+              <p className="text-orange-600 ">{errors.id?.message}</p>
             </div>
             <div>
               <FormControl fullWidth>
-                <InputLabel>Role</InputLabel>
+                <InputLabel>Gateway ID</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={type}
-                  label="Role"
+                  value={selectedGwid}
+                  label="ID"
                   size="small"
                   onChange={handleChange}
                 >
-                  <MenuItem value="user">User</MenuItem>
-                  <MenuItem value="mod">Moderator</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
+                  {gatewayIds &&
+                    gatewayIds.map((gateway) => (
+                      <MenuItem key={gateway.gwid} value={gateway.gwid}>
+                        {gateway.gwid}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </div>

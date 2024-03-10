@@ -1,4 +1,5 @@
 const Gateway = require("../models/Gateway");
+const Beacon = require("../models/Beacon");
 
 const registerGateway = async (gatewayData) => {
   const gateway = new Gateway(gatewayData);
@@ -8,8 +9,16 @@ const registerGateway = async (gatewayData) => {
 
 const readAllGateways = async () => {
   const allGateways = await Gateway.find({});
-  // .populate("owner", "username")
-  // .populate("department");
+
+  // Populate the "beacons" field for each gateway
+  await Promise.all(
+    allGateways.map(async (gateway) => {
+      gateway.beacons = await Beacon.find({ gateway: gateway._id }).select(
+        "-gateway -sos -battery"
+      );
+    })
+  );
+
   return allGateways;
 };
 

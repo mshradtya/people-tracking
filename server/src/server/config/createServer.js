@@ -3,6 +3,7 @@ var cors = require("cors");
 const users = require("../routes/usersRoute");
 const devices = require("../routes/devicesRoute");
 const gateways = require("../routes/gatewayRoute");
+const beacons = require("../routes/beaconRoute");
 const departments = require("../routes/departmentsRoute");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -37,6 +38,7 @@ function createServer() {
   app.use(`${API}`, devices);
   app.use(`${API}`, departments);
   app.use(`${API}`, gateways);
+  app.use(`${API}`, beacons);
   return app;
 }
 

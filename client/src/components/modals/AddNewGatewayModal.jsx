@@ -13,7 +13,10 @@ import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
 
 const schema = yup
   .object({
-    id: yup.number().required("Please Enter Gateway ID"),
+    id: yup
+      .number()
+      .typeError("Please Enter Valid Gateway ID")
+      .required("Please Enter Valid Gateway ID"),
   })
   .required();
 
@@ -51,7 +54,7 @@ export default function AddNewGatewayModal({
       if (response?.data?.status === 201) {
         handleClose();
         fetchGateways();
-        showSnackbar("success", "User Added Successfully");
+        showSnackbar("success", "Gateway Added Successfully");
       } else {
         showSnackbar("error", "Something went wrong");
       }

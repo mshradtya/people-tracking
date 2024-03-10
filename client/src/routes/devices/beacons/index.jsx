@@ -3,33 +3,49 @@ import AddNewWearableModal from "@/components/modals/AddNewWearableModal";
 import BeaconsTable from "./BeaconsTable";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
-import axios from "axios";
+import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSnackbar } from "../../../hooks/useSnackbar";
 
 export default function Beacons() {
-  const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
-  const [usersData, setUsersData] = useState([]);
+  const [isBeaconDetailsOpen, setIsBeaconDetailsOpen] = useState(false);
+  const [beacons, setBeacons] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [serialNumber, setSerialNumber] = useState(1);
+  const { showSnackbar } = useSnackbar();
+
+  // Context and hooks
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    getUsersData();
+    const fetchBeaconsInterval = setInterval(fetchBeacons, 500);
+
+    return () => {
+      clearInterval(fetchBeaconsInterval);
+    };
   }, []);
 
-  const getUsersData = () => {
-    axios
-      .get("/api/users")
-      .then((res) => {
-        setUsersData(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  // Fetch devices from the server
+  const fetchBeacons = async () => {
+    try {
+      const response = await axiosPrivate.get("/beacons");
+      setBeacons(response.data.beacons);
+      setIsLoading(false);
+      setSerialNumber(1);
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+      navigate("/login", { state: location, replace: true });
+    }
   };
 
-  const handleAddUserClick = () => {
-    setIsUserDetailsOpen(true);
+  const handleRegisterBeacon = () => {
+    setIsBeaconDetailsOpen(true);
   };
 
-  const handleCloseUserDetails = () => {
-    setIsUserDetailsOpen(false);
+  const handleCloseBeaconDetails = () => {
+    setIsBeaconDetailsOpen(false);
   };
 
   return (
@@ -38,16 +54,21 @@ export default function Beacons() {
         <Button
           variant="outlined"
           startIcon={<AddCircleRoundedIcon />}
-          onClick={handleAddUserClick}
+          onClick={handleRegisterBeacon}
         >
           Register Beacon
         </Button>
       </div>
-      <BeaconsTable usersData={usersData} getUsersData={getUsersData} />
-      {isUserDetailsOpen && (
+      <BeaconsTable
+        beacons={beacons}
+        fetchBeacons={fetchBeacons}
+        isLoading={isLoading}
+        serialNumber={serialNumber}
+      />
+      {isBeaconDetailsOpen && (
         <AddNewWearableModal
-          handleCloseUserDetails={handleCloseUserDetails}
-          getUsersData={getUsersData}
+          handleCloseBeaconDetails={handleCloseBeaconDetails}
+          fetchBeacons={fetchBeacons}
         />
       )}
     </>
