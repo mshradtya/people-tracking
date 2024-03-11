@@ -39,8 +39,8 @@ export default function SelectMapName() {
             }}
           >
             <MenuItem value={"map1"}>Layout 1</MenuItem>
-            <MenuItem value={"map2"}>Layout 2</MenuItem>
-            <MenuItem value={"map3"}>Layout 3</MenuItem>
+            {/* <MenuItem value={"map2"}>Layout 2</MenuItem>
+            <MenuItem value={"map3"}>Layout 3</MenuItem> */}
           </Select>
         </FormControl>
       </Box>

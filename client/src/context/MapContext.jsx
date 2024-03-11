@@ -5,9 +5,10 @@ const MapContext = createContext({});
 export const MapProvider = ({ children }) => {
   const [scale, setScale] = useState(1);
   const [mapName, setMapName] = useState("map1");
-  const [mapView, setMapView] = useState("geofencing");
+  const [mapView, setMapView] = useState("sos-alert");
   const [addingRepeaters, setAddingRepeaters] = useState(false);
   const [addingGateways, setAddingGateways] = useState(false);
+  const [addingROI, setAddingROI] = useState(false);
 
   return (
     <MapContext.Provider
@@ -22,6 +23,8 @@ export const MapProvider = ({ children }) => {
         setAddingRepeaters,
         addingGateways,
         setAddingGateways,
+        addingROI,
+        setAddingROI,
       }}
     >
       {children}

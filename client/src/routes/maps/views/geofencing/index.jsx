@@ -4,6 +4,7 @@ import { Stage, Layer, Image, Line } from "react-konva";
 import GatewayIndicator from "./GatewayIndicator";
 import useAxiosPrivate from "../../../../hooks/auth/useAxiosPrivate";
 import { useSnackbar } from "../../../../hooks/useSnackbar";
+import ROIModal from "./ROIModal";
 
 import GatewayModal from "./GatewayModal";
 
@@ -23,8 +24,9 @@ function calculateCanvasMeasures() {
   }
   return { width, height };
 }
+
 function GeoFencing() {
-  const { mapName, addingGateways } = useMap();
+  const { mapName, addingGateways, addingROI, setAddingROI } = useMap();
   const { showSnackbar } = useSnackbar();
   const [image, setImage] = useState(null);
   const [allGateways, setAllGateways] = useState([]);
@@ -36,7 +38,13 @@ function GeoFencing() {
   const [clickedGatewayCoordinates, setClickedGatewayCoordinates] = useState(
     []
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedGatewayId, setSelectedGatewayId] = useState(null);
+  const [clickedPoint, setClickedPoint] = useState(null);
   const [gatewaysWithSOS, setGatewaysWithSOS] = useState([]);
+  const [roiCoordinatesPerGateway, setRoiCoordinatesPerGateway] = useState({});
+  const [selectedGatewayIdForROI, setSelectedGatewayIdForROI] = useState(null);
+  const [isROIModalOpen, setIsROIModalOpen] = useState(false);
 
   const fetchGateways = async () => {
     try {
@@ -44,7 +52,6 @@ function GeoFencing() {
       setAllGateways(response.data.gateways);
     } catch (error) {
       showSnackbar("error", error.response.data.message);
-      // navigate("/login", { state: location, replace: true });
     }
   };
 
@@ -60,7 +67,6 @@ function GeoFencing() {
     };
   }, []);
 
-  // Fetch devices from the server
   const fetchGatewaysWithSOS = async () => {
     try {
       const response = await axiosPrivate.get("/gateway/sos");
@@ -83,14 +89,9 @@ function GeoFencing() {
     };
 
     return () => {
-      // Clean up
       imageToLoad.onload = null;
     };
   }, [mapName, window.innerWidth, window.innerHeight]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedGatewayId, setSelectedGatewayId] = useState(null);
-  const [clickedPoint, setClickedPoint] = useState(null);
 
   const openModal = (point) => {
     setClickedPoint(point);
@@ -109,7 +110,6 @@ function GeoFencing() {
   const handleModalSubmit = async () => {
     if (selectedGatewayId && clickedPoint) {
       try {
-        // Send a POST request to update gateway coordinates
         await axiosPrivate.post("/gateway/update/coords", {
           gwid: selectedGatewayId,
           coords: {
@@ -118,7 +118,6 @@ function GeoFencing() {
           },
         });
 
-        // Add the selected gateway indicator on the map
         setClickedGatewayCoordinates((prevCoordinates) => [
           ...prevCoordinates,
           {
@@ -147,9 +146,48 @@ function GeoFencing() {
     openModal({ x, y });
   };
 
+  const openROIModal = () => {
+    setIsROIModalOpen(true);
+  };
+
+  const closeROIModal = () => {
+    setIsROIModalOpen(false);
+  };
+
+  const handleROIModalSubmit = (gatewayId) => {
+    setSelectedGatewayIdForROI(gatewayId);
+    closeROIModal();
+  };
+
+  const handleAddROIClick = (event) => {
+    if (!selectedGatewayIdForROI) {
+      openROIModal();
+      return;
+    }
+
+    const container = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - container.left).toFixed(2);
+    const y = (event.clientY - container.top).toFixed(2);
+
+    setRoiCoordinatesPerGateway((prevCoordinates) => ({
+      ...prevCoordinates,
+      [selectedGatewayIdForROI]: [
+        ...(prevCoordinates[selectedGatewayIdForROI] || []),
+        { x, y },
+      ],
+    }));
+
+    if (
+      roiCoordinatesPerGateway[selectedGatewayIdForROI]?.length === 3 ||
+      (prevCoordinates[selectedGatewayIdForROI] || []).length === 3
+    ) {
+      setAddingROI(false);
+      setSelectedGatewayIdForROI(null);
+    }
+  };
+
   const removeGatewayFromMap = async (gatewayId) => {
     try {
-      // Send a POST request to update gateway coordinates to null
       await axiosPrivate.post("/gateway/update/coords", {
         gwid: gatewayId,
         coords: {
@@ -158,7 +196,6 @@ function GeoFencing() {
         },
       });
 
-      // Remove the gateway indicator from the map
       setAllGateways((prevGateways) =>
         prevGateways.filter((gateway) => gateway.gwid !== gatewayId)
       );
@@ -177,7 +214,13 @@ function GeoFencing() {
   return (
     <div>
       <div
-        onClick={addingGateways ? handleAddGateways : () => {}}
+        onClick={
+          addingGateways
+            ? handleAddGateways
+            : addingROI
+            ? handleAddROIClick
+            : () => {}
+        }
         style={{
           position: "relative",
           display: "flex",
@@ -196,12 +239,18 @@ function GeoFencing() {
           <Stage width={canvasMeasures.width} height={canvasMeasures.height}>
             <Layer>
               <Image image={image} />
-              {/* Dummy path */}
-              {/* <Line
-                points={[150, 120, 150, 460, 400, 460, 400, 200, 600, 200]}
-                stroke="green"
-                strokeWidth={4}
-              /> */}
+              {Object.entries(roiCoordinatesPerGateway).map(
+                ([gatewayId, coordinates]) =>
+                  coordinates.length > 0 && (
+                    <Line
+                      key={gatewayId}
+                      points={coordinates.flatMap(({ x, y }) => [x, y])}
+                      stroke="green"
+                      strokeWidth={3}
+                      closed
+                    />
+                  )
+              )}
             </Layer>
           </Stage>
           {allGateways.map(
@@ -237,6 +286,13 @@ function GeoFencing() {
           onGatewaySelect={handleGatewaySelect}
           onSubmit={handleModalSubmit}
           onClose={closeModal}
+        />
+      )}
+      {isROIModalOpen && (
+        <ROIModal
+          allGateways={allGateways}
+          onSubmit={handleROIModalSubmit}
+          onClose={closeROIModal}
         />
       )}
     </div>

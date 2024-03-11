@@ -17,6 +17,14 @@ const gatewaySchema = new mongoose.Schema(
         type: Number,
       },
     },
+    roiCoords: [
+      [
+        {
+          x: { type: Number },
+          y: { type: Number },
+        },
+      ],
+    ],
     sos: {
       type: String,
       enum: ["H", "L"],

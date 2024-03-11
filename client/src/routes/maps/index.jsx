@@ -23,7 +23,7 @@ export default function Maps() {
     "live-tracking": <LiveTracking />,
     "path-tracking": <PathTracking />,
     heatmap: <Heatmap />,
-    geofencing: <GeoFencing />,
+    "sos-alert": <GeoFencing />,
   };
 
   function handleScaleChange(event) {
