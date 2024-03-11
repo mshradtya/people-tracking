@@ -6,15 +6,14 @@ export default function GatewayIndicator({
   removeGatewayFromMap,
 }) {
   const { scale } = useMap();
-  const handleDoubleClick = () => {
-    // Remove gateway indicator and send POST request
+  const handleDoubleClick = (event) => {
+    event.preventDefault();
     removeGatewayFromMap(data.gatewayId);
   };
 
   return (
     <div
-      onClick={() => console.log(data)}
-      onDoubleClick={handleDoubleClick}
+      onContextMenu={handleDoubleClick}
       key={index}
       style={{
         position: "absolute",

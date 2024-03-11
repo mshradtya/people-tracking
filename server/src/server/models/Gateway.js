@@ -17,6 +17,11 @@ const gatewaySchema = new mongoose.Schema(
         type: Number,
       },
     },
+    sos: {
+      type: String,
+      enum: ["H", "L"],
+      required: true,
+    },
     beacons: [
       {
         type: mongoose.Schema.Types.ObjectId,

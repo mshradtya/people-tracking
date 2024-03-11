@@ -1,4 +1,5 @@
 const Beacon = require("../models/Beacon");
+const Gateway = require("../models/Gateway");
 
 const registerBeacon = async (beaconData) => {
   const beacon = new Beacon(beaconData);
@@ -11,12 +12,18 @@ const readAllBeacons = async () => {
   return allBeacons;
 };
 
-const updateBeacon = async (BNID, SOS, BATTERY) => {
+const updateBeacon = async (GWID, BNID, SOS, BATTERY) => {
   const updatedBeacon = await Beacon.findOneAndUpdate(
     { bnid: BNID },
     { sos: SOS, battery: BATTERY },
     { new: true, runValidators: true }
   );
+
+  const updatedGateway = await Gateway.findOneAndUpdate(
+    { gwid: GWID },
+    { sos: SOS }
+  );
+
   return updatedBeacon;
 };
 

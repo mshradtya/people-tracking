@@ -74,10 +74,10 @@ const readAllBeacons = async (req, res) => {
 };
 
 const updateBeacon = async (req, res) => {
-  const { BNID, SOS, BATTERY } = req.query;
+  const { GWID, BNID, SOS, BATTERY } = req.query;
 
   try {
-    const beacon = await beaconService.updateBeacon(BNID, SOS, BATTERY);
+    const beacon = await beaconService.updateBeacon(GWID, BNID, SOS, BATTERY);
     if (!beacon) {
       return res.status(201).json({
         status: 201,
