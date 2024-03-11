@@ -43,6 +43,12 @@ const updateGatewayCoords = async (gwid, coords) => {
   return updatedGateway;
 };
 
+const gatewaySosStatus = async () => {
+  const gatewaysWithSos = await Gateway.find({ sos: "H" }, "gwid");
+  const gwidList = gatewaysWithSos.map((gateway) => gateway.gwid);
+  return gwidList;
+};
+
 const deleteGateway = async (gwid) => {
   const { deletedCount } = await Gateway.deleteOne({
     gwid,
@@ -54,5 +60,6 @@ module.exports = {
   registerGateway,
   readAllGateways,
   updateGatewayCoords,
+  gatewaySosStatus,
   deleteGateway,
 };

@@ -36,6 +36,7 @@ function GeoFencing() {
   const [clickedGatewayCoordinates, setClickedGatewayCoordinates] = useState(
     []
   );
+  const [gatewaysWithSOS, setGatewaysWithSOS] = useState([]);
 
   const fetchGateways = async () => {
     try {
@@ -50,6 +51,24 @@ function GeoFencing() {
   useEffect(() => {
     fetchGateways();
   }, []);
+
+  useEffect(() => {
+    const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 500);
+
+    return () => {
+      clearInterval(fetchGatewaysWithSOSInterval);
+    };
+  }, []);
+
+  // Fetch devices from the server
+  const fetchGatewaysWithSOS = async () => {
+    try {
+      const response = await axiosPrivate.get("/gateway/sos");
+      setGatewaysWithSOS(response.data.gateways);
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+    }
+  };
 
   useEffect(() => {
     const { width, height } = calculateCanvasMeasures();
@@ -196,6 +215,7 @@ function GeoFencing() {
                     gatewayId: gateway.gwid,
                   }}
                   removeGatewayFromMap={removeGatewayFromMap}
+                  gatewaysWithSOS={gatewaysWithSOS}
                 />
               )
           )}
@@ -205,6 +225,7 @@ function GeoFencing() {
               index={index}
               data={data}
               removeGatewayFromMap={removeGatewayFromMap}
+              gatewaysWithSOS={gatewaysWithSOS}
             />
           ))}
         </div>

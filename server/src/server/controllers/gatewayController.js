@@ -100,6 +100,30 @@ const updateGatewayCoords = async (req, res) => {
   }
 };
 
+const gatewaySosStatus = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: "You must have SuperAdmin privilege to perform this operation",
+    });
+  }
+
+  try {
+    const sosGateways = await gatewayService.gatewaySosStatus();
+    return res.status(200).json({
+      status: 200,
+      success: true,
+      gateways: sosGateways,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 500, success: false, message: error.message });
+  }
+};
+
 const deleteGateway = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
@@ -136,5 +160,6 @@ module.exports = {
   registerGateway,
   readAllGateways,
   updateGatewayCoords,
+  gatewaySosStatus,
   deleteGateway,
 };
