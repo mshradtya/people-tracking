@@ -43,6 +43,21 @@ const updateGatewayCoords = async (gwid, coords) => {
   return updatedGateway;
 };
 
+const updateGatewayRoiCoords = async (gwid, roiCoords) => {
+  const filter = { gwid };
+  const update = { roiCoords };
+  const options = { new: true };
+
+  // Perform the update
+  const updatedGateway = await Gateway.findOneAndUpdate(
+    filter,
+    update,
+    options
+  );
+
+  return updatedGateway;
+};
+
 const gatewaySosStatus = async () => {
   const gatewaysWithSos = await Gateway.find({ sos: "H" }, "gwid");
   const gwidList = gatewaysWithSos.map((gateway) => gateway.gwid);
@@ -60,6 +75,7 @@ module.exports = {
   registerGateway,
   readAllGateways,
   updateGatewayCoords,
+  updateGatewayRoiCoords,
   gatewaySosStatus,
   deleteGateway,
 };

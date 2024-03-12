@@ -14,10 +14,10 @@ import {
 const ROIModal = ({ allGateways, onSubmit, onClose }) => {
   // Filter gatewayIds based on the condition
   const filteredGateways = allGateways.filter(
-    (gateway) => gateway.coords.x === null && gateway.coords.y === null
+    (gateway) => gateway.roiCoords.length === 0
   );
 
-  const [selectedGatewayId, setSelectedGatewayId] = React.useState("");
+  const [selectedGatewayId, setSelectedGatewayId] = React.useState(null);
 
   const handleGatewaySelect = (event) => {
     setSelectedGatewayId(event.target.value);

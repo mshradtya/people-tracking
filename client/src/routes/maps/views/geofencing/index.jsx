@@ -50,6 +50,14 @@ function GeoFencing() {
     try {
       const response = await axiosPrivate.get("/gateways");
       setAllGateways(response.data.gateways);
+      response.data.gateways.map((gateway) => {
+        setRoiCoordinatesPerGateway((prev) => {
+          return {
+            ...prev,
+            [gateway.gwid]: gateway.roiCoords,
+          };
+        });
+      });
     } catch (error) {
       showSnackbar("error", error.response.data.message);
     }
@@ -71,6 +79,7 @@ function GeoFencing() {
     try {
       const response = await axiosPrivate.get("/gateway/sos");
       setGatewaysWithSOS(response.data.gateways);
+      // console.log(response.data.gateways);
     } catch (error) {
       showSnackbar("error", error.response.data.message);
     }
@@ -166,23 +175,38 @@ function GeoFencing() {
     }
 
     const container = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - container.left).toFixed(2);
-    const y = (event.clientY - container.top).toFixed(2);
+    const x = +(event.clientX - container.left).toFixed(2);
+    const y = +(event.clientY - container.top).toFixed(2);
 
-    setRoiCoordinatesPerGateway((prevCoordinates) => ({
-      ...prevCoordinates,
-      [selectedGatewayIdForROI]: [
-        ...(prevCoordinates[selectedGatewayIdForROI] || []),
-        { x, y },
-      ],
-    }));
+    setRoiCoordinatesPerGateway((prevCoordinates) => {
+      const gatewayCoordinates = prevCoordinates[selectedGatewayIdForROI] || [];
 
-    if (
-      roiCoordinatesPerGateway[selectedGatewayIdForROI]?.length === 3 ||
-      (prevCoordinates[selectedGatewayIdForROI] || []).length === 3
-    ) {
-      setAddingROI(false);
+      return {
+        ...prevCoordinates,
+        [selectedGatewayIdForROI]: [...gatewayCoordinates, x, y],
+      };
+    });
+  };
+
+  useEffect(() => {
+    if (roiCoordinatesPerGateway[selectedGatewayIdForROI]?.length === 8) {
+      // setAddingROI(false);
+      updateROICoordinates(selectedGatewayIdForROI);
       setSelectedGatewayIdForROI(null);
+      fetchGateways();
+    }
+  }, [roiCoordinatesPerGateway]);
+
+  const updateROICoordinates = async (gatewayId) => {
+    try {
+      await axiosPrivate.post("/gateway/update/roiCoords", {
+        gwid: gatewayId,
+        roiCoords: roiCoordinatesPerGateway[gatewayId],
+      });
+      showSnackbar("success", "ROI added successfully");
+    } catch (error) {
+      showSnackbar("error", "Failed to update ROI coordinates");
+      console.error("Error updating ROI coordinates:", error);
     }
   };
 
@@ -210,6 +234,18 @@ function GeoFencing() {
       console.error("Error updating gateway coordinates:", error);
     }
   };
+
+  const [blink, setBlink] = useState(true);
+
+  useEffect(() => {
+    // Set up an interval to toggle the blinking effect
+    const intervalId = setInterval(() => {
+      setBlink((prevBlink) => !prevBlink);
+    }, 500); // Change the interval duration (in milliseconds) as needed
+
+    // Clean up the interval when the component is unmounted
+    return () => clearInterval(intervalId);
+  }, []); // Empty
 
   return (
     <div>
@@ -240,16 +276,22 @@ function GeoFencing() {
             <Layer>
               <Image image={image} />
               {Object.entries(roiCoordinatesPerGateway).map(
-                ([gatewayId, coordinates]) =>
-                  coordinates.length > 0 && (
-                    <Line
-                      key={gatewayId}
-                      points={coordinates.flatMap(({ x, y }) => [x, y])}
-                      stroke="green"
-                      strokeWidth={3}
-                      closed
-                    />
-                  )
+                ([gatewayId, coordinates]) => {
+                  const sosActive = gatewaysWithSOS.includes(Number(gatewayId));
+                  if (coordinates.length > 0) {
+                    return (
+                      <Line
+                        key={gatewayId}
+                        points={coordinates}
+                        stroke={sosActive ? "red" : "green"}
+                        strokeWidth={3}
+                        fill={sosActive ? (blink ? "red" : "") : ""}
+                        opacity={sosActive ? 0.6 : 1}
+                        closed
+                      />
+                    );
+                  }
+                }
               )}
             </Layer>
           </Stage>

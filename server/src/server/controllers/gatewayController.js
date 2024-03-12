@@ -27,6 +27,7 @@ const registerGateway = async (req, res) => {
     const gatewayData = {
       gwid,
       coords: { x: null, y: null },
+      roiCoords: [],
       sos: "L",
       beacons: null,
     };
@@ -100,6 +101,45 @@ const updateGatewayCoords = async (req, res) => {
   }
 };
 
+const updateGatewayRoiCoords = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: "You must have SuperAdmin privilege to perform this operation",
+    });
+  }
+
+  // Validate request body
+  if (
+    Object.keys(req.body).length !== 2 ||
+    !Object.keys(req.body).includes("gwid") ||
+    !Object.keys(req.body).includes("roiCoords")
+  ) {
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "gateway id and roi coords is required",
+    });
+  }
+
+  try {
+    const { gwid, roiCoords } = req.body;
+    const updatedGateway = await gatewayService.updateGatewayRoiCoords(
+      gwid,
+      roiCoords
+    );
+    return res
+      .status(200)
+      .json({ status: 200, success: true, gateways: updatedGateway });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const gatewaySosStatus = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
@@ -160,6 +200,7 @@ module.exports = {
   registerGateway,
   readAllGateways,
   updateGatewayCoords,
+  updateGatewayRoiCoords,
   gatewaySosStatus,
   deleteGateway,
 };
