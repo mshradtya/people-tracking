@@ -13,32 +13,22 @@ const registerBeacon = async (req, res) => {
 
   // Validate request body
   if (
-    Object.keys(req.body).length !== 2 ||
-    !Object.keys(req.body).includes("bnid") ||
-    !Object.keys(req.body).includes("gateway")
+    Object.keys(req.body).length !== 1 ||
+    !Object.keys(req.body).includes("bnid")
   ) {
     return res.status(400).json({
       status: 400,
       success: false,
-      message: "beacon and gateway id is required",
+      message: "beacon id is required",
     });
   }
 
   try {
-    const { bnid, gateway } = req.body;
-
-    // Check if the provided gateway is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(gateway)) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "Invalid gateway ObjectId",
-      });
-    }
+    const { bnid } = req.body;
 
     const beaconData = {
       bnid,
-      gateway,
+      gwid: null,
       sos: "L",
       battery: 10,
     };
@@ -74,10 +64,16 @@ const readAllBeacons = async (req, res) => {
 };
 
 const updateBeacon = async (req, res) => {
-  const { GWID, BNID, SOS, BATTERY } = req.query;
+  const { GWID, CPID, BNID, SOS, BATTERY } = req.query;
 
   try {
-    const beacon = await beaconService.updateBeacon(GWID, BNID, SOS, BATTERY);
+    const beacon = await beaconService.updateBeacon(
+      GWID,
+      CPID,
+      BNID,
+      SOS,
+      BATTERY
+    );
     if (!beacon) {
       return res.status(201).json({
         status: 201,

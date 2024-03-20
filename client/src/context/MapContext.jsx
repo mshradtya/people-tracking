@@ -8,7 +8,9 @@ export const MapProvider = ({ children }) => {
   const [mapView, setMapView] = useState("sos-alert");
   const [addingRepeaters, setAddingRepeaters] = useState(false);
   const [addingGateways, setAddingGateways] = useState(false);
+  const [addingConnectPoint, setAddingConnectPoint] = useState(false);
   const [addingROI, setAddingROI] = useState(false);
+  const [addingConnectPointROI, setAddingConnectPointROI] = useState(false);
 
   return (
     <MapContext.Provider
@@ -23,8 +25,12 @@ export const MapProvider = ({ children }) => {
         setAddingRepeaters,
         addingGateways,
         setAddingGateways,
+        addingConnectPoint,
+        setAddingConnectPoint,
         addingROI,
         setAddingROI,
+        addingConnectPointROI,
+        setAddingConnectPointROI,
       }}
     >
       {children}

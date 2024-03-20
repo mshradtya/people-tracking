@@ -9,27 +9,27 @@ const registerGateway = async (req, res) => {
       message: "You must have SuperAdmin privilege to perform this operation",
     });
   }
-
   // Validate request body
   if (
-    Object.keys(req.body).length !== 1 ||
-    !Object.keys(req.body).includes("gwid")
+    Object.keys(req.body).length !== 2 ||
+    !Object.keys(req.body).includes("gwid") ||
+    !Object.keys(req.body).includes("location")
   ) {
     return res.status(400).json({
       status: 400,
       success: false,
-      message: "gateway id is required",
+      message: "gateway id and location is required",
     });
   }
 
   try {
-    const { gwid } = req.body;
+    const { gwid, location } = req.body;
     const gatewayData = {
       gwid,
+      location,
       coords: { x: null, y: null },
       roiCoords: [],
       sos: "L",
-      beacons: null,
     };
     const gateway = await gatewayService.registerGateway(gatewayData);
     res.status(201).json({ status: 201, success: true, gateway });

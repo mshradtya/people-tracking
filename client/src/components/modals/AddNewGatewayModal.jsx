@@ -7,7 +7,6 @@ import DialogContent from "@mui/material/DialogContent";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import axios from "axios";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
 
@@ -17,6 +16,10 @@ const schema = yup
       .number()
       .typeError("Please Enter Valid Gateway ID")
       .required("Please Enter Valid Gateway ID"),
+    location: yup
+      .string()
+      .typeError("Location must be a string")
+      .required("Location is required"),
   })
   .required();
 
@@ -45,6 +48,7 @@ export default function AddNewGatewayModal({
     try {
       const response = await axiosPrivate.post("/gateway/register", {
         gwid: data.id,
+        location: data.location,
       });
 
       // Clear form errors
@@ -71,7 +75,7 @@ export default function AddNewGatewayModal({
       <DialogTitle>Gateway Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1 mb-4">
+          <div className="grid sm:grid-rows-1 mb-4 gap-4">
             <div>
               <TextField
                 fullWidth
@@ -81,6 +85,16 @@ export default function AddNewGatewayModal({
                 {...register("id")}
               />
               <p className="text-orange-600 ">{errors.id?.message}</p>
+            </div>
+            <div>
+              <TextField
+                fullWidth
+                label="Gateway Location"
+                size="small"
+                variant="outlined"
+                {...register("location")}
+              />
+              <p className="text-orange-600 ">{errors.location?.message}</p>
             </div>
           </div>
           <div className="flex justify-center items-center w-full mb-4">

@@ -9,6 +9,10 @@ const gatewaySchema = new mongoose.Schema(
       min: 201,
       max: 250,
     },
+    location: {
+      type: String,
+      required: true,
+    },
     coords: {
       x: {
         type: Number,
@@ -23,12 +27,6 @@ const gatewaySchema = new mongoose.Schema(
       enum: ["H", "L"],
       required: true,
     },
-    beacons: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Beacon",
-      },
-    ],
   },
   { versionKey: false }
 );

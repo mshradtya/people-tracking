@@ -108,7 +108,13 @@ export default function BeaconsTable({
                   Beacon ID
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
+                  Connect Point ID
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
                   Gateway ID
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
+                  Assigned To
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
                   SOS
@@ -137,7 +143,13 @@ export default function BeaconsTable({
                           {serialNumber + index}
                         </TableCell>
                         <TableCell align="center">{row.bnid}</TableCell>
-                        <TableCell align="center">{row.gateway.gwid}</TableCell>
+                        <TableCell align="center">
+                          {row.cpid ? row.cpid : "--"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.gwid ? row.gwid : "--"}
+                        </TableCell>
+                        <TableCell align="center">Aditya Mishra</TableCell>
                         <TableCell align="center">
                           <span
                             style={{

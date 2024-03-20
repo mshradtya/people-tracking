@@ -6,7 +6,7 @@ import Tab from "@mui/material/Tab";
 
 import Beacons from "./beacons";
 import Gateways from "./gateways";
-// import Repeaters from "./repeaters";
+import ConnectPoints from "./connect-points";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -48,7 +48,7 @@ export default function Devices() {
     <>
       <div className="flex justify-center">
         <div
-          className="bg-white w-1/5 rounded-md"
+          className="bg-white w-1/3 rounded-md"
           style={{
             boxShadow:
               "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
@@ -56,8 +56,8 @@ export default function Devices() {
         >
           <Tabs value={value} onChange={handleChange} centered>
             <Tab label="Gateways" {...a11yProps(0)} />
-            {/* <Tab label="Repeaters" {...a11yProps(1)} /> */}
-            <Tab label="Beacons" {...a11yProps(1)} />
+            <Tab label="Connect Points" {...a11yProps(1)} />
+            <Tab label="Beacons" {...a11yProps(2)} />
           </Tabs>
         </div>
       </div>
@@ -65,10 +65,10 @@ export default function Devices() {
         <CustomTabPanel value={value} index={0}>
           <Gateways />
         </CustomTabPanel>
-        {/* <CustomTabPanel value={value} index={1}>
-          <Repeaters />
-        </CustomTabPanel> */}
         <CustomTabPanel value={value} index={1}>
+          <ConnectPoints />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
           <Beacons />
         </CustomTabPanel>
       </div>

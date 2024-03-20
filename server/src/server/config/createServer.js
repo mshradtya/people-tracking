@@ -4,6 +4,7 @@ const users = require("../routes/usersRoute");
 const devices = require("../routes/devicesRoute");
 const gateways = require("../routes/gatewayRoute");
 const beacons = require("../routes/beaconRoute");
+const connectPoints = require("../routes/connectPointRoute");
 const departments = require("../routes/departmentsRoute");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -39,6 +40,7 @@ function createServer() {
   app.use(`${API}`, departments);
   app.use(`${API}`, gateways);
   app.use(`${API}`, beacons);
+  app.use(`${API}`, connectPoints);
   return app;
 }
 

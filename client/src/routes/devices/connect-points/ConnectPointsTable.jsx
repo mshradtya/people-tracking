@@ -18,9 +18,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
 import Tooltip from "@mui/material/Tooltip";
 
-export default function GatewaysTable({
-  gateways,
-  fetchGateways,
+export default function ConnectPointsTable({
+  connectPoints,
+  fetchConnectPoints,
   isLoading,
   serialNumber,
 }) {
@@ -60,8 +60,8 @@ export default function GatewaysTable({
 
       if (response && response.data && response.data.status === 200) {
         handleCloseConfirmDeleteGatewayModal();
-        fetchGateways();
-        showSnackbar("success", "Gateway deleted successfully!");
+        fetchConnectPoints();
+        showSnackbar("success", "Connect Point deleted successfully!");
       } else {
         // Handle unexpected response structure or status
         showSnackbar("error", "Unexpected response from the server.");
@@ -78,11 +78,6 @@ export default function GatewaysTable({
   const handleCloseConfirmDeleteGatewayModal = () => {
     setConfirmDeleteGatewayModalOpen(false);
     setSelectedGateway(null);
-  };
-
-  const formatDate = (dateString) => {
-    const parseDate = new Date(dateString);
-    return format(parseDate, "MMMM d, yyyy h:mm a");
   };
 
   return (
@@ -107,10 +102,10 @@ export default function GatewaysTable({
                   Serial No.
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Gateway ID
+                  Connect Point ID
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Location
+                  Gateway ID
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
                   Action
@@ -118,8 +113,8 @@ export default function GatewaysTable({
               </TableRow>
             </TableHead>
             <TableBody>
-              {gateways &&
-                gateways
+              {connectPoints &&
+                connectPoints
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     return (
@@ -127,13 +122,15 @@ export default function GatewaysTable({
                         hover
                         role="checkbox"
                         tabIndex={-1}
-                        key={row.gwid}
+                        key={row.cpid}
                       >
                         <TableCell align="center">
                           {serialNumber + index}
                         </TableCell>
-                        <TableCell align="center">{row.gwid}</TableCell>
-                        <TableCell align="center">{row.location}</TableCell>
+                        <TableCell align="center">{row.cpid}</TableCell>
+                        <TableCell align="center">
+                          {row.gwid ? row.gwid : "--"}
+                        </TableCell>
                         <TableCell align="center">
                           <div className="flex justify-center">
                             {/* <IconButton
@@ -165,7 +162,7 @@ export default function GatewaysTable({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={gateways.length}
+        count={connectPoints.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

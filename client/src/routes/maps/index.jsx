@@ -13,8 +13,15 @@ import useMap from "@/hooks/useMap";
 import GeoFencing from "./views/geofencing";
 
 export default function Maps() {
-  const { mapName, mapView, addingRepeaters, addingGateways, scale, setScale } =
-    useMap();
+  const {
+    mapName,
+    mapView,
+    addingRepeaters,
+    addingGateways,
+    addingROI,
+    scale,
+    setScale,
+  } = useMap();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -51,7 +58,9 @@ export default function Maps() {
           }}
         >
           <TransformWrapper
-            disabled={addingRepeaters || addingGateways ? true : false}
+            disabled={
+              addingRepeaters || addingGateways || addingROI ? true : false
+            }
             onTransformed={(e) => handleScaleChange(e)}
             initialScale={scale}
             minScale={1}
@@ -59,7 +68,9 @@ export default function Maps() {
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
-                {addingGateways || addingRepeaters ? resetTransform(1) : null}
+                {addingGateways || addingRepeaters || addingROI
+                  ? resetTransform(1)
+                  : null}
                 <div
                   style={{
                     position: "absolute",
@@ -92,7 +103,11 @@ export default function Maps() {
                       marginTop: "5px",
                       backgroundColor: "#fff",
                     }}
-                    disabled={addingRepeaters || addingGateways ? true : false}
+                    disabled={
+                      addingRepeaters || addingGateways || addingROI
+                        ? true
+                        : false
+                    }
                   >
                     <AddIcon />
                   </IconButton>
@@ -106,7 +121,11 @@ export default function Maps() {
                       backgroundColor: "#fff",
                       borderRadius: "8px",
                     }}
-                    disabled={addingRepeaters || addingGateways ? true : false}
+                    disabled={
+                      addingRepeaters || addingGateways || addingROI
+                        ? true
+                        : false
+                    }
                   >
                     <RemoveIcon />
                   </IconButton>

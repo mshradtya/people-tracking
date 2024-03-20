@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -14,22 +14,22 @@ const schema = yup
   .object({
     id: yup
       .number()
-      .typeError("Please Enter Valid Beacon ID")
-      .required("Please Enter Valid Beacon ID"),
+      .typeError("Please Enter Valid Connect Point ID")
+      .required("Please Enter Valid Connect Point ID"),
   })
   .required();
 
-export default function AddNewWearableModal({
-  handleCloseBeaconDetails,
-  fetchBeacons,
+export default function AddNewConnectPointModal({
+  handleCloseConnectPointDetails,
+  fetchConnectPoints,
 }) {
-  const { showSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
+  const { showSnackbar } = useSnackbar();
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseBeaconDetails();
+    handleCloseConnectPointDetails();
   };
 
   const {
@@ -42,8 +42,8 @@ export default function AddNewWearableModal({
 
   const onSubmit = async (data, e) => {
     try {
-      const response = await axiosPrivate.post("/beacon/register", {
-        bnid: data.id,
+      const response = await axiosPrivate.post("/connect-point/register", {
+        cpid: data.id,
       });
 
       // Clear form errors
@@ -52,8 +52,8 @@ export default function AddNewWearableModal({
       // If the response is successful, close the modal and fetch gateways
       if (response?.data?.status === 201) {
         handleClose();
-        fetchBeacons();
-        showSnackbar("success", "Beacon Added Successfully");
+        fetchConnectPoints();
+        showSnackbar("success", "Connect Point Added Successfully");
       } else {
         showSnackbar("error", "Something went wrong");
       }
@@ -67,14 +67,14 @@ export default function AddNewWearableModal({
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>Beacon Details</DialogTitle>
+      <DialogTitle>Connect Point Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1  gap-5 mb-4">
+          <div className="grid sm:grid-rows-1 mb-4 gap-4">
             <div>
               <TextField
                 fullWidth
-                label="Beacon ID"
+                label="Connect Point ID"
                 size="small"
                 variant="outlined"
                 {...register("id")}

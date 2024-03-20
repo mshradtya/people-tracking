@@ -9,10 +9,15 @@ const beaconSchema = new mongoose.Schema(
       min: 1,
       max: 50,
     },
-    gateway: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Gateway",
-      required: true,
+    gwid: {
+      type: Number,
+      min: 201,
+      max: 250,
+    },
+    cpid: {
+      type: Number,
+      min: 101,
+      max: 200,
     },
     sos: {
       type: String,
@@ -39,7 +44,7 @@ beaconSchema.post("save", function (error, doc, next) {
     }
   }
 
-  if (error.errors.bnid) {
+  if (error.errors && error.errors.bnid) {
     if (error.errors.bnid.kind === "required") {
       return next(new Error(`beacon id is required.`));
     }
@@ -49,7 +54,9 @@ beaconSchema.post("save", function (error, doc, next) {
     if (error.errors.bnid.kind === "min" || error.errors.bnid.kind === "max") {
       return next(
         new Error(
-          `Beacon ID must be between ${beaconSchema.obj.bnid.min} and ${beaconSchema.obj.bnid.max}.`
+          `Beacon ID must be between ${
+            beaconSchema.path("bnid").options.min
+          } and ${beaconSchema.path("bnid").options.max}.`
         )
       );
     }
