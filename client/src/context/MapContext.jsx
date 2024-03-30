@@ -9,7 +9,6 @@ export const MapProvider = ({ children }) => {
   const [addingRepeaters, setAddingRepeaters] = useState(false);
   const [addingGateways, setAddingGateways] = useState(false);
   const [addingConnectPoint, setAddingConnectPoint] = useState(false);
-  const [addingROI, setAddingROI] = useState(false);
   const [addingConnectPointROI, setAddingConnectPointROI] = useState(false);
 
   return (
@@ -27,8 +26,6 @@ export const MapProvider = ({ children }) => {
         setAddingGateways,
         addingConnectPoint,
         setAddingConnectPoint,
-        addingROI,
-        setAddingROI,
         addingConnectPointROI,
         setAddingConnectPointROI,
       }}

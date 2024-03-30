@@ -8,6 +8,7 @@ const useFetchGateways = () => {
   const [gateways, setGateways] = useState([]);
   const [isGatewaysLoading, setIsGatewaysLoading] = useState(true);
   const [gatewaysSerialNumber, setGatewaysSerialNumber] = useState(1);
+  const [gatewaysWithSOS, setGatewaysWithSOS] = useState([]);
 
   const fetchGateways = async () => {
     try {
@@ -19,11 +20,23 @@ const useFetchGateways = () => {
       showSnackbar("error", error.response.data.message);
     }
   };
+
+  const fetchGatewaysWithSOS = async () => {
+    try {
+      const response = await axiosPrivate.get("/gateway/sos");
+      setGatewaysWithSOS(response.data.gateways);
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+    }
+  };
+
   return {
     gateways,
     isGatewaysLoading,
     gatewaysSerialNumber,
     fetchGateways,
+    gatewaysWithSOS,
+    fetchGatewaysWithSOS,
   };
 };
 

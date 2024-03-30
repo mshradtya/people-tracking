@@ -1,10 +1,9 @@
 import SelectMapName from "./SelectMapName";
 import SelectMapView from "./SelectMapView";
-import AddDevice from "./AddDevice";
+import AddGateway from "./AddGateway";
 import AddConnectPoint from "./AddConnectPoint";
-import AddROI from "./AddROI";
 import AddConnectPointROI from "./AddConnectPointROI";
-import useAuth from "../../../hooks/auth/useAuth";
+import useAuth from "@/hooks/auth/useAuth";
 
 export default function MapOptions() {
   const { auth } = useAuth();
@@ -15,8 +14,7 @@ export default function MapOptions() {
       <SelectMapName />
       {isSuperAdmin && (
         <>
-          <AddDevice />
-          <AddROI />
+          <AddGateway />
           <AddConnectPoint />
           <AddConnectPointROI />
         </>

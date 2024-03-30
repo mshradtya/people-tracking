@@ -18,11 +18,6 @@ const GatewayModal = ({
   onSubmit,
   onClose,
 }) => {
-  // Filter gatewayIds based on the condition
-  const filteredGateways = allGateways.filter(
-    (gateway) => gateway.coords.x === null && gateway.coords.y === null
-  );
-
   return (
     <Dialog open={true} onClose={onClose}>
       <DialogTitle>Select Gateway ID</DialogTitle>
@@ -37,11 +32,16 @@ const GatewayModal = ({
             <MenuItem value="" disabled>
               Select Gateway ID
             </MenuItem>
-            {filteredGateways.map((gateway) => (
-              <MenuItem key={gateway._id} value={gateway.gwid}>
-                {gateway.gwid}
-              </MenuItem>
-            ))}
+            {allGateways
+              .filter(
+                (gateway) =>
+                  gateway.coords.x === null && gateway.coords.y === null
+              )
+              .map((gateway) => (
+                <MenuItem key={gateway._id} value={gateway.gwid}>
+                  {gateway.gwid}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       </DialogContent>

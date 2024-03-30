@@ -12,18 +12,12 @@ import {
 } from "@mui/material";
 
 const ConnectPointModal = ({
-  allConnectPoints,
+  connectPoints,
   selectedConnectPointId,
   onConnectPointSelect,
   onSubmit,
   onClose,
 }) => {
-  // Filter gatewayIds based on the condition
-  const filteredConnectPoints = allConnectPoints.filter(
-    (connectPoint) =>
-      connectPoint.coords.x === null && connectPoint.coords.y === null
-  );
-
   return (
     <Dialog open={true} onClose={onClose}>
       <DialogTitle>Select Connect Point ID</DialogTitle>
@@ -38,11 +32,17 @@ const ConnectPointModal = ({
             <MenuItem value="" disabled>
               Select Connect Point ID
             </MenuItem>
-            {filteredConnectPoints.map((connectPoint) => (
-              <MenuItem key={connectPoint._id} value={connectPoint.cpid}>
-                {connectPoint.cpid}
-              </MenuItem>
-            ))}
+            {connectPoints
+              .filter(
+                (connectPoint) =>
+                  connectPoint.coords.x === null &&
+                  connectPoint.coords.y === null
+              )
+              .map((connectPoint) => (
+                <MenuItem key={connectPoint._id} value={connectPoint.cpid}>
+                  {connectPoint.cpid}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       </DialogContent>

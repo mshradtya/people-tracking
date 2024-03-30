@@ -16,9 +16,9 @@ export default function Maps() {
   const {
     mapName,
     mapView,
-    addingRepeaters,
+    addingConnectPoint,
     addingGateways,
-    addingROI,
+    addingConnectPointROI,
     scale,
     setScale,
   } = useMap();
@@ -59,7 +59,9 @@ export default function Maps() {
         >
           <TransformWrapper
             disabled={
-              addingRepeaters || addingGateways || addingROI ? true : false
+              addingConnectPoint || addingGateways || addingConnectPointROI
+                ? true
+                : false
             }
             onTransformed={(e) => handleScaleChange(e)}
             initialScale={scale}
@@ -68,7 +70,7 @@ export default function Maps() {
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
-                {addingGateways || addingRepeaters || addingROI
+                {addingGateways || addingConnectPoint || addingConnectPointROI
                   ? resetTransform(1)
                   : null}
                 <div
@@ -104,7 +106,9 @@ export default function Maps() {
                       backgroundColor: "#fff",
                     }}
                     disabled={
-                      addingRepeaters || addingGateways || addingROI
+                      addingConnectPoint ||
+                      addingGateways ||
+                      addingConnectPointROI
                         ? true
                         : false
                     }
@@ -122,7 +126,9 @@ export default function Maps() {
                       borderRadius: "8px",
                     }}
                     disabled={
-                      addingRepeaters || addingGateways || addingROI
+                      addingConnectPoint ||
+                      addingGateways ||
+                      addingConnectPointROI
                         ? true
                         : false
                     }

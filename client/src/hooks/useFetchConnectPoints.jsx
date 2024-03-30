@@ -8,6 +8,7 @@ const useFetchConnectPoints = () => {
   const [connectPoints, setConnectPoints] = useState([]);
   const [isConnectPointsLoading, setIsConnectPointsLoading] = useState(true);
   const [connectPointsSerialNumber, setConnectPointsSerialNumber] = useState(1);
+  const [connectPointsWithSOS, setConnectPointsWithSOS] = useState([]);
 
   const fetchConnectPoints = async () => {
     try {
@@ -20,11 +21,22 @@ const useFetchConnectPoints = () => {
     }
   };
 
+  const fetchConnectPointsWithSOS = async () => {
+    try {
+      const response = await axiosPrivate.get("/connect-point/sos");
+      setConnectPointsWithSOS(response.data.connectPoints);
+    } catch (error) {
+      showSnackbar("error", error.response.data.message);
+    }
+  };
+
   return {
     connectPoints,
     isConnectPointsLoading,
     connectPointsSerialNumber,
     fetchConnectPoints,
+    connectPointsWithSOS,
+    fetchConnectPointsWithSOS,
   };
 };
 

@@ -117,7 +117,7 @@ import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import useMap from "@/hooks/useMap";
 
-export default function AddDevice() {
+export default function AddGateway() {
   const { addingGateways, setAddingGateways } = useMap();
 
   const handleClick = () => {

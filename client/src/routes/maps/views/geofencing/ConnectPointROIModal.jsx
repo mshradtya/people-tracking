@@ -11,9 +11,9 @@ import {
   InputLabel,
 } from "@mui/material";
 
-const ConnectPointROIModal = ({ allConnectPoints, onSubmit, onClose }) => {
+const ConnectPointROIModal = ({ connectPoints, onSubmit, onClose }) => {
   // Filter gatewayIds based on the condition
-  const filteredConnectPoints = allConnectPoints.filter(
+  const filteredConnectPoints = connectPoints.filter(
     (connectPoint) => connectPoint.roiCoords.length === 0
   );
 
