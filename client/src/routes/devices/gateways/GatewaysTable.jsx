@@ -8,31 +8,34 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
 import { format } from "date-fns";
 import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
-import Tooltip from "@mui/material/Tooltip";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import useAuth from "@/hooks/auth/useAuth";
+import { useFetchGateways } from "@/hooks/useFetchGateways";
 
-export default function GatewaysTable({
-  gateways,
-  fetchGateways,
-  isLoading,
-  serialNumber,
-}) {
+export default function GatewaysTable({}) {
+  const { gateways, isGatewaysLoading, gatewaysSerialNumber, fetchGateways } =
+    useFetchGateways();
+  const { auth } = useAuth();
   const { showSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [loading, setLoading] = useState(true);
   const [selectedGateway, setSelectedGateway] = useState(null);
   const [isConfirmDeleteGatewayModalOpen, setConfirmDeleteGatewayModalOpen] =
     useState(false);
+
+  useEffect(() => {
+    const fetchGatewaysInterval = setInterval(fetchGateways, 500);
+
+    return () => {
+      clearInterval(fetchGatewaysInterval);
+    };
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -88,7 +91,7 @@ export default function GatewaysTable({
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
-        {isLoading ? (
+        {isGatewaysLoading ? (
           <div
             style={{
               display: "flex",
@@ -113,8 +116,13 @@ export default function GatewaysTable({
                   Location
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Action
+                  Last Packet DateTime
                 </TableCell>
+                {auth?.role === "SuperAdmin" && (
+                  <TableCell align="center" style={{ minWidth: 70 }}>
+                    Action
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -130,31 +138,28 @@ export default function GatewaysTable({
                         key={row.gwid}
                       >
                         <TableCell align="center">
-                          {serialNumber + index}
+                          {gatewaysSerialNumber + index}
                         </TableCell>
                         <TableCell align="center">{row.gwid}</TableCell>
                         <TableCell align="center">{row.location}</TableCell>
                         <TableCell align="center">
-                          <div className="flex justify-center">
-                            {/* <IconButton
-                              aria-label="edit"
-                              sx={{ color: "orange" }}
-                              onClick={() => handleEditUser(row)}
-                            >
-                              <EditIcon />
-                            </IconButton> */}
-
-                            <span>
-                              <IconButton
-                                aria-label="delete"
-                                sx={{ color: "red" }}
-                                onClick={() => handleDeleteGateway(row)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </span>
-                          </div>
+                          {row.timestamp ? row.timestamp : "--"}
                         </TableCell>
+                        {auth?.role === "SuperAdmin" && (
+                          <TableCell align="center">
+                            <div className="flex justify-center">
+                              <span>
+                                <IconButton
+                                  aria-label="delete"
+                                  sx={{ color: "red" }}
+                                  onClick={() => handleDeleteGateway(row)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </span>
+                            </div>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })}

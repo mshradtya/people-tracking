@@ -10,6 +10,8 @@ import ConnectPointROIModal from "./ConnectPointROIModal";
 
 import GatewayModal from "./GatewayModal";
 import ConnectPointModal from "./ConnectPointModal";
+import useAudioPlayer from "../../../../hooks/useAudioPlayer";
+import { useAlarmAlert } from "../../../../hooks/useAlarmAlert";
 
 function calculateCanvasMeasures() {
   const maxWidth = window.innerWidth - 350;
@@ -38,6 +40,7 @@ function GeoFencing() {
   } = useMap();
   const axiosPrivate = useAxiosPrivate();
   const { showSnackbar } = useSnackbar();
+  const { showAlarmAlert, setShowAlarmAlert } = useAlarmAlert();
 
   const [image, setImage] = useState(null);
   const [allGateways, setAllGateways] = useState([]);
@@ -63,6 +66,8 @@ function GeoFencing() {
   const [isConnectPointROIModalOpen, setIsConnectPointROIModalOpen] =
     useState(false);
   const [blink, setBlink] = useState(true);
+  // const [audioTrigger, setAudioTrigger] = useState(false);
+  // const isPlaying = useAudioPlayer("/alarm.mp3", audioTrigger);
 
   const fetchGateways = async () => {
     try {
@@ -120,6 +125,13 @@ function GeoFencing() {
     try {
       const response = await axiosPrivate.get("/gateway/sos");
       setGatewaysWithSOS(response.data.gateways);
+      if (response.data.gateways.length) {
+        // setAudioTrigger(true);
+        // setShowAlarmAlert(true);
+      } else {
+        // setAudioTrigger(false);
+        // setShowAlarmAlert(false);
+      }
       // console.log(response.data.gateways);
     } catch (error) {
       showSnackbar("error", error.response.data.message);

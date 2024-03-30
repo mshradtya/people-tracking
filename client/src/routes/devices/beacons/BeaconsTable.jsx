@@ -15,23 +15,33 @@ import { format } from "date-fns";
 // import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import Battery2BarIcon from "@mui/icons-material/Battery2Bar";
+import Battery0BarIcon from "@mui/icons-material/Battery0Bar";
+import Battery20Icon from "@mui/icons-material/Battery20";
 import Battery30Icon from "@mui/icons-material/Battery30";
+import Battery50Icon from "@mui/icons-material/Battery50";
+import Battery60Icon from "@mui/icons-material/Battery60";
+import Battery80Icon from "@mui/icons-material/Battery80";
 import Battery90Icon from "@mui/icons-material/Battery90";
+import useAuth from "@/hooks/auth/useAuth";
+import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 
-export default function BeaconsTable({
-  beacons,
-  fetchBeacons,
-  isLoading,
-  serialNumber,
-}) {
+export default function BeaconsTable() {
+  const { beacons, fetchBeacons, serialNumber, isLoading } = useFetchBeacons();
+  const { auth } = useAuth();
   const { showSnackbar } = useSnackbar();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchBeaconsInterval = setInterval(fetchBeacons, 500);
+
+    return () => {
+      clearInterval(fetchBeaconsInterval);
+    };
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -120,11 +130,16 @@ export default function BeaconsTable({
                   SOS
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Battery
+                  Last Packet DateTime
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Action
+                  Battery
                 </TableCell>
+                {auth?.role === "SuperAdmin" && (
+                  <TableCell align="center" style={{ minWidth: 70 }}>
+                    Action
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -166,39 +181,51 @@ export default function BeaconsTable({
                           </span>
                         </TableCell>
                         <TableCell align="center">
-                          {/* <span style={{ marginRight: "5px" }}>
-                          {row.battery}%
-                        </span> */}
-                          {row.battery >= 10 && row.battery < 20 && (
-                            <Battery2BarIcon style={{ color: "red" }} />
+                          {row.timestamp ? row.timestamp : "--"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.battery > 0 && row.battery <= 10 && (
+                            <Battery0BarIcon style={{ color: "red" }} />
                           )}
-                          {row.battery >= 20 && row.battery < 30 && (
-                            <Battery30Icon style={{ color: "orange" }} />
+                          {row.battery > 10 && row.battery <= 20 && (
+                            <Battery20Icon style={{ color: "red" }} />
                           )}
-                          {/* Add similar conditions for other battery levels */}
-                          {row.battery >= 90 && row.battery <= 100 && (
+                          {row.battery > 20 && row.battery <= 30 && (
+                            <Battery20Icon style={{ color: "red" }} />
+                          )}
+                          {row.battery > 30 && row.battery <= 40 && (
+                            <Battery30Icon style={{ color: "red" }} />
+                          )}
+                          {row.battery > 40 && row.battery <= 50 && (
+                            <Battery50Icon style={{ color: "orange" }} />
+                          )}
+                          {row.battery > 50 && row.battery <= 60 && (
+                            <Battery50Icon style={{ color: "orange" }} />
+                          )}
+                          {row.battery > 60 && row.battery <= 70 && (
+                            <Battery60Icon style={{ color: "orange" }} />
+                          )}
+                          {row.battery > 70 && row.battery <= 80 && (
+                            <Battery60Icon style={{ color: "green" }} />
+                          )}
+                          {row.battery > 80 && row.battery <= 90 && (
+                            <Battery80Icon style={{ color: "green" }} />
+                          )}
+                          {row.battery > 90 && row.battery <= 100 && (
                             <Battery90Icon style={{ color: "green" }} />
                           )}
                         </TableCell>
-                        <TableCell align="center">
-                          {/* <div className="flex justify-center"> */}
-                          {/* <IconButton
-                              aria-label="edit"
-                              sx={{ color: "orange" }}
-                              onClick={() => handleEditUser(row)}
+                        {auth?.role === "SuperAdmin" && (
+                          <TableCell align="center">
+                            <IconButton
+                              aria-label="delete"
+                              sx={{ color: "red" }}
+                              onClick={() => handleDeleteUser(row)}
                             >
-                              <EditIcon />
-                            </IconButton> */}
-
-                          <IconButton
-                            aria-label="delete"
-                            sx={{ color: "red" }}
-                            onClick={() => handleDeleteUser(row)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                          {/* </div> */}
-                        </TableCell>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })}

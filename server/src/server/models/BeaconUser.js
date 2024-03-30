@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-const userSchema = new mongoose.Schema(
+const beaconUserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -13,29 +13,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    designation: { type: String, required: true },
     email: {
       type: String,
-      required: true,
       unique: true,
       maxLength: 32,
       minLength: 6,
       lowercase: true,
       match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
     },
-    password: {
-      type: String,
-      required: true,
-      minLength: 8,
-      maxLength: 256,
-      // match:
-      //   /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()-+]).{8,256}$/,
-      match: /^[^\s]{8,}$/,
-    },
-    role: {
-      type: String,
-      required: true,
-      enum: ["SuperAdmin", "User"],
-      default: "User",
+    phone: {
+      type: Number,
     },
     dateRegistered: {
       type: String,
@@ -46,20 +34,14 @@ const userSchema = new mongoose.Schema(
   { versionKey: false }
 );
 
-userSchema.pre("save", async function (next) {
+beaconUserSchema.pre("save", async function (next) {
   const user = this;
   const lowercaseUsername = user.username.toLowerCase();
   user.username = lowercaseUsername;
-
-  if (user.isModified("password") && user.password.length < 257) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(user.password, salt);
-    user.password = hashedPassword;
-  }
   next();
 });
 
-userSchema.post("save", function (error, doc, next) {
+beaconUserSchema.post("save", function (error, doc, next) {
   if (error.code === 11000) {
     if (error.keyPattern && error.keyPattern.username) {
       return next(
@@ -81,6 +63,12 @@ userSchema.post("save", function (error, doc, next) {
     }
   }
 
+  if (error.errors.designation) {
+    if (error.errors.designation.kind === "required") {
+      return next(new Error(`Designation is required.`));
+    }
+  }
+
   if (error.errors.email) {
     if (error.errors.email.kind === "required") {
       return next(new Error(`Email is required.`));
@@ -96,38 +84,17 @@ userSchema.post("save", function (error, doc, next) {
     }
   }
 
-  if (error.errors.password) {
-    if (error.errors.password.kind === "required") {
-      return next(new Error(`Password is required.`));
-    }
-    if (error.errors.password.kind === "maxlength") {
-      return next(new Error(`Password cannot be more than 256 characters.`));
-    }
-    if (error.errors.password.kind === "minlength") {
-      return next(new Error(`Password cannot be less than 8 characters.`));
-    }
-    if (error.errors.password.kind === "regexp") {
-      return next(
-        new Error(
-          `Password should be minimum 8 characters long, without any whitespace.`
-        )
-      );
-    }
-  }
-
-  if (error.errors.role) {
-    if (error.errors.role.kind === "required") {
-      return next(new Error(`Role is required.`));
-    }
-    if (error.errors.role.kind === "enum") {
-      return next(
-        new Error(`Role can only be assigned as either SuperAdmin or User.`)
-      );
-    }
-  }
+  // if (error.errors.phone) {
+  //   if (error.errors.phone.kind === "min") {
+  //     return next(new Error(`Phone Number must be of 10 digits.`));
+  //   }
+  //   if (error.errors.phone.kind === "max") {
+  //     return next(new Error(`Phone Number must be of 10 digits.`));
+  //   }
+  // }
 
   return next(error);
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const BeaconUser = mongoose.model("BeaconUser", beaconUserSchema);
+module.exports = BeaconUser;

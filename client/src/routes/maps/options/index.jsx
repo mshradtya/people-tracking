@@ -4,15 +4,23 @@ import AddDevice from "./AddDevice";
 import AddConnectPoint from "./AddConnectPoint";
 import AddROI from "./AddROI";
 import AddConnectPointROI from "./AddConnectPointROI";
+import useAuth from "../../../hooks/auth/useAuth";
 
 export default function MapOptions() {
+  const { auth } = useAuth();
+  const isSuperAdmin = auth.role === "SuperAdmin";
+
   return (
     <div className="flex justify-between items-center">
       <SelectMapName />
-      <AddDevice />
-      <AddROI />
-      <AddConnectPoint />
-      <AddConnectPointROI />
+      {isSuperAdmin && (
+        <>
+          <AddDevice />
+          <AddROI />
+          <AddConnectPoint />
+          <AddConnectPointROI />
+        </>
+      )}
       <SelectMapView />
     </div>
   );

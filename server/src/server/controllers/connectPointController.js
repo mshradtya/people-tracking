@@ -43,7 +43,7 @@ const registerConnectPoint = async (req, res) => {
 
 const readAllConnectPoints = async (req, res) => {
   // Check user role
-  if (res.body.role !== "SuperAdmin") {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,
@@ -139,7 +139,7 @@ const updateConnectPointRoiCoords = async (req, res) => {
 
 const connectPointSosStatus = async (req, res) => {
   // Check user role
-  if (res.body.role !== "SuperAdmin") {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,

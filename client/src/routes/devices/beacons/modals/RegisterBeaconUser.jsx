@@ -1,43 +1,38 @@
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import useAxiosPrivate from "../../../hooks/auth/useAxiosPrivate";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import { useFetchBeaconUsers } from "@/hooks/useFetchBeaconUsers";
 
 const schema = yup
   .object({
     name: yup.string().required("Please Enter Full Name"),
     username: yup.string().required("Please Enter Username"),
+    designation: yup.string().required("Please Enter Designation"),
     email: yup
       .string()
       .email("Email Must Be Valid")
       .required("Please Enter Email"),
-    password: yup.string().required("Please Enter Password"),
+    phone: yup.number().required("Please Enter Phone Number"),
   })
   .required();
 
-export default function AddNewUserModal({
-  handleCloseUserDetails,
-  fetchUsers,
-}) {
+export default function RegisterBeaconUser({ handleCloseBeaconUserDetails }) {
+  const { fetchBeaconUsers } = useFetchBeaconUsers();
   const { showSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
-  const [type, setType] = useState("User");
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseUserDetails();
+    handleCloseBeaconUserDetails();
   };
 
   const {
@@ -50,12 +45,12 @@ export default function AddNewUserModal({
 
   const onSubmit = async (data, e) => {
     try {
-      const response = await axiosPrivate.post("/auth/register", {
+      const response = await axiosPrivate.post("/beacon/user/register", {
         name: data.name,
         username: data.username,
+        designation: data.designation,
         email: data.email,
-        role: type,
-        password: data.password,
+        phone: data.phone,
       });
 
       // Clear form errors
@@ -63,8 +58,8 @@ export default function AddNewUserModal({
 
       // If the response is successful, close the modal and fetch gateways
       if (response?.data?.status === 201) {
-        handleCloseUserDetails();
-        fetchUsers();
+        handleCloseBeaconUserDetails();
+        fetchBeaconUsers();
         showSnackbar("success", "User Added Successfully");
       } else {
         showSnackbar("error", "Something went wrong");
@@ -75,10 +70,6 @@ export default function AddNewUserModal({
         error?.response?.data?.message || "Something went wrong"
       );
     }
-  };
-
-  const handleChange = (event) => {
-    setType(event.target.value);
   };
 
   return (
@@ -110,6 +101,16 @@ export default function AddNewUserModal({
             <div>
               <TextField
                 fullWidth
+                label="Designation"
+                size="small"
+                variant="outlined"
+                {...register("designation")}
+              />
+              <p className="text-orange-600 ">{errors.designation?.message}</p>
+            </div>
+            <div>
+              <TextField
+                fullWidth
                 label="Email"
                 size="small"
                 variant="outlined"
@@ -118,31 +119,14 @@ export default function AddNewUserModal({
               <p className="text-orange-600 ">{errors.email?.message}</p>
             </div>
             <div>
-              <FormControl fullWidth>
-                <InputLabel>Role</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={type}
-                  label="Role"
-                  size="small"
-                  onChange={handleChange}
-                >
-                  <MenuItem value="User">User</MenuItem>
-                  {/* <MenuItem value="mod">Moderator</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem> */}
-                </Select>
-              </FormControl>
-            </div>
-            <div>
               <TextField
                 fullWidth
-                label="Password"
+                label="Phone Number"
                 size="small"
                 variant="outlined"
-                {...register("password")}
+                {...register("phone")}
               />
-              <p className="text-orange-600 ">{errors.email?.message}</p>
+              <p className="text-orange-600 ">{errors.phone?.message}</p>
             </div>
           </div>
           <div className="flex justify-center items-center w-full mb-4">

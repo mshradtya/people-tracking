@@ -4,16 +4,16 @@ const { formattedDate } = require("./helper");
 // Check if admin user exists, and create admin if not
 const createAdmin = async () => {
   try {
-    const admin = await UserModel.findOne({ username: "admin" });
+    const admin = await UserModel.findOne({ username: "docketrun" });
 
     if (!admin) {
       const adminData = new UserModel({
-        username: "admin",
-        email: "admin@gmail.com",
-        password: "Adm1n!123",
+        name: "DocketRun",
+        username: "docketrun",
+        email: "admin@docketrun.com",
+        password: "DocketRun@123",
         role: "SuperAdmin",
         dateRegistered: formattedDate(new Date()),
-        devices: [],
       });
 
       await adminData.save();

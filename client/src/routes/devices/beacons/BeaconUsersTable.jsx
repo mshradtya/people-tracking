@@ -8,31 +8,39 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
-import { format } from "date-fns";
 import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
-import Tooltip from "@mui/material/Tooltip";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import useAuth from "@/hooks/auth/useAuth";
+import { useFetchBeaconUsers } from "@/hooks/useFetchBeaconUsers";
 
-export default function UsersTable({
-  users,
-  fetchUsers,
-  isLoading,
-  serialNumber,
-}) {
+export default function BeaconUsersTable() {
+  const {
+    beaconUsers,
+    fetchBeaconUsers,
+    isBeaconUsersLoading,
+    beaconUsersSerialNumber,
+  } = useFetchBeaconUsers();
+  const { auth } = useAuth();
+  const isSuperAdmin = auth?.role === "SuperAdmin";
   const { showSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [loading, setLoading] = useState(true);
   const [selectedGateway, setSelectedGateway] = useState(null);
   const [isConfirmDeleteGatewayModalOpen, setConfirmDeleteGatewayModalOpen] =
     useState(false);
+
+  useEffect(() => {
+    const fetchBeaconUsersInterval = setInterval(fetchBeaconUsers, 500);
+
+    return () => {
+      clearInterval(fetchBeaconUsersInterval);
+    };
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -83,7 +91,7 @@ export default function UsersTable({
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
-        {isLoading ? (
+        {isBeaconUsersLoading ? (
           <div
             style={{
               display: "flex",
@@ -108,22 +116,27 @@ export default function UsersTable({
                   Full Name
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
+                  Designation
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
                   Email
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
-                  Role
+                  Phone
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
                   Registered On
                 </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Action
-                </TableCell>
+                {isSuperAdmin && (
+                  <TableCell align="center" style={{ minWidth: 70 }}>
+                    Action
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
-              {users &&
-                users
+              {beaconUsers &&
+                beaconUsers
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     return (
@@ -134,39 +147,30 @@ export default function UsersTable({
                         key={row.username}
                       >
                         <TableCell align="center">
-                          {serialNumber + index}
+                          {beaconUsersSerialNumber + index}
                         </TableCell>
                         <TableCell align="center">{row.username}</TableCell>
                         <TableCell align="center">{row.name}</TableCell>
+                        <TableCell align="center">{row.designation}</TableCell>
                         <TableCell align="center">{row.email}</TableCell>
-                        <TableCell align="center">{row.role}</TableCell>
+                        <TableCell align="center">{row.phone}</TableCell>
                         <TableCell align="center">
                           {row.dateRegistered}
                         </TableCell>
-                        <TableCell align="center">
-                          <div className="flex justify-center">
-                            {/* <IconButton
-                              aria-label="edit"
-                              sx={{ color: "orange" }}
-                              onClick={() => handleEditUser(row)}
+                        {isSuperAdmin && (
+                          <TableCell align="center">
+                            <IconButton
+                              disabled={
+                                row.role === "SuperAdmin" ? true : false
+                              }
+                              aria-label="delete"
+                              sx={{ color: "red" }}
+                              onClick={() => handleDeleteGateway(row)}
                             >
-                              <EditIcon />
-                            </IconButton> */}
-
-                            <span>
-                              <IconButton
-                                disabled={
-                                  row.role === "SuperAdmin" ? true : false
-                                }
-                                aria-label="delete"
-                                sx={{ color: "red" }}
-                                onClick={() => handleDeleteGateway(row)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </span>
-                          </div>
-                        </TableCell>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     );
                   })}
@@ -177,7 +181,7 @@ export default function UsersTable({
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={users.length}
+        count={beaconUsers.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

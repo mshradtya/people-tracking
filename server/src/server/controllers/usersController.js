@@ -4,10 +4,12 @@ const bcrypt = require("bcrypt");
 
 const registerUser = async (req, res) => {
   if (
-    Object.keys(req.body).length !== 3 ||
+    Object.keys(req.body).length !== 5 ||
     !(
+      Object.keys(req.body).includes("name") &&
       Object.keys(req.body).includes("username") &&
       Object.keys(req.body).includes("email") &&
+      Object.keys(req.body).includes("role") &&
       Object.keys(req.body).includes("password")
     )
   ) {
@@ -18,13 +20,16 @@ const registerUser = async (req, res) => {
     });
   }
   try {
+    const { name, username, email, role, password } = req.body;
+    console.log(name, username, email, role, password);
+
     const userData = {
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      role: "User",
+      name,
+      username,
+      email,
+      role,
+      password,
       dateRegistered: formattedDate(new Date()),
-      devices: [],
     };
     const user = await usersService.registerUser(userData);
     return res.status(201).json({ status: 201, success: true, user: user });

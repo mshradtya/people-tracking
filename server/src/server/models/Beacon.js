@@ -24,6 +24,9 @@ const beaconSchema = new mongoose.Schema(
       enum: ["H", "L"],
       required: true,
     },
+    timestamp: {
+      type: String,
+    },
     battery: {
       type: Number,
       required: true,

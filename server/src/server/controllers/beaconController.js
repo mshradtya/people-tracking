@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const beaconService = require("../services/beaconService");
+const { formattedDate } = require("../utils/helper");
 
 const registerBeacon = async (req, res) => {
   // Check user role
@@ -30,6 +31,7 @@ const registerBeacon = async (req, res) => {
       bnid,
       gwid: null,
       sos: "L",
+      timestamp: null,
       battery: 10,
     };
     const beacon = await beaconService.registerBeacon(beaconData);
@@ -41,13 +43,52 @@ const registerBeacon = async (req, res) => {
   }
 };
 
+const registerBeaconUser = async (req, res) => {
+  if (
+    Object.keys(req.body).length !== 5 ||
+    !(
+      Object.keys(req.body).includes("name") &&
+      Object.keys(req.body).includes("username") &&
+      Object.keys(req.body).includes("designation") &&
+      Object.keys(req.body).includes("email") &&
+      Object.keys(req.body).includes("phone")
+    )
+  ) {
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "name, username, designation, email and phone is required.",
+    });
+  }
+  try {
+    const { name, username, designation, email, phone } = req.body;
+
+    const userData = {
+      name,
+      username,
+      designation,
+      email,
+      phone,
+      dateRegistered: formattedDate(new Date()),
+    };
+    const user = await beaconService.registerBeaconUser(userData);
+    return res
+      .status(201)
+      .json({ status: 201, success: true, beaconUser: user });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const readAllBeacons = async (req, res) => {
   // Check user role
-  if (res.body.role !== "SuperAdmin") {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,
-      message: `You must have SuperAdmin privilege to perform this operation.`,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
     });
   }
 
@@ -60,6 +101,28 @@ const readAllBeacons = async (req, res) => {
     return res
       .status(500)
       .json({ status: 400, success: false, message: error.message });
+  }
+};
+
+const readAllBeaconUsers = async (req, res) => {
+  if (res.body.role === "SuperAdmin" || res.body.role === "User") {
+    const allUsers = await beaconService.readAllBeaconUsers();
+    if (allUsers.length === 0) {
+      return res.status(200).json({
+        status: 200,
+        success: true,
+        message: `There are no users.`,
+      });
+    }
+    return res
+      .status(200)
+      .json({ status: 200, success: true, allBeaconUsers: allUsers });
+  } else {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
+    });
   }
 };
 
@@ -123,7 +186,9 @@ const deleteGateway = async (req, res) => {
 
 module.exports = {
   registerBeacon,
+  registerBeaconUser,
   readAllBeacons,
+  readAllBeaconUsers,
   updateBeacon,
   deleteGateway,
 };

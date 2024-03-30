@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -8,28 +8,31 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useSnackbar } from "@/hooks/useSnackbar";
-import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import { useFetchGateways } from "@/hooks/useFetchGateways";
 
 const schema = yup
   .object({
     id: yup
       .number()
-      .typeError("Please Enter Valid Beacon ID")
-      .required("Please Enter Valid Beacon ID"),
+      .typeError("Please Enter Valid Gateway ID")
+      .required("Please Enter Valid Gateway ID"),
+    location: yup
+      .string()
+      .typeError("Location must be a string")
+      .required("Location is required"),
   })
   .required();
 
-export default function AddNewWearableModal({
-  handleCloseBeaconDetails,
-  fetchBeacons,
-}) {
-  const { showSnackbar } = useSnackbar();
+export default function RegisterGateway({ handleCloseGatewayDetails }) {
+  const { fetchGateways } = useFetchGateways();
   const axiosPrivate = useAxiosPrivate();
+  const { showSnackbar } = useSnackbar();
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseBeaconDetails();
+    handleCloseGatewayDetails();
   };
 
   const {
@@ -42,8 +45,9 @@ export default function AddNewWearableModal({
 
   const onSubmit = async (data, e) => {
     try {
-      const response = await axiosPrivate.post("/beacon/register", {
-        bnid: data.id,
+      const response = await axiosPrivate.post("/gateway/register", {
+        gwid: data.id,
+        location: data.location,
       });
 
       // Clear form errors
@@ -52,8 +56,8 @@ export default function AddNewWearableModal({
       // If the response is successful, close the modal and fetch gateways
       if (response?.data?.status === 201) {
         handleClose();
-        fetchBeacons();
-        showSnackbar("success", "Beacon Added Successfully");
+        fetchGateways();
+        showSnackbar("success", "Gateway Added Successfully");
       } else {
         showSnackbar("error", "Something went wrong");
       }
@@ -67,19 +71,29 @@ export default function AddNewWearableModal({
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>Beacon Details</DialogTitle>
+      <DialogTitle>Gateway Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1  gap-5 mb-4">
+          <div className="grid sm:grid-rows-1 mb-4 gap-4">
             <div>
               <TextField
                 fullWidth
-                label="Beacon ID"
+                label="Gateway ID"
                 size="small"
                 variant="outlined"
                 {...register("id")}
               />
               <p className="text-orange-600 ">{errors.id?.message}</p>
+            </div>
+            <div>
+              <TextField
+                fullWidth
+                label="Gateway Location"
+                size="small"
+                variant="outlined"
+                {...register("location")}
+              />
+              <p className="text-orange-600 ">{errors.location?.message}</p>
             </div>
           </div>
           <div className="flex justify-center items-center w-full mb-4">

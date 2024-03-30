@@ -11,6 +11,7 @@ import Unauthorized from "@/routes/auth/unauthorized";
 import RequireAuth from "@/components/auth/RequireAuth";
 import ErrorPage from "@/routes/root/ErrorPage";
 import { SnackbarProvider } from "@/context/SnackbarContext";
+import { AlarmAlertProvider } from "./context/AlarmAlertContext";
 import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
 import Test from "./routes/test";
@@ -33,6 +34,14 @@ const router = createBrowserRouter([
         element: <PersistLogin />,
         children: [
           {
+            element: <RequireAuth allowedRoles={["User", "SuperAdmin"]} />,
+            children: [
+              { path: "maps", element: <Maps /> },
+              { path: "devices", element: <Devices /> },
+              { path: "users", element: <Users /> },
+            ],
+          },
+          {
             element: <RequireAuth allowedRoles={["SuperAdmin"]} />,
             children: [
               { path: "", element: <Dashboard /> },
@@ -54,9 +63,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
       <MapProvider>
-        <SnackbarProvider>
-          <RouterProvider router={router} />
-        </SnackbarProvider>
+        <AlarmAlertProvider>
+          <SnackbarProvider>
+            <RouterProvider router={router} />
+          </SnackbarProvider>
+        </AlarmAlertProvider>
       </MapProvider>
     </AuthProvider>
   </React.StrictMode>

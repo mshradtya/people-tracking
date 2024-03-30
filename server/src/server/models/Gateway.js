@@ -27,6 +27,9 @@ const gatewaySchema = new mongoose.Schema(
       enum: ["H", "L"],
       required: true,
     },
+    timestamp: {
+      type: String,
+    },
   },
   { versionKey: false }
 );

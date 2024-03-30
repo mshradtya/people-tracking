@@ -42,11 +42,11 @@ const registerGateway = async (req, res) => {
 
 const readAllGateways = async (req, res) => {
   // Check user role
-  if (res.body.role !== "SuperAdmin") {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,
-      message: `You must have SuperAdmin privilege to perform this operation.`,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
     });
   }
 
@@ -142,7 +142,7 @@ const updateGatewayRoiCoords = async (req, res) => {
 
 const gatewaySosStatus = async (req, res) => {
   // Check user role
-  if (res.body.role !== "SuperAdmin") {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,

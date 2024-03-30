@@ -8,7 +8,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useSnackbar } from "@/hooks/useSnackbar";
-import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 
 const schema = yup
   .object({
@@ -19,10 +20,10 @@ const schema = yup
   })
   .required();
 
-export default function AddNewConnectPointModal({
+export default function RegisterConnectPoint({
   handleCloseConnectPointDetails,
-  fetchConnectPoints,
 }) {
+  const { fetchConnectPoints } = useFetchConnectPoints();
   const axiosPrivate = useAxiosPrivate();
   const { showSnackbar } = useSnackbar();
   const [open, setOpen] = useState(true);

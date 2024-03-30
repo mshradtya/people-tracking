@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import InfoCard from "./InfoCard";
 import Analytics from "./Analytics";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/auth/useAuth";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const { auth } = useAuth();
+
+  useEffect(() => {
+    if (auth?.role === "User") {
+      navigate("/maps", { replace: true });
+    }
+  }, []);
+
   return (
     <div>
       <div className="grid grid-cols-3 gap-6">

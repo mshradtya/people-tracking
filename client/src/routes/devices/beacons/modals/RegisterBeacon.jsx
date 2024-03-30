@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -8,32 +8,27 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useSnackbar } from "@/hooks/useSnackbar";
-import useAxiosPrivate from "../../hooks/auth/useAxiosPrivate";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 
 const schema = yup
   .object({
     id: yup
       .number()
-      .typeError("Please Enter Valid Gateway ID")
-      .required("Please Enter Valid Gateway ID"),
-    location: yup
-      .string()
-      .typeError("Location must be a string")
-      .required("Location is required"),
+      .typeError("Please Enter Valid Beacon ID")
+      .required("Please Enter Valid Beacon ID"),
   })
   .required();
 
-export default function AddNewGatewayModal({
-  handleCloseGatewayDetails,
-  fetchGateways,
-}) {
-  const axiosPrivate = useAxiosPrivate();
+export default function RegisterBeacon({ handleCloseBeaconDetails }) {
+  const { fetchBeacons } = useFetchBeacons();
   const { showSnackbar } = useSnackbar();
+  const axiosPrivate = useAxiosPrivate();
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    handleCloseGatewayDetails();
+    handleCloseBeaconDetails();
   };
 
   const {
@@ -46,9 +41,8 @@ export default function AddNewGatewayModal({
 
   const onSubmit = async (data, e) => {
     try {
-      const response = await axiosPrivate.post("/gateway/register", {
-        gwid: data.id,
-        location: data.location,
+      const response = await axiosPrivate.post("/beacon/register", {
+        bnid: data.id,
       });
 
       // Clear form errors
@@ -57,8 +51,8 @@ export default function AddNewGatewayModal({
       // If the response is successful, close the modal and fetch gateways
       if (response?.data?.status === 201) {
         handleClose();
-        fetchGateways();
-        showSnackbar("success", "Gateway Added Successfully");
+        fetchBeacons();
+        showSnackbar("success", "Beacon Added Successfully");
       } else {
         showSnackbar("error", "Something went wrong");
       }
@@ -72,29 +66,19 @@ export default function AddNewGatewayModal({
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
-      <DialogTitle>Gateway Details</DialogTitle>
+      <DialogTitle>Beacon Details</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid sm:grid-rows-1 mb-4 gap-4">
+          <div className="grid sm:grid-rows-1  gap-5 mb-4">
             <div>
               <TextField
                 fullWidth
-                label="Gateway ID"
+                label="Beacon ID"
                 size="small"
                 variant="outlined"
                 {...register("id")}
               />
               <p className="text-orange-600 ">{errors.id?.message}</p>
-            </div>
-            <div>
-              <TextField
-                fullWidth
-                label="Gateway Location"
-                size="small"
-                variant="outlined"
-                {...register("location")}
-              />
-              <p className="text-orange-600 ">{errors.location?.message}</p>
             </div>
           </div>
           <div className="flex justify-center items-center w-full mb-4">

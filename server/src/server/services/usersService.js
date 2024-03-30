@@ -8,11 +8,10 @@ const registerUser = async (userData) => {
 };
 
 const readAllUsers = async () => {
-  const allUsers = await User.find({ role: "User" }, "-password").populate(
-    "devices"
-  );
+  const allUsers = await User.find({}, "-password");
   return allUsers;
 };
+
 const readUser = async (_id) => {
   const userDetail = await User.findById({ _id }, "-password");
   if (userDetail === null) {

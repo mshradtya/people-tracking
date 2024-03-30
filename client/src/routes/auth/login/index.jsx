@@ -12,15 +12,14 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const LOGIN_URL = "/auth/login";
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const PASSWORD_REGEX =
-  /^(?!.*\s)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[~`!@#$%^&*()-+]).{8,256}$/;
+const PASSWORD_REGEX = /^[^\s]{8,}$/;
 
 export default function Login() {
   const { auth, setAuth } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  const from = auth.role === "SuperAdmin" ? "/" : "/maps";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
