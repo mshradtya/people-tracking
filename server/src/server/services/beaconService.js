@@ -15,6 +15,15 @@ const registerBeaconUser = async (userData) => {
   return newBeaconUser;
 };
 
+const assignBeaconUser = async (bnid, username) => {
+  const beacon = await Beacon.findOneAndUpdate(
+    { bnid },
+    { username },
+    { new: true }
+  );
+  return beacon;
+};
+
 const readAllBeacons = async () => {
   const allBeacons = await Beacon.find({});
   return allBeacons;
@@ -72,6 +81,7 @@ const deleteGateway = async (gwid) => {
 module.exports = {
   registerBeacon,
   registerBeaconUser,
+  assignBeaconUser,
   readAllBeacons,
   readAllBeaconUsers,
   updateBeacon,

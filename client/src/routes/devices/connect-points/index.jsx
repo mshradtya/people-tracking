@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ConnectPointsTable from "./ConnectPointsTable";
-import RegisterConnectPoint from "./modals/RegisterConnectPoint";
+import RegisterConnectPoint from "./RegisterConnectPoint";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import useAuth from "@/hooks/auth/useAuth";

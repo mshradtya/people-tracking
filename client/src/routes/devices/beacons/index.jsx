@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import RegisterBeacon from "./modals/RegisterBeacon";
-import RegisterBeaconUser from "./modals/RegisterBeaconUser";
+import RegisterBeacon from "./RegisterBeacon";
+import RegisterBeaconUser from "./RegisterBeaconUser";
 import BeaconsTable from "./BeaconsTable";
 import BeaconUsersTable from "./BeaconUsersTable";
 import Button from "@mui/material/Button";

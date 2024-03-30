@@ -5,6 +5,7 @@ const beaconUserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
+      match: /^[a-zA-Z0-9]{4,}$/,
       required: true,
       maxLength: 32,
       unique: true,
@@ -60,6 +61,9 @@ beaconUserSchema.post("save", function (error, doc, next) {
     }
     if (error.errors.username.kind === "maxlength") {
       return next(new Error(`Username cannot be more than 32 characters.`));
+    }
+    if (error.errors.username.kind === "regexp") {
+      return next(new Error(`invalid username`));
     }
   }
 

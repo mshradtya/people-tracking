@@ -137,6 +137,7 @@ export default function BeaconUsersTable() {
             <TableBody>
               {beaconUsers &&
                 beaconUsers
+                  .filter((row) => row.username !== "none")
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     return (

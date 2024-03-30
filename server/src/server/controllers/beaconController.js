@@ -33,6 +33,8 @@ const registerBeacon = async (req, res) => {
       sos: "L",
       timestamp: null,
       battery: 10,
+      username: "none",
+      reassigned: false,
     };
     const beacon = await beaconService.registerBeacon(beaconData);
     res.status(201).json({ status: 201, success: true, beacon });
@@ -44,6 +46,15 @@ const registerBeacon = async (req, res) => {
 };
 
 const registerBeaconUser = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: "You must have SuperAdmin privilege to perform this operation",
+    });
+  }
+
   if (
     Object.keys(req.body).length !== 5 ||
     !(
@@ -82,6 +93,32 @@ const registerBeaconUser = async (req, res) => {
   }
 };
 
+const assignBeaconUser = async (req, res) => {
+  // Validate request body
+  if (
+    Object.keys(req.body).length !== 2 ||
+    !Object.keys(req.body).includes("bnid") ||
+    !Object.keys(req.body).includes("username")
+  ) {
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "beacon id and username is required",
+    });
+  }
+
+  try {
+    const { bnid, username } = req.body;
+
+    const beacon = await beaconService.assignBeaconUser(bnid, username);
+    res.status(200).json({ status: 200, success: true, beacon });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const readAllBeacons = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
@@ -107,13 +144,7 @@ const readAllBeacons = async (req, res) => {
 const readAllBeaconUsers = async (req, res) => {
   if (res.body.role === "SuperAdmin" || res.body.role === "User") {
     const allUsers = await beaconService.readAllBeaconUsers();
-    if (allUsers.length === 0) {
-      return res.status(200).json({
-        status: 200,
-        success: true,
-        message: `There are no users.`,
-      });
-    }
+
     return res
       .status(200)
       .json({ status: 200, success: true, allBeaconUsers: allUsers });
@@ -187,6 +218,7 @@ const deleteGateway = async (req, res) => {
 module.exports = {
   registerBeacon,
   registerBeaconUser,
+  assignBeaconUser,
   readAllBeacons,
   readAllBeaconUsers,
   updateBeacon,

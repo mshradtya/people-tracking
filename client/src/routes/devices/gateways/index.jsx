@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import GatewaysTable from "./GatewaysTable";
-import RegisterGateway from "./modals/RegisterGateway";
+import RegisterGateway from "./RegisterGateway";
 import Button from "@mui/material/Button";
 import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 import useAuth from "@/hooks/auth/useAuth";

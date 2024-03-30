@@ -33,6 +33,13 @@ const beaconSchema = new mongoose.Schema(
       min: 10,
       max: 100,
     },
+    username: {
+      type: String,
+      match: /^[a-zA-Z0-9]{4,}$/,
+    },
+    reassigned: {
+      type: Boolean,
+    },
   },
   { versionKey: false }
 );
