@@ -14,7 +14,7 @@ import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
 import BeaconIndicator from "./BeaconIndicator";
-import PersonIndicator from "../live-tracking/PersonIndicator";
+import useAuth from "@/hooks/auth/useAuth";
 
 function GeoFencing() {
   const { mapName, addingGateways, addingConnectPoint, addingConnectPointROI } =
@@ -48,6 +48,7 @@ function GeoFencing() {
   const [selectedConnectPointForROI, setSelectedConnectPointForROI] =
     useState(null);
   const [blink, setBlink] = useState(true);
+  const [prevBeaconPositions, setPrevBeaconPositions] = useState({});
 
   useEffect(() => {
     connectPoints.map((connectPoint) => {
@@ -61,20 +62,36 @@ function GeoFencing() {
   }, [connectPoints]);
 
   useEffect(() => {
+    fetchBeacons();
+    const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
+
+    // Set initial random positions for all beacons
+    const initialPositions = beacons.reduce((acc, beacon) => {
+      acc[beacon.bnid] = { x: 0, y: 0 };
+      return acc;
+    }, {});
+    setPrevBeaconPositions(initialPositions);
+
+    return () => {
+      clearInterval(fetchBeaconsInterval);
+    };
+  }, []);
+
+  useEffect(() => {
     fetchGateways();
     fetchConnectPoints();
-    fetchBeacons();
+    // fetchBeacons();
     const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 300);
     const fetchConnectPointsWithSOSInterval = setInterval(
       fetchConnectPointsWithSOS,
       300
     );
-    const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
+    // const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
 
     return () => {
       clearInterval(fetchGatewaysWithSOSInterval);
       clearInterval(fetchConnectPointsWithSOSInterval);
-      clearInterval(fetchBeaconsInterval);
+      // clearInterval(fetchBeaconsInterval);
     };
   }, []);
 
@@ -339,8 +356,13 @@ function GeoFencing() {
           </Stage>
           {beacons.map(
             (beacon, index) =>
-              beacon.boundingBox.length && (
-                <BeaconIndicator index={index} beacon={beacon} />
+              beacon.boundingBox.length > 0 && (
+                <BeaconIndicator
+                  index={index}
+                  beacon={beacon}
+                  prevBeaconPositions={prevBeaconPositions}
+                  setPrevBeaconPositions={setPrevBeaconPositions}
+                />
               )
           )}
           {gateways.map(
