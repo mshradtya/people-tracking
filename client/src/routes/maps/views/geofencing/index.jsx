@@ -11,13 +11,17 @@ import GatewayModal from "./GatewayModal";
 import ConnectPointModal from "./ConnectPointModal";
 import { useFetchGateways } from "@/hooks/useFetchGateways";
 import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
+import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
+import BeaconIndicator from "./BeaconIndicator";
+import PersonIndicator from "../live-tracking/PersonIndicator";
 
 function GeoFencing() {
   const { mapName, addingGateways, addingConnectPoint, addingConnectPointROI } =
     useMap();
   const { gateways, fetchGateways, gatewaysWithSOS, fetchGatewaysWithSOS } =
     useFetchGateways();
+  const { beacons, fetchBeacons } = useFetchBeacons();
   const {
     connectPoints,
     fetchConnectPoints,
@@ -59,15 +63,18 @@ function GeoFencing() {
   useEffect(() => {
     fetchGateways();
     fetchConnectPoints();
-    const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 500);
+    fetchBeacons();
+    const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 300);
     const fetchConnectPointsWithSOSInterval = setInterval(
       fetchConnectPointsWithSOS,
-      500
+      300
     );
+    const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
 
     return () => {
       clearInterval(fetchGatewaysWithSOSInterval);
       clearInterval(fetchConnectPointsWithSOSInterval);
+      clearInterval(fetchBeaconsInterval);
     };
   }, []);
 
@@ -330,6 +337,12 @@ function GeoFencing() {
               )}
             </Layer>
           </Stage>
+          {beacons.map(
+            (beacon, index) =>
+              beacon.boundingBox.length && (
+                <BeaconIndicator index={index} beacon={beacon} />
+              )
+          )}
           {gateways.map(
             (gateway, index) =>
               gateway.coords.x !== null && (

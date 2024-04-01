@@ -35,7 +35,7 @@ export default function BeaconUsersTable() {
     useState(false);
 
   useEffect(() => {
-    const fetchBeaconUsersInterval = setInterval(fetchBeaconUsers, 500);
+    const fetchBeaconUsersInterval = setInterval(fetchBeaconUsers, 200);
 
     return () => {
       clearInterval(fetchBeaconUsersInterval);

@@ -26,6 +26,18 @@ const assignBeaconUser = async (bnid, username) => {
 
 const readAllBeacons = async () => {
   const allBeacons = await Beacon.find({});
+
+  for (let i = 0; i < allBeacons.length; i++) {
+    const beacon = allBeacons[i];
+
+    if (beacon.cpid) {
+      const connectPoint = await ConnectPoint.findOne({ cpid: beacon.cpid });
+      if (connectPoint && connectPoint.roiCoords) {
+        beacon.boundingBox = connectPoint.roiCoords;
+      }
+    }
+  }
+
   return allBeacons;
 };
 

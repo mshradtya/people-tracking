@@ -30,11 +30,13 @@ const registerBeacon = async (req, res) => {
     const beaconData = {
       bnid,
       gwid: null,
+      cpid: null,
       sos: "L",
       timestamp: null,
       battery: 10,
       username: "none",
       reassigned: false,
+      boundingBox: [],
     };
     const beacon = await beaconService.registerBeacon(beaconData);
     res.status(201).json({ status: 201, success: true, beacon });

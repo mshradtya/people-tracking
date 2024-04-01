@@ -30,7 +30,7 @@ export default function BeaconsTable() {
   const [selectedBeacon, setSelectedBeacon] = useState(null);
 
   useEffect(() => {
-    const fetchBeaconsInterval = setInterval(fetchBeacons, 500);
+    const fetchBeaconsInterval = setInterval(fetchBeacons, 200);
 
     return () => {
       clearInterval(fetchBeaconsInterval);

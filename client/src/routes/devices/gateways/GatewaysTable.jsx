@@ -30,7 +30,7 @@ export default function GatewaysTable({}) {
     useState(false);
 
   useEffect(() => {
-    const fetchGatewaysInterval = setInterval(fetchGateways, 500);
+    const fetchGatewaysInterval = setInterval(fetchGateways, 200);
 
     return () => {
       clearInterval(fetchGatewaysInterval);

@@ -40,6 +40,7 @@ const beaconSchema = new mongoose.Schema(
     reassigned: {
       type: Boolean,
     },
+    boundingBox: [{ type: Number }],
   },
   { versionKey: false }
 );

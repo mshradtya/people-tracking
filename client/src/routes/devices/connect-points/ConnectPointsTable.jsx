@@ -34,7 +34,7 @@ export default function ConnectPointsTable() {
     useState(false);
 
   useEffect(() => {
-    const fetchConnectPointsInterval = setInterval(fetchConnectPoints, 500);
+    const fetchConnectPointsInterval = setInterval(fetchConnectPoints, 200);
 
     return () => {
       clearInterval(fetchConnectPointsInterval);
