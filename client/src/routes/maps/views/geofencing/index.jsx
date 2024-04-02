@@ -14,7 +14,6 @@ import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
 import BeaconIndicator from "./BeaconIndicator";
-import useAuth from "@/hooks/auth/useAuth";
 
 function GeoFencing() {
   const { mapName, addingGateways, addingConnectPoint, addingConnectPointROI } =
@@ -342,9 +341,8 @@ function GeoFencing() {
                       <Line
                         key={connectPointId}
                         points={coordinates}
-                        stroke={sosActive ? "red" : "#DA0037"}
+                        stroke={sosActive ? "red" : "green"}
                         strokeWidth={3}
-                        fill={sosActive ? (blink ? "red" : "") : ""}
                         opacity={sosActive ? 0.6 : 1}
                         closed
                       />

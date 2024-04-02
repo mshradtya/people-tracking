@@ -9,7 +9,6 @@ const ConnectPointIndicator = ({
   connectPointsWithSOS,
 }) => {
   const { scale } = useMap();
-  const [isBlinking, setBlinking] = useState(true);
 
   const handleDoubleClick = (event) => {
     event.preventDefault();
@@ -17,14 +16,6 @@ const ConnectPointIndicator = ({
   };
 
   const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setBlinking((prevBlinking) => !prevBlinking);
-    }, 500);
-
-    return () => clearInterval(intervalId);
-  }, []);
 
   return (
     <Tooltip
@@ -42,11 +33,7 @@ const ConnectPointIndicator = ({
           width: "20px",
           height: "20px",
           borderRadius: "50%",
-          backgroundColor: isSosConnectPoint
-            ? isBlinking
-              ? "red"
-              : "white"
-            : "#DA0037",
+          backgroundColor: isSosConnectPoint ? "red" : "green",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",
@@ -61,7 +48,6 @@ const ConnectPointIndicator = ({
         <span
           style={{
             fontSize: "12px",
-            color: isSosConnectPoint ? (isBlinking ? "white" : "red") : "",
           }}
         >
           C

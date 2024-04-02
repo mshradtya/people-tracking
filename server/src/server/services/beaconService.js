@@ -2,6 +2,7 @@ const Beacon = require("../models/Beacon");
 const Gateway = require("../models/Gateway");
 const ConnectPoint = require("../models/ConnectPoint");
 const BeaconUser = require("../models/BeaconUser");
+const recentRequests = new Map();
 
 const registerBeacon = async (beaconData) => {
   const beacon = new Beacon(beaconData);
@@ -57,6 +58,23 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
     second: "2-digit",
     hour12: true,
   };
+
+  // Check if there's a recent request with the same BNID
+  const recentRequest = recentRequests.get(BNID);
+  if (recentRequest) {
+    // If there's a recent request, check if the SOS value is different
+    const timeDiff = now - recentRequest.timestamp;
+    if (timeDiff < 15000 && recentRequest.sos === SOS) {
+      // If the SOS value is the same and the request is within the last 5 seconds, ignore the current request
+      return null;
+    }
+    // Update the recent request with the new SOS value and timestamp
+    recentRequest.sos = SOS;
+    recentRequest.timestamp = now;
+  } else {
+    // If there's no recent request, add a new entry in the recentRequests Map
+    recentRequests.set(BNID, { sos: SOS, timestamp: now });
+  }
 
   const updatedBeacon = await Beacon.findOneAndUpdate(
     { bnid: BNID },

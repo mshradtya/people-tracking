@@ -18,10 +18,10 @@ function getRandomPoint(coordinates) {
   const maxY = Math.max(...coordinates.filter((_, index) => index % 2 !== 0));
 
   // Adjust the bounding box to be 20 pixels smaller
-  const adjustedMinX = minX + 50;
-  const adjustedMaxX = maxX - 50;
-  const adjustedMinY = minY + 50;
-  const adjustedMaxY = maxY - 50;
+  const adjustedMinX = minX + 25;
+  const adjustedMaxX = maxX - 25;
+  const adjustedMinY = minY + 25;
+  const adjustedMaxY = maxY - 25;
 
   // Generate a random x and y value within the adjusted bounding box
   const randomX = adjustedMinX + Math.random() * (adjustedMaxX - adjustedMinX);
@@ -59,6 +59,15 @@ const BeaconIndicator = ({
   const { scale } = useMap();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
+  const [isBlinking, setIsBlinking] = useState(true);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setIsBlinking((prevBlinking) => !prevBlinking);
+    }, 500);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     setBeaconColor(getRandomColor());
@@ -89,7 +98,8 @@ const BeaconIndicator = ({
         width: "1.5em",
         height: "1.5em",
         borderRadius: "50%",
-        backgroundColor: beaconColor,
+        backgroundColor:
+          beacon.sos === "H" ? (isBlinking ? "red" : "white") : beaconColor,
         boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
         transform: `scale(${1 / scale})`,
         display: "flex",
@@ -101,8 +111,12 @@ const BeaconIndicator = ({
           "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
       }}
     >
-      <span>
-        <Tooltip title={`${beacon.username}`}>
+      <span
+        style={{
+          color: beacon.sos === "H" ? (isBlinking ? "white" : "red") : "",
+        }}
+      >
+        <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>
           <PersonIcon />
         </Tooltip>
       </span>
