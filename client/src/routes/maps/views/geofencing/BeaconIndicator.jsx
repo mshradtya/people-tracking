@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import useMap from "@/hooks/useMap";
 import Tooltip from "@mui/material/Tooltip";
 import PersonIcon from "@mui/icons-material/Person";
+import PersonPinIcon from "@mui/icons-material/PersonPin";
+import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 
 function getRandomPoint(coordinates) {
   // Validate input array length
@@ -117,7 +119,7 @@ const BeaconIndicator = ({
         }}
       >
         <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>
-          <PersonIcon />
+          <PersonPinIcon />
         </Tooltip>
       </span>
     </div>

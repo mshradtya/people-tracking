@@ -6,7 +6,7 @@ const ConnectPointIndicator = ({
   index,
   data,
   removeConnectPointFromMap,
-  connectPointsWithSOS,
+  // connectPointsWithSOS,
 }) => {
   const { scale } = useMap();
 
@@ -15,7 +15,7 @@ const ConnectPointIndicator = ({
     removeConnectPointFromMap(data.connectPointId);
   };
 
-  const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
+  // const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
 
   return (
     <Tooltip
@@ -33,7 +33,8 @@ const ConnectPointIndicator = ({
           width: "20px",
           height: "20px",
           borderRadius: "50%",
-          backgroundColor: isSosConnectPoint ? "red" : "green",
+          // backgroundColor: isSosConnectPoint ? "red" : "purple",
+          backgroundColor: "purple",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",

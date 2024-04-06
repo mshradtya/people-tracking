@@ -13,9 +13,11 @@ import { useFetchGateways } from "@/hooks/useFetchGateways";
 import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
+import useAuth from "@/hooks/auth/useAuth";
 import BeaconIndicator from "./BeaconIndicator";
 
 function GeoFencing() {
+  const { auth } = useAuth();
   const { mapName, addingGateways, addingConnectPoint, addingConnectPointROI } =
     useMap();
   const { gateways, fetchGateways, gatewaysWithSOS, fetchGatewaysWithSOS } =
@@ -333,25 +335,26 @@ function GeoFencing() {
           <Stage width={canvasMeasures.width} height={canvasMeasures.height}>
             <Layer>
               <Image image={image} />
-              {Object.entries(roiCoordinatesPerConnectPoint).map(
+              {/* {Object.entries(roiCoordinatesPerConnectPoint).map(
                 ([connectPointId, coordinates]) => {
-                  const sosActive = connectPointsWithSOS.includes(
-                    Number(connectPointId)
-                  );
+                  // const sosActive = connectPointsWithSOS.includes(
+                  //   Number(connectPointId)
+                  // );
                   if (coordinates.length > 0) {
                     return (
                       <Line
                         key={connectPointId}
                         points={coordinates}
-                        stroke={sosActive ? "red" : "green"}
+                        // stroke={sosActive ? "red" : "purple"}
+                        stroke={"#df7dfa"}
                         strokeWidth={3}
-                        opacity={sosActive ? 0.6 : 1}
+                        // opacity={sosActive ? 0.6 : 1}
                         closed
                       />
                     );
                   }
                 }
-              )}
+              )} */}
             </Layer>
           </Stage>
           {beacons.map(
@@ -376,7 +379,7 @@ function GeoFencing() {
                     gatewayId: gateway.gwid,
                   }}
                   removeGatewayFromMap={removeGatewayFromMap}
-                  gatewaysWithSOS={gatewaysWithSOS}
+                  // gatewaysWithSOS={gatewaysWithSOS}
                 />
               )
           )}
@@ -391,7 +394,7 @@ function GeoFencing() {
                     connectPointId: connectPoint.cpid,
                   }}
                   removeConnectPointFromMap={removeConnectPointFromMap}
-                  connectPointsWithSOS={connectPointsWithSOS}
+                  // connectPointsWithSOS={connectPointsWithSOS}
                 />
               )
           )}

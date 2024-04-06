@@ -6,25 +6,25 @@ const GatewayIndicator = ({
   index,
   data,
   removeGatewayFromMap,
-  gatewaysWithSOS,
+  // gatewaysWithSOS,
 }) => {
   const { scale } = useMap();
-  const [isBlinking, setBlinking] = useState(true);
+  // const [isBlinking, setBlinking] = useState(true);
 
   const handleDoubleClick = (event) => {
     event.preventDefault();
     removeGatewayFromMap(data.gatewayId);
   };
 
-  const isSosGateway = gatewaysWithSOS.includes(data.gatewayId);
+  // const isSosGateway = gatewaysWithSOS.includes(data.gatewayId);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setBlinking((prevBlinking) => !prevBlinking);
-    }, 500);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setBlinking((prevBlinking) => !prevBlinking);
+  //   }, 500);
 
-    return () => clearInterval(intervalId);
-  }, []);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <Tooltip title={`Gateway ID: ${data.gatewayId}`} placement="top" arrow>
@@ -38,11 +38,12 @@ const GatewayIndicator = ({
           width: "20px",
           height: "20px",
           borderRadius: "20%",
-          backgroundColor: isSosGateway
-            ? isBlinking
-              ? "red"
-              : "white"
-            : "blue",
+          // backgroundColor: isSosGateway
+          //   ? isBlinking
+          //     ? "red"
+          //     : "white"
+          //   : "blue",
+          backgroundColor: "blue",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",
@@ -57,7 +58,7 @@ const GatewayIndicator = ({
         <span
           style={{
             fontSize: "12px",
-            color: isSosGateway ? (isBlinking ? "white" : "red") : "",
+            // color: isSosGateway ? (isBlinking ? "white" : "red") : "",
           }}
         >
           G
