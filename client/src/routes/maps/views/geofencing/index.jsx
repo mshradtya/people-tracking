@@ -170,6 +170,7 @@ function GeoFencing() {
             x: clickedPoint.x,
             y: clickedPoint.y,
           },
+          roiCoords: [],
         });
 
         closeConnectPointModal();
@@ -282,6 +283,7 @@ function GeoFencing() {
           x: null,
           y: null,
         },
+        roiCoords: [],
       });
 
       fetchConnectPoints();

@@ -185,7 +185,7 @@ const updateBeacon = async (req, res) => {
   }
 };
 
-const deleteGateway = async (req, res) => {
+const deleteBeacon = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
     return res.status(403).json({
@@ -195,20 +195,21 @@ const deleteGateway = async (req, res) => {
     });
   }
 
+  console.log("this ran");
   try {
-    const gwid = req.params.id;
-    const deletedCount = await gatewayService.deleteGateway(gwid);
+    const bnid = req.params.id;
+    const deletedCount = await beaconService.deleteBeacon(bnid);
     if (deletedCount === 0) {
       return res.status(404).json({
         status: 404,
         success: false,
-        message: `Gateway not found`,
+        message: `Beacon not found`,
       });
     }
     return res.status(200).json({
       status: 200,
       success: true,
-      message: `${deletedCount} gateway(s) have been deleted`,
+      message: `${deletedCount} beacon(s) have been deleted`,
     });
   } catch (error) {
     return res
@@ -224,5 +225,5 @@ module.exports = {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeacon,
-  deleteGateway,
+  deleteBeacon,
 };

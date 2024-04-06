@@ -5,14 +5,14 @@ const {
   readAllConnectPoints,
   updateConnectPointCoords,
   updateConnectPointRoiCoords,
-  //   deleteGateway,
+  deleteConnectPoint,
   connectPointSosStatus,
 } = require("../controllers/connectPointController");
 const { authUser } = require("../controllers/authController");
 
 router.post("/connect-point/register", authUser, registerConnectPoint);
 router.get("/connect-points", authUser, readAllConnectPoints);
-// router.delete("/gateway/delete/:id", authUser, deleteGateway);
+router.delete("/connect-point/delete/:id", authUser, deleteConnectPoint);
 
 // // map
 router.post("/connect-point/update/coords", authUser, updateConnectPointCoords);

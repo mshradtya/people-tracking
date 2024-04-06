@@ -8,7 +8,7 @@ import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
 import LiveTracking from "./views/live-tracking";
 import PathTracking from "./views/path-tracking/PathTracking";
-import Heatmap from "./views/heatmap";
+// import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
 import GeoFencing from "./views/geofencing";
 
@@ -29,7 +29,7 @@ export default function Maps() {
   const views = {
     "live-tracking": <LiveTracking />,
     "path-tracking": <PathTracking />,
-    heatmap: <Heatmap />,
+    // heatmap: <Heatmap />,
     "sos-alert": <GeoFencing />,
   };
 

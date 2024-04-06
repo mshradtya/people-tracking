@@ -12,9 +12,9 @@ const readAllConnectPoints = async () => {
   return allConnectPoints;
 };
 
-const updateConnectPointCoords = async (cpid, coords) => {
+const updateConnectPointCoords = async (cpid, coords, roiCoords) => {
   const filter = { cpid };
-  const update = { coords };
+  const update = { coords, roiCoords };
   const options = { new: true };
 
   const updatedConnectPoint = await ConnectPoint.findOneAndUpdate(
@@ -49,12 +49,12 @@ const connectPointSosStatus = async () => {
   return cpidList;
 };
 
-// const deleteGateway = async (gwid) => {
-//   const { deletedCount } = await Gateway.deleteOne({
-//     gwid,
-//   });
-//   return deletedCount;
-// };
+const deleteConnectPoint = async (cpid) => {
+  const { deletedCount } = await ConnectPoint.deleteOne({
+    cpid,
+  });
+  return deletedCount;
+};
 
 module.exports = {
   registerConnectPoint,
@@ -62,5 +62,5 @@ module.exports = {
   updateConnectPointCoords,
   updateConnectPointRoiCoords,
   connectPointSosStatus,
-  //   deleteGateway,
+  deleteConnectPoint,
 };

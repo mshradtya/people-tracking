@@ -7,7 +7,7 @@ const {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeacon,
-  deleteGateway,
+  deleteBeacon,
 } = require("../controllers/beaconController");
 const { authUser } = require("../controllers/authController");
 
@@ -17,6 +17,6 @@ router.post("/beacon/user/assign", authUser, assignBeaconUser);
 router.get("/beacons", authUser, readAllBeacons);
 router.get("/beacon/users", authUser, readAllBeaconUsers);
 router.post("/beacon/update", updateBeacon);
-router.delete("/beacon/delete/:id", authUser, deleteGateway);
+router.delete("/beacon/delete/:id", authUser, deleteBeacon);
 
 module.exports = router;

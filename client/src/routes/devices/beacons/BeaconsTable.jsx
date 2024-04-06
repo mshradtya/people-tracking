@@ -11,9 +11,9 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import { format } from "date-fns";
-// import ConfirmDeletionModal from "@/components/modals/ConfirmDeletionModal";
+import ConfirmBeaconDeletionModal from "@/components/modals/ConfirmBeaconDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import useAuth from "@/hooks/auth/useAuth";
@@ -22,12 +22,16 @@ import BatteryIcon from "./BatteryIcon";
 import AssignUser from "./AssignUser";
 
 export default function BeaconsTable() {
+  const { showSnackbar } = useSnackbar();
+  const axiosPrivate = useAxiosPrivate();
   const { beacons, fetchBeacons, serialNumber, isLoading } = useFetchBeacons();
   const { auth } = useAuth();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openAssignUser, setOpenAssignUser] = useState(false);
   const [selectedBeacon, setSelectedBeacon] = useState(null);
+  const [isConfirmDeleteBeaconModalOpen, setConfirmDeleteBeaconModalOpen] =
+    useState(false);
 
   useEffect(() => {
     const fetchBeaconsInterval = setInterval(fetchBeacons, 200);
@@ -53,6 +57,39 @@ export default function BeaconsTable() {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleDeleteBeacon = (row) => {
+    setSelectedBeacon(row);
+    setConfirmDeleteBeaconModalOpen(true);
+  };
+
+  const deleteBeacon = async () => {
+    try {
+      const response = await axiosPrivate.delete(
+        `/beacon/delete/${selectedBeacon.bnid}`
+      );
+
+      if (response && response.data && response.data.status === 200) {
+        handleCloseConfirmDeleteBeaconModal();
+        fetchBeacons();
+        showSnackbar("success", "Beacon deleted successfully!");
+      } else {
+        // Handle unexpected response structure or status
+        showSnackbar("error", "Unexpected response from the server.");
+      }
+    } catch (error) {
+      // Handle errors, including cases where the response is undefined
+      showSnackbar(
+        "error",
+        error?.response?.data?.message || "Something went wrong"
+      );
+    }
+  };
+
+  const handleCloseConfirmDeleteBeaconModal = () => {
+    setConfirmDeleteBeaconModalOpen(false);
+    setSelectedBeacon(null);
   };
 
   return (
@@ -161,7 +198,7 @@ export default function BeaconsTable() {
                               <IconButton
                                 aria-label="delete"
                                 sx={{ color: "red" }}
-                                onClick={() => handleDeleteUser(row)}
+                                onClick={() => handleDeleteBeacon(row)}
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -192,11 +229,11 @@ export default function BeaconsTable() {
       />
 
       {/* Confirm Delete Modal */}
-      {/* <ConfirmDeletionModal
-        open={isConfirmModalOpen}
-        handleClose={handleCloseConfirmModal}
-        handleConfirmDelete={handleConfirmDelete}
-      /> */}
+      <ConfirmBeaconDeletionModal
+        open={isConfirmDeleteBeaconModalOpen}
+        handleClose={handleCloseConfirmDeleteBeaconModal}
+        handleConfirmDelete={deleteBeacon}
+      />
 
       <style jsx>{`
         @keyframes blink {

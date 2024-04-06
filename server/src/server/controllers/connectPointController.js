@@ -75,9 +75,10 @@ const updateConnectPointCoords = async (req, res) => {
 
   // Validate request body
   if (
-    Object.keys(req.body).length !== 2 ||
+    Object.keys(req.body).length !== 3 ||
     !Object.keys(req.body).includes("cpid") ||
-    !Object.keys(req.body).includes("coords")
+    !Object.keys(req.body).includes("coords") ||
+    !Object.keys(req.body).includes("roiCoords")
   ) {
     return res.status(400).json({
       status: 400,
@@ -87,9 +88,13 @@ const updateConnectPointCoords = async (req, res) => {
   }
 
   try {
-    const { cpid, coords } = req.body;
+    const { cpid, coords, roiCoords } = req.body;
     const updatedConnectPoint =
-      await connectPointService.updateConnectPointCoords(cpid, coords);
+      await connectPointService.updateConnectPointCoords(
+        cpid,
+        coords,
+        roiCoords
+      );
     return res
       .status(200)
       .json({ status: 200, success: true, connectPoint: updatedConnectPoint });
@@ -161,37 +166,37 @@ const connectPointSosStatus = async (req, res) => {
   }
 };
 
-// const deleteGateway = async (req, res) => {
-//   // Check user role
-//   if (res.body.role !== "SuperAdmin") {
-//     return res.status(403).json({
-//       status: 403,
-//       success: false,
-//       message: `You must have SuperAdmin privilege to perform this operation.`,
-//     });
-//   }
+const deleteConnectPoint = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: `You must have SuperAdmin privilege to perform this operation.`,
+    });
+  }
 
-//   try {
-//     const gwid = req.params.id;
-//     const deletedCount = await gatewayService.deleteGateway(gwid);
-//     if (deletedCount === 0) {
-//       return res.status(404).json({
-//         status: 404,
-//         success: false,
-//         message: `Gateway not found`,
-//       });
-//     }
-//     return res.status(200).json({
-//       status: 200,
-//       success: true,
-//       message: `${deletedCount} gateway(s) have been deleted`,
-//     });
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ status: 500, success: false, message: error.message });
-//   }
-// };
+  try {
+    const cpid = req.params.id;
+    const deletedCount = await connectPointService.deleteConnectPoint(cpid);
+    if (deletedCount === 0) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: `Connect Point not found`,
+      });
+    }
+    return res.status(200).json({
+      status: 200,
+      success: true,
+      message: `${deletedCount} connect point(s) have been deleted`,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 500, success: false, message: error.message });
+  }
+};
 
 module.exports = {
   registerConnectPoint,
@@ -199,5 +204,5 @@ module.exports = {
   updateConnectPointCoords,
   updateConnectPointRoiCoords,
   connectPointSosStatus,
-  //   deleteGateway,
+  deleteConnectPoint,
 };

@@ -64,7 +64,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
   if (recentRequest) {
     // If there's a recent request, check if the SOS value is different
     const timeDiff = now - recentRequest.timestamp;
-    if (timeDiff < 15000 && recentRequest.sos === SOS) {
+    if (timeDiff < 5000 && recentRequest.sos === SOS) {
       // If the SOS value is the same and the request is within the last 5 seconds, ignore the current request
       return null;
     }
@@ -101,9 +101,9 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
   return updatedBeacon;
 };
 
-const deleteGateway = async (gwid) => {
-  const { deletedCount } = await Gateway.deleteOne({
-    gwid,
+const deleteBeacon = async (bnid) => {
+  const { deletedCount } = await Beacon.deleteOne({
+    bnid,
   });
   return deletedCount;
 };
@@ -115,5 +115,5 @@ module.exports = {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeacon,
-  deleteGateway,
+  deleteBeacon,
 };

@@ -9,7 +9,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDeletionModal";
+import ConfirmConnectPointDeletionModal from "@/components/modals/ConfirmConnectPointDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
@@ -29,9 +29,11 @@ export default function ConnectPointsTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [selectedGateway, setSelectedGateway] = useState(null);
-  const [isConfirmDeleteGatewayModalOpen, setConfirmDeleteGatewayModalOpen] =
-    useState(false);
+  const [selectedConnectPoint, setSelectedConnectPoint] = useState(null);
+  const [
+    isConfirmDeleteConnectPointModalOpen,
+    setConfirmDeleteConnectPointModalOpen,
+  ] = useState(false);
 
   useEffect(() => {
     const fetchConnectPointsInterval = setInterval(fetchConnectPoints, 200);
@@ -54,19 +56,19 @@ export default function ConnectPointsTable() {
     console.log(row);
   };
 
-  const handleDeleteGateway = (row) => {
-    setSelectedGateway(row);
-    setConfirmDeleteGatewayModalOpen(true);
+  const handleDeleteConnectPoint = (row) => {
+    setSelectedConnectPoint(row);
+    setConfirmDeleteConnectPointModalOpen(true);
   };
 
-  const deleteGateway = async () => {
+  const deleteConnectPoint = async () => {
     try {
       const response = await axiosPrivate.delete(
-        `/gateway/delete/${selectedGateway.gwid}`
+        `/connect-point/delete/${selectedConnectPoint.cpid}`
       );
 
       if (response && response.data && response.data.status === 200) {
-        handleCloseConfirmDeleteGatewayModal();
+        handleCloseConfirmDeleteConnectPointModal();
         fetchConnectPoints();
         showSnackbar("success", "Connect Point deleted successfully!");
       } else {
@@ -82,9 +84,9 @@ export default function ConnectPointsTable() {
     }
   };
 
-  const handleCloseConfirmDeleteGatewayModal = () => {
-    setConfirmDeleteGatewayModalOpen(false);
-    setSelectedGateway(null);
+  const handleCloseConfirmDeleteConnectPointModal = () => {
+    setConfirmDeleteConnectPointModalOpen(false);
+    setSelectedConnectPoint(null);
   };
 
   return (
@@ -153,7 +155,7 @@ export default function ConnectPointsTable() {
                                 <IconButton
                                   aria-label="delete"
                                   sx={{ color: "red" }}
-                                  onClick={() => handleDeleteGateway(row)}
+                                  onClick={() => handleDeleteConnectPoint(row)}
                                 >
                                   <DeleteIcon />
                                 </IconButton>
@@ -179,10 +181,10 @@ export default function ConnectPointsTable() {
       />
 
       {/* Confirm Delete Modal */}
-      <ConfirmGatewayDeletionModal
-        open={isConfirmDeleteGatewayModalOpen}
-        handleClose={handleCloseConfirmDeleteGatewayModal}
-        handleConfirmDelete={deleteGateway}
+      <ConfirmConnectPointDeletionModal
+        open={isConfirmDeleteConnectPointModalOpen}
+        handleClose={handleCloseConfirmDeleteConnectPointModal}
+        handleConfirmDelete={deleteConnectPoint}
       />
     </Paper>
   );
