@@ -1,11 +1,9 @@
 const express = require("express");
 var cors = require("cors");
-const users = require("../routes/usersRoute");
-const devices = require("../routes/devicesRoute");
-const gateways = require("../routes/gatewayRoute");
-const beacons = require("../routes/beaconRoute");
-const connectPoints = require("../routes/connectPointRoute");
-const departments = require("../routes/departmentsRoute");
+const users = require("../features/user/user.route");
+const gateways = require("../features/gateway/gateway.route");
+const beacons = require("../features/beacon/beacon.route");
+const connectPoints = require("../features/connect-point/connect-point.route");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
@@ -36,8 +34,6 @@ function createServer() {
     }
   });
   app.use(`${API}`, users);
-  app.use(`${API}`, devices);
-  app.use(`${API}`, departments);
   app.use(`${API}`, gateways);
   app.use(`${API}`, beacons);
   app.use(`${API}`, connectPoints);

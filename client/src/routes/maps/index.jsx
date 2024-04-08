@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import HighlightAltIcon from "@mui/icons-material/HighlightAlt";
 import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
 import LiveTracking from "./views/live-tracking";
@@ -21,6 +22,7 @@ export default function Maps() {
     addingConnectPointROI,
     scale,
     setScale,
+    setShowROI,
   } = useMap();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -95,6 +97,26 @@ export default function Maps() {
                   >
                     <OpenInFullIcon />
                   </IconButton> */}
+                  <IconButton
+                    onClick={() => setShowROI((prev) => !prev)}
+                    color="primary"
+                    sx={{
+                      boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                      marginTop: "5px",
+                      color: "black",
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                    }}
+                    disabled={
+                      addingConnectPoint ||
+                      addingGateways ||
+                      addingConnectPointROI
+                        ? true
+                        : false
+                    }
+                  >
+                    <HighlightAltIcon />
+                  </IconButton>
                   <IconButton
                     onClick={() => zoomIn()}
                     color="primary"

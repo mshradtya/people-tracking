@@ -10,13 +10,13 @@ const {
   assignDevices,
   deleteUsers,
   readUserDevices,
-} = require("../controllers/usersController");
+} = require("./user.controllers");
 const {
   loginUser,
   authUser,
   refresh,
   logout,
-} = require("../controllers/authController");
+} = require("../auth/auth.controllers");
 
 router.post("/auth/register", registerUser);
 router.post("/auth/login", loginUser);

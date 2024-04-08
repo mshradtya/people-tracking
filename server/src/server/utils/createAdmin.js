@@ -1,5 +1,5 @@
-var UserModel = require("../models/User");
-var BeaconUser = require("../models/BeaconUser");
+var UserModel = require("../features/user/user.model");
+var BeaconUser = require("../features/beacon/beacon-user.model");
 const { formattedDate } = require("./helper");
 
 // Check if admin user exists, and create admin if not

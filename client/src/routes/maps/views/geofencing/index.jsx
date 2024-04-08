@@ -18,8 +18,13 @@ import BeaconIndicator from "./BeaconIndicator";
 
 function GeoFencing() {
   const { auth } = useAuth();
-  const { mapName, addingGateways, addingConnectPoint, addingConnectPointROI } =
-    useMap();
+  const {
+    mapName,
+    addingGateways,
+    addingConnectPoint,
+    addingConnectPointROI,
+    showROI,
+  } = useMap();
   const { gateways, fetchGateways, gatewaysWithSOS, fetchGatewaysWithSOS } =
     useFetchGateways();
   const { beacons, fetchBeacons } = useFetchBeacons();
@@ -335,26 +340,27 @@ function GeoFencing() {
           <Stage width={canvasMeasures.width} height={canvasMeasures.height}>
             <Layer>
               <Image image={image} />
-              {/* {Object.entries(roiCoordinatesPerConnectPoint).map(
-                ([connectPointId, coordinates]) => {
-                  // const sosActive = connectPointsWithSOS.includes(
-                  //   Number(connectPointId)
-                  // );
-                  if (coordinates.length > 0) {
-                    return (
-                      <Line
-                        key={connectPointId}
-                        points={coordinates}
-                        // stroke={sosActive ? "red" : "purple"}
-                        stroke={"#df7dfa"}
-                        strokeWidth={3}
-                        // opacity={sosActive ? 0.6 : 1}
-                        closed
-                      />
-                    );
+              {showROI &&
+                Object.entries(roiCoordinatesPerConnectPoint).map(
+                  ([connectPointId, coordinates]) => {
+                    // const sosActive = connectPointsWithSOS.includes(
+                    //   Number(connectPointId)
+                    // );
+                    if (coordinates.length > 0) {
+                      return (
+                        <Line
+                          key={connectPointId}
+                          points={coordinates}
+                          // stroke={sosActive ? "red" : "purple"}
+                          stroke={"#df7dfa"}
+                          strokeWidth={3}
+                          // opacity={sosActive ? 0.6 : 1}
+                          closed
+                        />
+                      );
+                    }
                   }
-                }
-              )} */}
+                )}
             </Layer>
           </Stage>
           {beacons.map(

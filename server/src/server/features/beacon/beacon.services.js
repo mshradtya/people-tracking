@@ -1,7 +1,7 @@
-const Beacon = require("../models/Beacon");
-const Gateway = require("../models/Gateway");
-const ConnectPoint = require("../models/ConnectPoint");
-const BeaconUser = require("../models/BeaconUser");
+const Beacon = require("./beacon.model");
+const Gateway = require("../gateway/gateway.model");
+const ConnectPoint = require("../connect-point/connect-point.model");
+const BeaconUser = require("./beacon-user.model");
 const recentRequests = new Map();
 
 const registerBeacon = async (beaconData) => {

@@ -1,5 +1,4 @@
-const ConnectPoint = require("../models/ConnectPoint");
-const Beacon = require("../models/Beacon");
+const ConnectPoint = require("./connect-point.model");
 
 const registerConnectPoint = async (connectPointData) => {
   const connectPoint = new ConnectPoint(connectPointData);

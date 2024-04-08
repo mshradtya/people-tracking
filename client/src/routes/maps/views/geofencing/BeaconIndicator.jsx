@@ -4,6 +4,7 @@ import Tooltip from "@mui/material/Tooltip";
 import PersonIcon from "@mui/icons-material/Person";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
+import Alert from "@mui/material/Alert";
 
 function getRandomPoint(coordinates) {
   // Validate input array length
@@ -113,6 +114,19 @@ const BeaconIndicator = ({
           "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
       }}
     >
+      {beacon.sos === "H" && (
+        <div style={{ position: "absolute", bottom: 30, color: "blue" }}>
+          <Alert
+            variant="filled"
+            sx={{
+              background: "red",
+              boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            SOS!
+          </Alert>
+        </div>
+      )}
       <span
         style={{
           color: beacon.sos === "H" ? (isBlinking ? "white" : "red") : "",

@@ -7,8 +7,8 @@ const {
   updateConnectPointRoiCoords,
   deleteConnectPoint,
   connectPointSosStatus,
-} = require("../controllers/connectPointController");
-const { authUser } = require("../controllers/authController");
+} = require("./connect-point.controllers");
+const { authUser } = require("../auth/auth.controllers");
 
 router.post("/connect-point/register", authUser, registerConnectPoint);
 router.get("/connect-points", authUser, readAllConnectPoints);

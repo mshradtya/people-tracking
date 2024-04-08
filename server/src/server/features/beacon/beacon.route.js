@@ -8,8 +8,8 @@ const {
   readAllBeaconUsers,
   updateBeacon,
   deleteBeacon,
-} = require("../controllers/beaconController");
-const { authUser } = require("../controllers/authController");
+} = require("./beacon.controllers");
+const { authUser } = require("../auth/auth.controllers");
 
 router.post("/beacon/register", authUser, registerBeacon);
 router.post("/beacon/user/register", authUser, registerBeaconUser);

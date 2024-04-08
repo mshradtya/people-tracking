@@ -1,6 +1,6 @@
-const connectPointService = require("../services/connectPointService");
+const gatewayService = require("./gateway.services");
 
-const registerConnectPoint = async (req, res) => {
+const registerGateway = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
     return res.status(403).json({
@@ -11,29 +11,28 @@ const registerConnectPoint = async (req, res) => {
   }
   // Validate request body
   if (
-    Object.keys(req.body).length !== 1 ||
-    !Object.keys(req.body).includes("cpid")
+    Object.keys(req.body).length !== 2 ||
+    !Object.keys(req.body).includes("gwid") ||
+    !Object.keys(req.body).includes("location")
   ) {
     return res.status(400).json({
       status: 400,
       success: false,
-      message: "connect point id is required",
+      message: "gateway id and location is required",
     });
   }
 
   try {
-    const { cpid } = req.body;
-    const connectPointData = {
-      cpid,
-      gwid: null,
+    const { gwid, location } = req.body;
+    const gatewayData = {
+      gwid,
+      location,
       coords: { x: null, y: null },
       roiCoords: [],
       sos: "L",
     };
-    const connectPoint = await connectPointService.registerConnectPoint(
-      connectPointData
-    );
-    res.status(201).json({ status: 201, success: true, connectPoint });
+    const gateway = await gatewayService.registerGateway(gatewayData);
+    res.status(201).json({ status: 201, success: true, gateway });
   } catch (error) {
     return res
       .status(500)
@@ -41,21 +40,21 @@ const registerConnectPoint = async (req, res) => {
   }
 };
 
-const readAllConnectPoints = async (req, res) => {
+const readAllGateways = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
       status: 403,
       success: false,
-      message: `You must have SuperAdmin privilege to perform this operation.`,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
     });
   }
 
   try {
-    const allConnectPoints = await connectPointService.readAllConnectPoints();
+    const allGateways = await gatewayService.readAllGateways();
     return res
       .status(200)
-      .json({ status: 200, success: true, connectPoints: allConnectPoints });
+      .json({ status: 200, success: true, gateways: allGateways });
   } catch (error) {
     return res
       .status(500)
@@ -63,49 +62,7 @@ const readAllConnectPoints = async (req, res) => {
   }
 };
 
-const updateConnectPointCoords = async (req, res) => {
-  // Check user role
-  if (res.body.role !== "SuperAdmin") {
-    return res.status(403).json({
-      status: 403,
-      success: false,
-      message: "You must have SuperAdmin privilege to perform this operation",
-    });
-  }
-
-  // Validate request body
-  if (
-    Object.keys(req.body).length !== 3 ||
-    !Object.keys(req.body).includes("cpid") ||
-    !Object.keys(req.body).includes("coords") ||
-    !Object.keys(req.body).includes("roiCoords")
-  ) {
-    return res.status(400).json({
-      status: 400,
-      success: false,
-      message: "connect point id and coords is required",
-    });
-  }
-
-  try {
-    const { cpid, coords, roiCoords } = req.body;
-    const updatedConnectPoint =
-      await connectPointService.updateConnectPointCoords(
-        cpid,
-        coords,
-        roiCoords
-      );
-    return res
-      .status(200)
-      .json({ status: 200, success: true, connectPoint: updatedConnectPoint });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ status: 400, success: false, message: error.message });
-  }
-};
-
-const updateConnectPointRoiCoords = async (req, res) => {
+const updateGatewayCoords = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
     return res.status(403).json({
@@ -118,23 +75,25 @@ const updateConnectPointRoiCoords = async (req, res) => {
   // Validate request body
   if (
     Object.keys(req.body).length !== 2 ||
-    !Object.keys(req.body).includes("cpid") ||
-    !Object.keys(req.body).includes("roiCoords")
+    !Object.keys(req.body).includes("gwid") ||
+    !Object.keys(req.body).includes("coords")
   ) {
     return res.status(400).json({
       status: 400,
       success: false,
-      message: "connect point id and roi coords is required",
+      message: "gateway id and coords is required",
     });
   }
 
   try {
-    const { cpid, roiCoords } = req.body;
-    const updatedConnectPoint =
-      await connectPointService.updateConnectPointRoiCoords(cpid, roiCoords);
+    const { gwid, coords } = req.body;
+    const updatedGateway = await gatewayService.updateGatewayCoords(
+      gwid,
+      coords
+    );
     return res
       .status(200)
-      .json({ status: 200, success: true, connectPoints: updatedConnectPoint });
+      .json({ status: 200, success: true, gateways: updatedGateway });
   } catch (error) {
     return res
       .status(500)
@@ -142,7 +101,46 @@ const updateConnectPointRoiCoords = async (req, res) => {
   }
 };
 
-const connectPointSosStatus = async (req, res) => {
+const updateGatewayRoiCoords = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: "You must have SuperAdmin privilege to perform this operation",
+    });
+  }
+
+  // Validate request body
+  if (
+    Object.keys(req.body).length !== 2 ||
+    !Object.keys(req.body).includes("gwid") ||
+    !Object.keys(req.body).includes("roiCoords")
+  ) {
+    return res.status(400).json({
+      status: 400,
+      success: false,
+      message: "gateway id and roi coords is required",
+    });
+  }
+
+  try {
+    const { gwid, roiCoords } = req.body;
+    const updatedGateway = await gatewayService.updateGatewayRoiCoords(
+      gwid,
+      roiCoords
+    );
+    return res
+      .status(200)
+      .json({ status: 200, success: true, gateways: updatedGateway });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
+const gatewaySosStatus = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
     return res.status(403).json({
@@ -153,11 +151,11 @@ const connectPointSosStatus = async (req, res) => {
   }
 
   try {
-    const sosConnectPoints = await connectPointService.connectPointSosStatus();
+    const sosGateways = await gatewayService.gatewaySosStatus();
     return res.status(200).json({
       status: 200,
       success: true,
-      connectPoints: sosConnectPoints,
+      gateways: sosGateways,
     });
   } catch (error) {
     return res
@@ -166,7 +164,7 @@ const connectPointSosStatus = async (req, res) => {
   }
 };
 
-const deleteConnectPoint = async (req, res) => {
+const deleteGateway = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin") {
     return res.status(403).json({
@@ -177,19 +175,19 @@ const deleteConnectPoint = async (req, res) => {
   }
 
   try {
-    const cpid = req.params.id;
-    const deletedCount = await connectPointService.deleteConnectPoint(cpid);
+    const gwid = req.params.id;
+    const deletedCount = await gatewayService.deleteGateway(gwid);
     if (deletedCount === 0) {
       return res.status(404).json({
         status: 404,
         success: false,
-        message: `Connect Point not found`,
+        message: `Gateway not found`,
       });
     }
     return res.status(200).json({
       status: 200,
       success: true,
-      message: `${deletedCount} connect point(s) have been deleted`,
+      message: `${deletedCount} gateway(s) have been deleted`,
     });
   } catch (error) {
     return res
@@ -199,10 +197,10 @@ const deleteConnectPoint = async (req, res) => {
 };
 
 module.exports = {
-  registerConnectPoint,
-  readAllConnectPoints,
-  updateConnectPointCoords,
-  updateConnectPointRoiCoords,
-  connectPointSosStatus,
-  deleteConnectPoint,
+  registerGateway,
+  readAllGateways,
+  updateGatewayCoords,
+  updateGatewayRoiCoords,
+  gatewaySosStatus,
+  deleteGateway,
 };

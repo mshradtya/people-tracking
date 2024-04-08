@@ -1,5 +1,5 @@
-const usersService = require("../services/usersService");
-const { formattedDate } = require("../utils/helper");
+const usersService = require("./user.services");
+const { formattedDate } = require("../../utils/helper");
 const bcrypt = require("bcrypt");
 
 const registerUser = async (req, res) => {

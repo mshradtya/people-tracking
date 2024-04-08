@@ -1,5 +1,4 @@
-const Gateway = require("../models/Gateway");
-const Beacon = require("../models/Beacon");
+const Gateway = require("./gateway.model");
 
 const registerGateway = async (gatewayData) => {
   const gateway = new Gateway(gatewayData);

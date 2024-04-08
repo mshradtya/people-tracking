@@ -7,8 +7,8 @@ const {
   updateGatewayRoiCoords,
   deleteGateway,
   gatewaySosStatus,
-} = require("../controllers/gatewayController");
-const { authUser } = require("../controllers/authController");
+} = require("./gateway.controllers");
+const { authUser } = require("../auth/auth.controllers");
 
 router.post("/gateway/register", authUser, registerGateway);
 router.get("/gateways", authUser, readAllGateways);

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const beaconService = require("../services/beaconService");
-const { formattedDate } = require("../utils/helper");
+const beaconService = require("./beacon.services");
+const { formattedDate } = require("../../utils/helper");
 
 const registerBeacon = async (req, res) => {
   // Check user role
