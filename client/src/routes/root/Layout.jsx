@@ -19,6 +19,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import MemoryIcon from "@mui/icons-material/Memory";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import LogoutIcon from "@mui/icons-material/Logout";
+import HistoryIcon from "@mui/icons-material/History";
 
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import useLogout from "../../hooks/auth/useLogout";
@@ -50,7 +51,7 @@ function Layout({ children }) {
       </Toolbar>
       <Divider />
       <List>
-        {isSuperAdmin && (
+        {/* {isSuperAdmin && (
           <ListItem
             disablePadding
             className={pathname === "/" ? "text-red-500 bg-red-100" : ""}
@@ -73,7 +74,7 @@ function Layout({ children }) {
               <ListItemText primary="Dashboard" />
             </ListItemButton>
           </ListItem>
-        )}
+        )} */}
         <ListItem
           disablePadding
           className={pathname === "/maps" ? "text-red-500 bg-red-100" : ""}
@@ -142,7 +143,7 @@ function Layout({ children }) {
             </ListItemButton>
           </ListItem>
         )}
-        {isSuperAdmin && (
+        {/* {isSuperAdmin && (
           <ListItem
             disablePadding
             className={pathname === "/test" ? "text-red-500 bg-red-100" : ""}
@@ -165,7 +166,29 @@ function Layout({ children }) {
               <ListItemText primary="Test" />
             </ListItemButton>
           </ListItem>
-        )}
+        )} */}
+        <ListItem
+          disablePadding
+          className={pathname === "/history" ? "text-red-500 bg-red-100" : ""}
+          onClick={() => {
+            navigate("/history");
+          }}
+        >
+          <ListItemButton>
+            <ListItemIcon
+              sx={{
+                color: `${
+                  "/history"
+                    ? "rgb(239 68 68 / var(--tw-text-opacity))"
+                    : "rgb(51 65 85)"
+                }`,
+              }}
+            >
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary="History" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </div>
   );

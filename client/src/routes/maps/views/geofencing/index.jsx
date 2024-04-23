@@ -363,17 +363,30 @@ function GeoFencing() {
                 )}
             </Layer>
           </Stage>
-          {beacons.map(
-            (beacon, index) =>
-              beacon.boundingBox.length > 0 && (
+          {beacons.map((beacon, index) => {
+            // Parse beacon timestamp
+            const beaconTimestamp = new Date(beacon.timestamp);
+            // Calculate the time difference in milliseconds
+            const timeDifference = new Date() - beaconTimestamp;
+            // Convert milliseconds to minutes
+            const minutesDifference = timeDifference / (1000 * 60);
+
+            // Check if the time difference is less than 2 minutes
+            if (minutesDifference < 2 && beacon.boundingBox.length > 0) {
+              return (
                 <BeaconIndicator
+                  key={index} // Make sure to include a unique key for each element in the map
                   index={index}
                   beacon={beacon}
                   prevBeaconPositions={prevBeaconPositions}
                   setPrevBeaconPositions={setPrevBeaconPositions}
                 />
-              )
-          )}
+              );
+            } else {
+              return null; // Don't render the beacon if the condition is not met
+            }
+          })}
+
           {gateways.map(
             (gateway, index) =>
               gateway.coords.x !== null && (

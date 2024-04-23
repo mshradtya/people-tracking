@@ -8,6 +8,7 @@ const {
   readAllBeaconUsers,
   updateBeacon,
   deleteBeacon,
+  readAllSosHistory,
 } = require("./beacon.controllers");
 const { authUser } = require("../auth/auth.controllers");
 
@@ -18,5 +19,6 @@ router.get("/beacons", authUser, readAllBeacons);
 router.get("/beacon/users", authUser, readAllBeaconUsers);
 router.post("/beacon/update", updateBeacon);
 router.delete("/beacon/delete/:id", authUser, deleteBeacon);
+router.get("/beacon/sos/history", authUser, readAllSosHistory);
 
 module.exports = router;

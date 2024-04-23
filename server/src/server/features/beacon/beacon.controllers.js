@@ -159,6 +159,28 @@ const readAllBeaconUsers = async (req, res) => {
   }
 };
 
+const readAllSosHistory = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
+    });
+  }
+
+  try {
+    const allSosHistory = await beaconService.readAllSosHistory();
+    return res
+      .status(200)
+      .json({ status: 200, success: true, history: allSosHistory });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const updateBeacon = async (req, res) => {
   const { GWID, CPID, BNID, SOS, BATTERY } = req.query;
 
@@ -226,4 +248,5 @@ module.exports = {
   readAllBeaconUsers,
   updateBeacon,
   deleteBeacon,
+  readAllSosHistory,
 };

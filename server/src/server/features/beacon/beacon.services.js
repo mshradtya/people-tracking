@@ -2,6 +2,7 @@ const Beacon = require("./beacon.model");
 const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
 const BeaconUser = require("./beacon-user.model");
+const SosHistory = require("./beacon-sos-history.model");
 const recentRequests = new Map();
 
 const registerBeacon = async (beaconData) => {
@@ -47,6 +48,11 @@ const readAllBeaconUsers = async () => {
   return allUsers;
 };
 
+const readAllSosHistory = async () => {
+  const allSosHistory = await SosHistory.find({}).sort({ _id: -1 });
+  return allSosHistory;
+};
+
 const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
   const now = new Date();
   const options = {
@@ -64,7 +70,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
   if (recentRequest) {
     // If there's a recent request, check if the SOS value is different
     const timeDiff = now - recentRequest.timestamp;
-    if (timeDiff < 5000 && recentRequest.sos === SOS) {
+    if (timeDiff < 10000 && recentRequest.sos === SOS) {
       // If the SOS value is the same and the request is within the last 5 seconds, ignore the current request
       return null;
     }
@@ -88,7 +94,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
     { new: true, runValidators: true }
   );
 
-  await Gateway.findOneAndUpdate(
+  const updatedGateway = await Gateway.findOneAndUpdate(
     { gwid: GWID },
     { sos: SOS, timestamp: now.toLocaleString("en-US", options) }
   );
@@ -97,6 +103,19 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
     { cpid: CPID },
     { gwid: GWID, sos: SOS, timestamp: now.toLocaleString("en-US", options) }
   );
+
+  if (SOS === "H") {
+    const newSosHistory = new SosHistory({
+      bnid: BNID,
+      gwid: GWID,
+      cpid: CPID,
+      location: updatedGateway.location,
+      timestamp: now.toLocaleString("en-US", options),
+      username: updatedBeacon.username,
+    });
+
+    await newSosHistory.save();
+  }
 
   return updatedBeacon;
 };
@@ -116,4 +135,5 @@ module.exports = {
   readAllBeaconUsers,
   updateBeacon,
   deleteBeacon,
+  readAllSosHistory,
 };

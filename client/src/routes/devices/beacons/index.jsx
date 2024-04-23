@@ -72,8 +72,8 @@ export default function Beacons() {
       <div className="flex justify-between items-center w-full mb-4">
         <Tabs value={value} onChange={handleChange} centered>
           <Tab label="Default" {...a11yProps(0)} />
-          <Tab label="Usage" {...a11yProps(1)} />
-          <Tab label="Users" {...a11yProps(2)} />
+          {/* <Tab label="Usage" {...a11yProps(1)} /> */}
+          <Tab label="Users" {...a11yProps(1)} />
         </Tabs>
         {value === 0 && isSuperAdmin ? (
           <Button
@@ -83,15 +83,7 @@ export default function Beacons() {
           >
             Register Beacon
           </Button>
-        ) : value === 1 ? (
-          <Button
-            variant="outlined"
-            startIcon={<AddCircleRoundedIcon />}
-            onClick={handleRegisterBeacon}
-          >
-            Register Point
-          </Button>
-        ) : value === 2 && isSuperAdmin ? (
+        ) : value === 1 && isSuperAdmin ? (
           <Button
             variant="outlined"
             startIcon={<AddCircleRoundedIcon />}
@@ -107,8 +99,8 @@ export default function Beacons() {
       <CustomTabPanel value={value} index={0}>
         <BeaconsTable />
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}></CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
+      {/* <CustomTabPanel value={value} index={1}></CustomTabPanel> */}
+      <CustomTabPanel value={value} index={1}>
         <BeaconUsersTable />
       </CustomTabPanel>
       {isBeaconDetailsOpen && (

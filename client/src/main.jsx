@@ -16,7 +16,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
 import Test from "./routes/test";
 import Devices from "./routes/devices";
+import SOSHistory from "./routes/history";
 import "./index.css";
+import { Navigate } from "react-router-dom";
 // import Missing from "./pages/Missing";
 
 const router = createBrowserRouter([
@@ -36,19 +38,21 @@ const router = createBrowserRouter([
           {
             element: <RequireAuth allowedRoles={["User", "SuperAdmin"]} />,
             children: [
+              { path: "", element: <Navigate to="/maps" replace /> },
               { path: "maps", element: <Maps /> },
               { path: "devices", element: <Devices /> },
               { path: "users", element: <Users /> },
+              { path: "history", element: <SOSHistory /> },
             ],
           },
           {
             element: <RequireAuth allowedRoles={["SuperAdmin"]} />,
             children: [
-              { path: "", element: <Dashboard /> },
+              { path: "", element: <Navigate to="/maps" replace /> },
               { path: "maps", element: <Maps /> },
               { path: "devices", element: <Devices /> },
               { path: "users", element: <Users /> },
-              { path: "test", element: <Test /> },
+              // { path: "test", element: <Test /> },
             ],
           },
         ],

@@ -19,7 +19,7 @@ export default function Login() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = auth.role === "SuperAdmin" ? "/" : "/maps";
+  const from = "/maps";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -10,10 +10,7 @@ const cookieParser = require("cookie-parser");
 function createServer() {
   const app = express();
   const API = process.env.API_URL;
-  const allowedOrigins = [
-    "http://localhost:5173",
-    "https://fire-extinguisher-docketrun.netlify.app",
-  ];
+  const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
   const corsOptions = {
     // origin: process.env.ORIGIN,
     origin: allowedOrigins,
