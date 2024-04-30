@@ -143,7 +143,7 @@ function Layout({ children }) {
             </ListItemButton>
           </ListItem>
         )}
-        {/* {isSuperAdmin && (
+        {isSuperAdmin && (
           <ListItem
             disablePadding
             className={pathname === "/test" ? "text-red-500 bg-red-100" : ""}
@@ -166,7 +166,7 @@ function Layout({ children }) {
               <ListItemText primary="Test" />
             </ListItemButton>
           </ListItem>
-        )} */}
+        )}
         <ListItem
           disablePadding
           className={pathname === "/history" ? "text-red-500 bg-red-100" : ""}
@@ -186,7 +186,7 @@ function Layout({ children }) {
             >
               <HistoryIcon />
             </ListItemIcon>
-            <ListItemText primary="History" />
+            <ListItemText primary="Violations" />
           </ListItemButton>
         </ListItem>
       </List>

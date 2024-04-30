@@ -52,7 +52,7 @@ const router = createBrowserRouter([
               { path: "maps", element: <Maps /> },
               { path: "devices", element: <Devices /> },
               { path: "users", element: <Users /> },
-              // { path: "test", element: <Test /> },
+              { path: "test", element: <Test /> },
             ],
           },
         ],
