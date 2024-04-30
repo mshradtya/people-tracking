@@ -53,6 +53,15 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
+const updateBeaconUserAck = async (bnid, ack) => {
+  const beacon = await Beacon.findOneAndUpdate(
+    { bnid },
+    { userAck: ack },
+    { new: true, runValidators: true }
+  );
+  return beacon;
+};
+
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   const now = new Date();
   const options = {
@@ -82,14 +91,17 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
     recentRequests.set(BNID, { sos: SOS, timestamp: now });
   }
 
+  const beacon = await Beacon.findOne({ bnid: BNID });
+
   const updatedBeacon = await Beacon.findOneAndUpdate(
     { bnid: BNID },
     {
-      sos: SOS,
+      sos: !beacon.userAck ? SOS : "H",
       idle: IDLE,
       battery: BATTERY,
       gwid: GWID,
       cpid: CPID,
+
       timestamp: now.toLocaleString("en-US", options),
     },
     { new: true, runValidators: true }
@@ -139,6 +151,7 @@ module.exports = {
   assignBeaconUser,
   readAllBeacons,
   readAllBeaconUsers,
+  updateBeaconUserAck,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,

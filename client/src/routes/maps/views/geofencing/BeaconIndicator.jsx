@@ -102,7 +102,15 @@ const BeaconIndicator = ({
         height: "1.5em",
         borderRadius: "50%",
         backgroundColor:
-          beacon.sos === "H" ? (isBlinking ? "red" : "white") : beaconColor,
+          beacon.sos === "H"
+            ? isBlinking
+              ? "red"
+              : "white"
+            : beacon.idle === "H"
+            ? isBlinking
+              ? "orange"
+              : "white"
+            : beaconColor,
         boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
         transform: `scale(${1 / scale})`,
         display: "flex",
@@ -116,22 +124,59 @@ const BeaconIndicator = ({
       }}
     >
       {beacon.sos === "H" && (
-        <div style={{ position: "absolute", bottom: 30, color: "blue" }}>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 30,
+            color: "blue",
+          }}
+        >
           <Alert
             variant="filled"
             severity="error"
             sx={{
               background: "red",
               boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+              zIndex: 1,
             }}
           >
             SOS!
           </Alert>
         </div>
       )}
+      {beacon.idle === "H" && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 30,
+            color: "blue",
+          }}
+        >
+          <Alert
+            variant="filled"
+            severity="error"
+            sx={{
+              background: "orange",
+              boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+              zIndex: 1,
+            }}
+          >
+            IDLE DETECTION!
+          </Alert>
+        </div>
+      )}
       <span
         style={{
-          color: beacon.sos === "H" ? (isBlinking ? "white" : "red") : "",
+          color:
+            beacon.sos === "H"
+              ? isBlinking
+                ? "white"
+                : "red"
+              : beacon.idle === "H"
+              ? isBlinking
+                ? "white"
+                : "orange"
+              : "",
         }}
       >
         <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>

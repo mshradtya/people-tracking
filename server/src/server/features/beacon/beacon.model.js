@@ -29,6 +29,10 @@ const beaconSchema = new mongoose.Schema(
       enum: ["H", "L"],
       required: true,
     },
+    userAck: {
+      type: Boolean,
+      required: true,
+    },
     timestamp: {
       type: String,
     },

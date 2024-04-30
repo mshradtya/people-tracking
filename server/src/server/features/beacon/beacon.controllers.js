@@ -33,6 +33,7 @@ const registerBeacon = async (req, res) => {
       cpid: null,
       sos: "L",
       idle: "L",
+      userAck: false,
       timestamp: null,
       battery: 10,
       username: "none",
@@ -182,6 +183,33 @@ const readAllSosHistory = async (req, res) => {
   }
 };
 
+const updateBeaconUserAck = async (req, res) => {
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
+    });
+  }
+
+  try {
+    const { bnid, ack } = req.query;
+    const beacon = await beaconService.updateBeaconUserAck(bnid, ack);
+    if (!beacon) {
+      return res.status(201).json({
+        status: 201,
+        success: false,
+        message: `beacon not registered`,
+      });
+    }
+    res.status(201).json({ status: 201, success: true, beacon });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const updateBeacon = async (req, res) => {
   const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
 
@@ -248,6 +276,7 @@ module.exports = {
   assignBeaconUser,
   readAllBeacons,
   readAllBeaconUsers,
+  updateBeaconUserAck,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAxiosPrivate from "./auth/useAxiosPrivate";
 import { useSnackbar } from "./useSnackbar";
 
@@ -8,6 +8,26 @@ const useFetchBeacons = () => {
   const [beacons, setBeacons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [serialNumber, setSerialNumber] = useState(1);
+
+  useEffect(() => {
+    const updateBeaconAck = async (bnid) => {
+      try {
+        await axiosPrivate.post(`/beacon/update/ack?bnid=${bnid}&ack=true`);
+      } catch (error) {
+        showSnackbar("error", error.response.data.message);
+      }
+    };
+
+    const handleBeaconUpdates = async () => {
+      for (const beacon of beacons) {
+        if (beacon.sos === "H" && !beacon.userAck) {
+          await updateBeaconAck(beacon.bnid);
+        }
+      }
+    };
+
+    handleBeaconUpdates();
+  }, [beacons]);
 
   const fetchBeacons = async () => {
     try {
