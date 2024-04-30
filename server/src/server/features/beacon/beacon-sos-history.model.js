@@ -11,6 +11,9 @@ const beaconSosHistorySchema = new mongoose.Schema(
     cpid: {
       type: Number,
     },
+    type: {
+      type: String,
+    },
     location: {
       type: String,
     },

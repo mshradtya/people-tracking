@@ -117,6 +117,9 @@ export default function ConnectPointsTable() {
                   Gateway ID
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
+                  Pillars Covered
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
                   Last Packet DateTime
                 </TableCell>
                 {auth?.role === "SuperAdmin" && (
@@ -144,6 +147,9 @@ export default function ConnectPointsTable() {
                         <TableCell align="center">{row.cpid}</TableCell>
                         <TableCell align="center">
                           {row.gwid ? row.gwid : "--"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {`${row.pillarStart} to ${row.pillarEnd}`}
                         </TableCell>
                         <TableCell align="center">
                           {row.timestamp ? row.timestamp : "--"}

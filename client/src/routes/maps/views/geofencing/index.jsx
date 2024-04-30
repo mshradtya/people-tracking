@@ -87,16 +87,16 @@ function GeoFencing() {
     fetchGateways();
     fetchConnectPoints();
     // fetchBeacons();
-    const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 300);
-    const fetchConnectPointsWithSOSInterval = setInterval(
-      fetchConnectPointsWithSOS,
-      300
-    );
+    // const fetchGatewaysWithSOSInterval = setInterval(fetchGatewaysWithSOS, 300);
+    // const fetchConnectPointsWithSOSInterval = setInterval(
+    //   fetchConnectPointsWithSOS,
+    //   300
+    // );
     // const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
 
     return () => {
-      clearInterval(fetchGatewaysWithSOSInterval);
-      clearInterval(fetchConnectPointsWithSOSInterval);
+      // clearInterval(fetchGatewaysWithSOSInterval);
+      // clearInterval(fetchConnectPointsWithSOSInterval);
       // clearInterval(fetchBeaconsInterval);
     };
   }, []);
@@ -411,6 +411,8 @@ function GeoFencing() {
                     x: connectPoint.coords.x,
                     y: connectPoint.coords.y,
                     connectPointId: connectPoint.cpid,
+                    pillarStart: connectPoint.pillarStart,
+                    pillarEnd: connectPoint.pillarEnd,
                   }}
                   removeConnectPointFromMap={removeConnectPointFromMap}
                   // connectPointsWithSOS={connectPointsWithSOS}

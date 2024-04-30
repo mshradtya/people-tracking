@@ -53,7 +53,7 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
-const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
+const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   const now = new Date();
   const options = {
     day: "2-digit",
@@ -86,6 +86,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
     { bnid: BNID },
     {
       sos: SOS,
+      idle: IDLE,
       battery: BATTERY,
       gwid: GWID,
       cpid: CPID,
@@ -96,7 +97,8 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
 
   const updatedGateway = await Gateway.findOneAndUpdate(
     { gwid: GWID },
-    { sos: SOS, timestamp: now.toLocaleString("en-US", options) }
+    { sos: SOS, timestamp: now.toLocaleString("en-US", options) },
+    { new: true, runValidators: true }
   );
 
   await ConnectPoint.findOneAndUpdate(
@@ -104,17 +106,23 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, BATTERY) => {
     { gwid: GWID, sos: SOS, timestamp: now.toLocaleString("en-US", options) }
   );
 
-  if (SOS === "H") {
-    const newSosHistory = new SosHistory({
-      bnid: BNID,
-      gwid: GWID,
-      cpid: CPID,
-      location: updatedGateway.location,
-      timestamp: now.toLocaleString("en-US", options),
-      username: updatedBeacon.username,
-    });
+  if ((BNID !== 0 && SOS === "H") || IDLE === "H") {
+    try {
+      const newSosHistory = new SosHistory({
+        bnid: BNID,
+        gwid: GWID,
+        cpid: CPID,
+        type: SOS === "H" ? "SOS" : "IDLE DETECTION",
+        location: updatedGateway.location,
+        timestamp: now.toLocaleString("en-US", options),
+        username: updatedBeacon.username,
+      });
+      await newSosHistory.save();
+    } catch (err) {
+      console.log(err);
+    }
 
-    await newSosHistory.save();
+    // console.log(newSosHistory);
   }
 
   return updatedBeacon;

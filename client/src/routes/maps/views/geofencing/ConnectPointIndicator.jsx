@@ -17,44 +17,67 @@ const ConnectPointIndicator = ({
 
   // const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
 
+  // Format pillarStart and pillarEnd with leading zeros if less than 10
+  const formattedPillarStart = data.pillarStart.toString().padStart(2, "0");
+  const formattedPillarEnd = data.pillarEnd.toString().padStart(2, "0");
+
   return (
-    <Tooltip
-      title={`Connect Point ID: ${data.connectPointId}`}
-      placement="top"
-      arrow
-    >
+    <div>
       <div
-        onContextMenu={handleDoubleClick}
-        key={index}
         style={{
           position: "absolute",
-          left: `${data.x}px`,
-          top: `${data.y}px`,
-          width: "20px",
-          height: "20px",
-          borderRadius: "50%",
-          // backgroundColor: isSosConnectPoint ? "red" : "purple",
-          backgroundColor: "purple",
-          boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
-          transform: `scale(${1 / scale})`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
+          left: `${data.x - 25}px`,
+          top: `${data.connectPointId < 107 ? data.y + 30 : data.y - 40}px`,
+          // backgroundColor: "purple",
+          borderRadius: "20%",
+          color: "black",
+          padding: "2px",
+          // boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+          // transform: `scale(${1 / scale})`,
+          fontSize: "20px",
           fontWeight: "bold",
-          transition:
-            "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
         }}
       >
-        <span
+        {`${formattedPillarStart} - ${formattedPillarEnd}`}
+      </div>
+      <Tooltip
+        title={`Connect Point ID: ${data.connectPointId}`}
+        placement="top"
+        arrow
+      >
+        <div
+          onContextMenu={handleDoubleClick}
+          key={index}
           style={{
-            fontSize: "12px",
+            position: "absolute",
+            left: `${data.x}px`,
+            top: `${data.y}px`,
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            // backgroundColor: isSosConnectPoint ? "red" : "purple",
+            backgroundColor: "purple",
+            boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+            transform: `scale(${1 / scale})`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: "bold",
+            transition:
+              "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
           }}
         >
-          C
-        </span>
-      </div>
-    </Tooltip>
+          <span
+            style={{
+              fontSize: "12px",
+            }}
+          >
+            C
+          </span>
+        </div>
+      </Tooltip>
+    </div>
   );
 };
 

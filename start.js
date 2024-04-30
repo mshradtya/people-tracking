@@ -18,7 +18,7 @@ function startServer() {
 
 // Function to start the client
 function startClient() {
-  exec("serve", { cwd: clientDir }, (error, stdout, stderr) => {
+  exec("serve -l 4000", { cwd: clientDir }, (error, stdout, stderr) => {
     if (error) {
       console.error(`Client error: ${error}`);
     } else {

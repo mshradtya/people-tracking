@@ -10,7 +10,11 @@ const cookieParser = require("cookie-parser");
 function createServer() {
   const app = express();
   const API = process.env.API_URL;
-  const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:4000",
+  ];
   const corsOptions = {
     // origin: process.env.ORIGIN,
     origin: allowedOrigins,

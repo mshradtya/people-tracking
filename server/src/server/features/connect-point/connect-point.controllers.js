@@ -11,8 +11,10 @@ const registerConnectPoint = async (req, res) => {
   }
   // Validate request body
   if (
-    Object.keys(req.body).length !== 1 ||
-    !Object.keys(req.body).includes("cpid")
+    Object.keys(req.body).length !== 3 ||
+    !Object.keys(req.body).includes("cpid") ||
+    !Object.keys(req.body).includes("pillarStart") ||
+    !Object.keys(req.body).includes("pillarEnd")
   ) {
     return res.status(400).json({
       status: 400,
@@ -22,10 +24,12 @@ const registerConnectPoint = async (req, res) => {
   }
 
   try {
-    const { cpid } = req.body;
+    const { cpid, pillarStart, pillarEnd } = req.body;
     const connectPointData = {
       cpid,
       gwid: null,
+      pillarStart,
+      pillarEnd,
       coords: { x: null, y: null },
       roiCoords: [],
       sos: "L",

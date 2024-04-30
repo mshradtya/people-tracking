@@ -32,6 +32,7 @@ const registerBeacon = async (req, res) => {
       gwid: null,
       cpid: null,
       sos: "L",
+      idle: "L",
       timestamp: null,
       battery: 10,
       username: "none",
@@ -182,7 +183,7 @@ const readAllSosHistory = async (req, res) => {
 };
 
 const updateBeacon = async (req, res) => {
-  const { GWID, CPID, BNID, SOS, BATTERY } = req.query;
+  const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
 
   try {
     const beacon = await beaconService.updateBeacon(
@@ -190,6 +191,7 @@ const updateBeacon = async (req, res) => {
       CPID,
       BNID,
       SOS,
+      IDLE,
       BATTERY
     );
     if (!beacon) {

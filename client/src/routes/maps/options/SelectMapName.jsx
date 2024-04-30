@@ -38,7 +38,7 @@ export default function SelectMapName() {
                 "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
             }}
           >
-            <MenuItem value={"map1"}>Coke Oven 3</MenuItem>
+            <MenuItem value={"map1"}>Coke Oven 4</MenuItem>
             {/* <MenuItem value={"map2"}>Layout 2</MenuItem>
             <MenuItem value={"map3"}>Layout 3</MenuItem> */}
           </Select>

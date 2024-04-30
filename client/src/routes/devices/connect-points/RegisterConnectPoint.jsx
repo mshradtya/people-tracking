@@ -17,6 +17,14 @@ const schema = yup
       .number()
       .typeError("Please Enter Valid Connect Point ID")
       .required("Please Enter Valid Connect Point ID"),
+    pillarStart: yup
+      .number()
+      .typeError("Please Enter Valid Pillar Number")
+      .required("Please Enter Valid Pillar Number"),
+    pillarEnd: yup
+      .number()
+      .typeError("Please Enter Valid Pillar Number")
+      .required("Please Enter Valid Pillar Number"),
   })
   .required();
 
@@ -45,6 +53,8 @@ export default function RegisterConnectPoint({
     try {
       const response = await axiosPrivate.post("/connect-point/register", {
         cpid: data.id,
+        pillarStart: data.pillarStart,
+        pillarEnd: data.pillarEnd,
       });
 
       // Clear form errors
@@ -79,6 +89,30 @@ export default function RegisterConnectPoint({
                 size="small"
                 variant="outlined"
                 {...register("id")}
+              />
+              <p className="text-orange-600 ">{errors.id?.message}</p>
+            </div>
+          </div>
+          <div className="grid sm:grid-rows-1 mb-4 gap-4">
+            <div>
+              <TextField
+                fullWidth
+                label="Starting Pillar Number"
+                size="small"
+                variant="outlined"
+                {...register("pillarStart")}
+              />
+              <p className="text-orange-600 ">{errors.id?.message}</p>
+            </div>
+          </div>
+          <div className="grid sm:grid-rows-1 mb-4 gap-4">
+            <div>
+              <TextField
+                fullWidth
+                label="Ending Pillar Number"
+                size="small"
+                variant="outlined"
+                {...register("pillarEnd")}
               />
               <p className="text-orange-600 ">{errors.id?.message}</p>
             </div>
