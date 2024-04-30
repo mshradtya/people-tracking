@@ -115,6 +115,9 @@ export default function SosHistoryTable() {
                   Gateway ID
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
+                  Type
+                </TableCell>
+                <TableCell align="center" style={{ minWidth: 70 }}>
                   Location
                 </TableCell>
                 <TableCell align="center" style={{ minWidth: 70 }}>
@@ -138,6 +141,7 @@ export default function SosHistoryTable() {
                         <TableCell align="center">{row.bnid}</TableCell>
                         <TableCell align="center">{row.cpid}</TableCell>
                         <TableCell align="center">{row.gwid}</TableCell>
+                        <TableCell align="center">{row.type}</TableCell>
                         <TableCell align="center">{row.location}</TableCell>
                         <TableCell align="center">{row.timestamp}</TableCell>
                         <TableCell align="center">{row.username}</TableCell>

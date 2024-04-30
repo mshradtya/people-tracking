@@ -112,12 +112,14 @@ const BeaconIndicator = ({
         fontWeight: "bold",
         transition:
           "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
+        zIndex: 1,
       }}
     >
       {beacon.sos === "H" && (
         <div style={{ position: "absolute", bottom: 30, color: "blue" }}>
           <Alert
             variant="filled"
+            severity="error"
             sx={{
               background: "red",
               boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",

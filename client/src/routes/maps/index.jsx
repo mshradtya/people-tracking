@@ -9,6 +9,7 @@ import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
 import LiveTracking from "./views/live-tracking";
 import PathTracking from "./views/path-tracking/PathTracking";
+import useAuth from "@/hooks/auth/useAuth";
 // import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
 import GeoFencing from "./views/geofencing";
@@ -24,6 +25,7 @@ export default function Maps() {
     setScale,
     setShowROI,
   } = useMap();
+  const { auth } = useAuth();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -97,26 +99,28 @@ export default function Maps() {
                   >
                     <OpenInFullIcon />
                   </IconButton> */}
-                  <IconButton
-                    onClick={() => setShowROI((prev) => !prev)}
-                    color="primary"
-                    sx={{
-                      boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-                      marginTop: "5px",
-                      color: "black",
-                      backgroundColor: "#fff",
-                      borderRadius: "8px",
-                    }}
-                    disabled={
-                      addingConnectPoint ||
-                      addingGateways ||
-                      addingConnectPointROI
-                        ? true
-                        : false
-                    }
-                  >
-                    <HighlightAltIcon />
-                  </IconButton>
+                  {auth.role === "SuperAdmin" && (
+                    <IconButton
+                      onClick={() => setShowROI((prev) => !prev)}
+                      color="primary"
+                      sx={{
+                        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                        marginTop: "5px",
+                        color: "black",
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                      }}
+                      disabled={
+                        addingConnectPoint ||
+                        addingGateways ||
+                        addingConnectPointROI
+                          ? true
+                          : false
+                      }
+                    >
+                      <HighlightAltIcon />
+                    </IconButton>
+                  )}
                   <IconButton
                     onClick={() => zoomIn()}
                     color="primary"

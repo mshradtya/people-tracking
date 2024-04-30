@@ -24,6 +24,11 @@ const beaconSchema = new mongoose.Schema(
       enum: ["H", "L"],
       required: true,
     },
+    idle: {
+      type: String,
+      enum: ["H", "L"],
+      required: true,
+    },
     timestamp: {
       type: String,
     },

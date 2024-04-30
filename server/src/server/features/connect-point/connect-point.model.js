@@ -14,6 +14,12 @@ const connectPointSchema = new mongoose.Schema(
       min: 201,
       max: 250,
     },
+    pillarStart: {
+      type: Number,
+    },
+    pillarEnd: {
+      type: Number,
+    },
     coords: {
       x: {
         type: Number,
@@ -55,7 +61,7 @@ connectPointSchema.post("save", function (error, doc, next) {
     if (error.errors.cpid.kind === "min" || error.errors.cpid.kind === "max") {
       return next(
         new Error(
-          `Gateway ID must be between ${connectPointSchema.obj.cpid.min} and ${connectPointSchema.obj.cpid.max}.`
+          `Connect Point ID must be between ${connectPointSchema.obj.cpid.min} and ${connectPointSchema.obj.cpid.max}.`
         )
       );
     }

@@ -183,6 +183,7 @@ export default function BeaconsTable() {
                           {row.timestamp ? row.timestamp : "--"}
                         </TableCell>
                         <TableCell align="center">
+                          <span>{row.battery}%</span>
                           <BatteryIcon battery={row.battery} />
                         </TableCell>
                         <TableCell align="center">
