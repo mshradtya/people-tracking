@@ -19,6 +19,10 @@ const ConnectPointIndicator = ({
   const formattedPillarStart = data.pillarStart.toString().padStart(2, "0");
   const formattedPillarEnd = data.pillarEnd.toString().padStart(2, "0");
 
+  // Format pillarStart and pillarEnd with leading zeros if less than 10
+  const formattedPillarStart = data.pillarStart.toString().padStart(2, "0");
+  const formattedPillarEnd = data.pillarEnd.toString().padStart(2, "0");
+
   return (
     <div>
       <div
