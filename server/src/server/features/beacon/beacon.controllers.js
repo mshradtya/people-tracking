@@ -193,8 +193,8 @@ const updateBeaconUserAck = async (req, res) => {
   }
 
   try {
-    const { bnid, ack } = req.query;
-    const beacon = await beaconService.updateBeaconUserAck(bnid, ack);
+    const { bnid, ack, sos } = req.query;
+    const beacon = await beaconService.updateBeaconUserAck(bnid, ack, sos);
     if (!beacon) {
       return res.status(201).json({
         status: 201,

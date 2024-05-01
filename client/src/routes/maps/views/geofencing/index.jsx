@@ -372,7 +372,7 @@ function GeoFencing() {
             const minutesDifference = timeDifference / (1000 * 60);
 
             // Check if the time difference is less than 2 minutes
-            if (minutesDifference < 2 && beacon.boundingBox.length > 0) {
+            if (minutesDifference < 50 && beacon.boundingBox.length > 0) {
               return (
                 <BeaconIndicator
                   key={index} // Make sure to include a unique key for each element in the map

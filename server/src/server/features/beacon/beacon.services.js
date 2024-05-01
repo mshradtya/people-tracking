@@ -53,10 +53,11 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
-const updateBeaconUserAck = async (bnid, ack) => {
+const updateBeaconUserAck = async (bnid, ack, sos) => {
+  console.log(bnid, ack);
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
-    { userAck: ack },
+    { userAck: ack, sos },
     { new: true, runValidators: true }
   );
   return beacon;

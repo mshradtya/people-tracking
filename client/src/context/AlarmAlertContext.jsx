@@ -1,6 +1,10 @@
 import React, { createContext, useEffect, useState } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
+import Button from "@mui/material/Button";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import IconButton from "@mui/material/IconButton";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -9,7 +13,12 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const AlarmAlertContext = createContext();
 
 export const AlarmAlertProvider = ({ children }) => {
-  const [showAlarmAlert, setShowAlarmAlert] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
+  const [alarmInfo, setAlarmInfo] = useState({
+    status: false,
+    bnid: -1,
+    user: "",
+  });
   const [open, setOpen] = useState(false);
   const [audioElement, setAudioElement] = useState(null);
 
@@ -22,12 +31,23 @@ export const AlarmAlertProvider = ({ children }) => {
     };
   }, []);
 
-  function closeAlert() {
-    setShowAlarmAlert(false);
+  const closeAlert = async () => {
+    try {
+      await axiosPrivate.post(
+        `/beacon/update/ack?bnid=${alarmInfo.bnid}&ack=false&sos=L`
+      );
+    } catch (err) {
+      console.log(err);
+    }
+    setAlarmInfo({ status: false, bnid: -1, user: "" });
+  };
+
+  function showAlert(beacon) {
+    setAlarmInfo({ status: true, bnid: beacon.bnid, user: beacon.username });
   }
 
   useEffect(() => {
-    if (showAlarmAlert) {
+    if (alarmInfo.status) {
       setOpen(true);
       audioElement.loop = true;
       audioElement.play();
@@ -36,22 +56,34 @@ export const AlarmAlertProvider = ({ children }) => {
       audioElement?.pause();
       //   console.log("this ran");
     }
-  }, [showAlarmAlert]);
+  }, [alarmInfo.status]);
 
   return (
-    <AlarmAlertContext.Provider value={{ showAlarmAlert, setShowAlarmAlert }}>
+    <AlarmAlertContext.Provider value={{ showAlert }}>
       {children}
       <Snackbar
         open={open}
-        onClose={closeAlert}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setOpen(false)}
           severity="error"
-          sx={{ width: "100%" }}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={closeAlert}
+              sx={{ background: "darkred" }}
+            >
+              OK
+            </Button>
+          }
+          sx={{
+            background: "red",
+            boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+            zIndex: 1,
+          }}
         >
-          SOS occured
+          SOS pressed by {alarmInfo.user}
         </Alert>
       </Snackbar>
     </AlarmAlertContext.Provider>

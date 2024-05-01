@@ -5,6 +5,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import { useAlarmAlert } from "@/hooks/useAlarmAlert";
 
 function getRandomPoint(coordinates) {
   // Validate input array length
@@ -60,6 +62,7 @@ const BeaconIndicator = ({
   setPrevBeaconPositions,
 }) => {
   const { scale } = useMap();
+  const { showAlert } = useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
@@ -89,6 +92,8 @@ const BeaconIndicator = ({
         },
       }));
     }
+
+    if (beacon.sos === "H") showAlert(beacon);
   }, [beacon]);
 
   return (
