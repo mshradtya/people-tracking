@@ -134,11 +134,6 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
     } catch (err) {
       console.log(err);
     }
-<<<<<<< HEAD
-=======
-
-    // console.log(newSosHistory);
->>>>>>> 856e9563b886106e97a8f9f186274d8fd8e81ad9
   }
 
   return updatedBeacon;
