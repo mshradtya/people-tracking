@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "@/api/axios";
 import useAuth from "@/hooks/auth/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -84,6 +84,12 @@ export default function Login() {
         console.log("auth", auth);
         console.log(setAuth);
       }
+    }
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
     }
   };
 
@@ -177,6 +183,7 @@ export default function Login() {
                 background: "#ed4354",
               },
             }}
+            onClick={toggleFullScreen}
           >
             Sign In
           </Button>
