@@ -12,7 +12,9 @@ const useFetchBeacons = () => {
   useEffect(() => {
     const updateBeaconAck = async (bnid) => {
       try {
-        await axiosPrivate.post(`/beacon/update/ack?bnid=${bnid}&ack=true`);
+        await axiosPrivate.post(
+          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=H`
+        );
       } catch (error) {
         showSnackbar("error", error.response.data.message);
       }

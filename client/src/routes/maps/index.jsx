@@ -7,12 +7,11 @@ import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import HighlightAltIcon from "@mui/icons-material/HighlightAlt";
 import FullscreenLayout from "./views/full-screen/FullscreenLayout";
 import MapOptions from "./options";
-import LiveTracking from "./views/live-tracking";
 import PathTracking from "./views/path-tracking/PathTracking";
 import useAuth from "@/hooks/auth/useAuth";
 // import Heatmap from "./views/heatmap";
 import useMap from "@/hooks/useMap";
-import GeoFencing from "./views/geofencing";
+import LiveTracking from "./views/live-tracking";
 
 export default function Maps() {
   const {
@@ -34,7 +33,6 @@ export default function Maps() {
     "live-tracking": <LiveTracking />,
     "path-tracking": <PathTracking />,
     // heatmap: <Heatmap />,
-    "sos-alert": <GeoFencing />,
   };
 
   function handleScaleChange(event) {

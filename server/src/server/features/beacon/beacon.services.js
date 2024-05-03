@@ -3,6 +3,7 @@ const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
 const BeaconUser = require("./beacon-user.model");
 const SosHistory = require("./beacon-sos-history.model");
+const { formattedDate } = require("../../utils/helper");
 const recentRequests = new Map();
 
 const registerBeacon = async (beaconData) => {
@@ -63,17 +64,13 @@ const updateBeaconUserAck = async (bnid, ack, sos) => {
   return beacon;
 };
 
+updateBeaconDCS = async (BNID, SOS, BATTERY) => {
+  const now = new Date();
+};
+
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   const now = new Date();
-  const options = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  };
+  const lastPacketDateTime = formattedDate();
 
   // Check if there's a recent request with the same BNID
   const recentRequest = recentRequests.get(BNID);
@@ -93,33 +90,36 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   }
 
   const beacon = await Beacon.findOne({ bnid: BNID });
+  let updatedBeacon;
 
-  const updatedBeacon = await Beacon.findOneAndUpdate(
-    { bnid: BNID },
-    {
-      sos: !beacon.userAck ? SOS : "H",
-      idle: IDLE,
-      battery: BATTERY,
-      gwid: GWID,
-      cpid: CPID,
+  if (beacon) {
+    updatedBeacon = await Beacon.findOneAndUpdate(
+      { bnid: BNID },
+      {
+        sos: !beacon.userAck ? SOS : "H",
+        idle: IDLE,
+        battery: BATTERY,
+        gwid: GWID,
+        cpid: CPID,
 
-      timestamp: now.toLocaleString("en-US", options),
-    },
-    { new: true, runValidators: true }
-  );
+        timestamp: lastPacketDateTime,
+      },
+      { new: true, runValidators: true }
+    );
+  }
 
   const updatedGateway = await Gateway.findOneAndUpdate(
     { gwid: GWID },
-    { sos: SOS, timestamp: now.toLocaleString("en-US", options) },
+    { sos: SOS, timestamp: lastPacketDateTime },
     { new: true, runValidators: true }
   );
 
   await ConnectPoint.findOneAndUpdate(
     { cpid: CPID },
-    { gwid: GWID, sos: SOS, timestamp: now.toLocaleString("en-US", options) }
+    { gwid: GWID, sos: SOS, timestamp: lastPacketDateTime }
   );
 
-  if ((BNID !== 0 && SOS === "H") || IDLE === "H") {
+  if (SOS === "H" || IDLE === "H") {
     try {
       const newSosHistory = new SosHistory({
         bnid: BNID,
@@ -127,7 +127,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
         cpid: CPID,
         type: SOS === "H" ? "SOS" : "IDLE DETECTION",
         location: updatedGateway.location,
-        timestamp: now.toLocaleString("en-US", options),
+        timestamp: lastPacketDateTime,
         username: updatedBeacon.username,
       });
       await newSosHistory.save();

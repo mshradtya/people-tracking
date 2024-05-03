@@ -196,44 +196,75 @@ const updateBeaconUserAck = async (req, res) => {
     const { bnid, ack, sos } = req.query;
     const beacon = await beaconService.updateBeaconUserAck(bnid, ack, sos);
     if (!beacon) {
-      return res.status(201).json({
-        status: 201,
+      return res.status(400).json({
+        status: 400,
         success: false,
         message: `beacon not registered`,
       });
     }
-    res.status(201).json({ status: 201, success: true, beacon });
+    res.status(201).json({ status: 200, success: true, beacon });
   } catch (error) {
     return res
       .status(500)
-      .json({ status: 400, success: false, message: error.message });
+      .json({ status: 500, success: false, message: error.message });
   }
 };
 
 const updateBeacon = async (req, res) => {
-  const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
+  if (req.query.BNID > 0) {
+    if ("Location" in req.query) {
+      const { Location, BNID, SOS, BATTERY } = req.query;
+      try {
+        const beacon = await beaconService.updateBeacon(
+          Location,
+          CPID,
+          BNID,
+          SOS,
+          BATTERY
+        );
 
-  try {
-    const beacon = await beaconService.updateBeacon(
-      GWID,
-      CPID,
-      BNID,
-      SOS,
-      IDLE,
-      BATTERY
-    );
-    if (!beacon) {
-      return res.status(201).json({
-        status: 201,
-        success: false,
-        message: `beacon not registered`,
-      });
+        if (!beacon) {
+          return res.status(201).json({
+            status: 201,
+            success: false,
+            message: `beacon not registered`,
+          });
+        }
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ status: 400, success: false, message: error.message });
+      }
+    } else {
+      const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
+
+      try {
+        const beacon = await beaconService.updateBeacon(
+          GWID,
+          CPID,
+          BNID,
+          SOS,
+          IDLE,
+          BATTERY
+        );
+        if (!beacon) {
+          return res.status(400).json({
+            status: 400,
+            success: false,
+            message: `beacon not registered`,
+          });
+        }
+        res.status(200).json({ status: 201, success: true, beacon });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ status: 400, success: false, message: error.message });
+      }
     }
-    res.status(201).json({ status: 201, success: true, beacon });
-  } catch (error) {
+  } else {
     return res
-      .status(500)
-      .json({ status: 400, success: false, message: error.message });
+      .status(400)
+      .json({ status: 400, success: false, message: "invalid bnid" });
   }
 };
 
@@ -247,7 +278,6 @@ const deleteBeacon = async (req, res) => {
     });
   }
 
-  console.log("this ran");
   try {
     const bnid = req.params.id;
     const deletedCount = await beaconService.deleteBeacon(bnid);

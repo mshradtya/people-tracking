@@ -5,7 +5,7 @@ const MapContext = createContext({});
 export const MapProvider = ({ children }) => {
   const [scale, setScale] = useState(1);
   const [mapName, setMapName] = useState("map1");
-  const [mapView, setMapView] = useState("sos-alert");
+  const [mapView, setMapView] = useState("live-tracking");
   const [addingRepeaters, setAddingRepeaters] = useState(false);
   const [addingGateways, setAddingGateways] = useState(false);
   const [addingConnectPoint, setAddingConnectPoint] = useState(false);

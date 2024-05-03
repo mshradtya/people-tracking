@@ -3,8 +3,6 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import Button from "@mui/material/Button";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import IconButton from "@mui/material/IconButton";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -54,7 +52,6 @@ export const AlarmAlertProvider = ({ children }) => {
     } else {
       setOpen(false);
       audioElement?.pause();
-      //   console.log("this ran");
     }
   }, [alarmInfo.status]);
 
@@ -81,6 +78,7 @@ export const AlarmAlertProvider = ({ children }) => {
             background: "red",
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             zIndex: 1,
+            width: "500px",
           }}
         >
           SOS pressed by {alarmInfo.user}
