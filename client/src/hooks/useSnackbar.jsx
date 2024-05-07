@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import SnackbarContext from "../context/SnackbarContext";
+import NotificationContext from "../context/NotificationContext";
 
 export const useSnackbar = () => {
-  const context = useContext(SnackbarContext);
+  const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error("useSnackbar must be used within a SnackbarProvider");
+    throw new Error("useSnackbar must be used within a NotificationProvider");
   }
   return context;
 };

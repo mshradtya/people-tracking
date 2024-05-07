@@ -5,15 +5,17 @@ import Root from "@/routes/root";
 import PersistLogin from "@/components/auth/PersistLogin";
 import Login from "./routes/auth/login";
 import Dashboard from "@/routes/dashboard";
+import { styled } from "@mui/material";
 import Maps from "@/routes/maps";
 import Users from "@/routes/users";
 import Unauthorized from "@/routes/auth/unauthorized";
 import RequireAuth from "@/components/auth/RequireAuth";
 import ErrorPage from "@/routes/root/ErrorPage";
-import { SnackbarProvider } from "@/context/SnackbarContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 import { AlarmAlertProvider } from "./context/AlarmAlertContext";
 import { AuthProvider } from "./context/AuthContext";
 import { MapProvider } from "./context/MapContext";
+import { SnackbarProvider, MaterialDesignContent } from "notistack";
 import Test from "./routes/test";
 import Devices from "./routes/devices";
 import SOSHistory from "./routes/history";
@@ -63,15 +65,28 @@ const router = createBrowserRouter([
   },
 ]);
 
+const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
+  "&.notistack-MuiContent-error": {
+    backgroundColor: "red",
+  },
+}));
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
       <MapProvider>
-        <AlarmAlertProvider>
-          <SnackbarProvider>
-            <RouterProvider router={router} />
-          </SnackbarProvider>
-        </AlarmAlertProvider>
+        <SnackbarProvider
+          hideIconVariant
+          Components={{
+            error: StyledMaterialDesignContent,
+          }}
+        >
+          <AlarmAlertProvider>
+            <NotificationProvider>
+              <RouterProvider router={router} />
+            </NotificationProvider>
+          </AlarmAlertProvider>
+        </SnackbarProvider>
       </MapProvider>
     </AuthProvider>
   </React.StrictMode>

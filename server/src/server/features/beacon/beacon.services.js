@@ -55,7 +55,6 @@ const readAllSosHistory = async () => {
 };
 
 const updateBeaconUserAck = async (bnid, ack, sos) => {
-  console.log(bnid, ack);
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
     { userAck: ack, sos },
@@ -64,8 +63,29 @@ const updateBeaconUserAck = async (bnid, ack, sos) => {
   return beacon;
 };
 
-updateBeaconDCS = async (BNID, SOS, BATTERY) => {
-  const now = new Date();
+const updateBeaconIsInDcsFlag = async (bnid) => {
+  const beacon = await Beacon.findOneAndUpdate(
+    { bnid },
+    { isInDcsRoom: false },
+    { new: true, runValidators: true }
+  );
+  return beacon;
+};
+
+const updateBeaconDCS = async (BNID, SOS, BATTERY) => {
+  const lastPacketDateTime = formattedDate();
+
+  const updatedBeacon = await Beacon.findOneAndUpdate(
+    { bnid: BNID },
+    {
+      isInDcsRoom: true,
+      sos: SOS,
+      battery: BATTERY,
+      timestamp: lastPacketDateTime,
+    },
+    { new: true, runValidators: true }
+  );
+  return updatedBeacon;
 };
 
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
@@ -153,6 +173,8 @@ module.exports = {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeaconUserAck,
+  updateBeaconIsInDcsFlag,
+  updateBeaconDCS,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,

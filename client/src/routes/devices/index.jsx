@@ -55,21 +55,21 @@ export default function Devices() {
           }}
         >
           <Tabs value={value} onChange={handleChange} centered>
-            <Tab label="Gateways" {...a11yProps(0)} />
+            <Tab label="Beacons" {...a11yProps(0)} />
             <Tab label="Connect Points" {...a11yProps(1)} />
-            <Tab label="Beacons" {...a11yProps(2)} />
+            <Tab label="Gateways" {...a11yProps(2)} />
           </Tabs>
         </div>
       </div>
       <div>
         <CustomTabPanel value={value} index={0}>
-          <Gateways />
+          <Beacons />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <ConnectPoints />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          <Beacons />
+          <Gateways />
         </CustomTabPanel>
       </div>
     </>

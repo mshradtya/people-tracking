@@ -1,27 +1,19 @@
 import React, { createContext, useEffect, useState } from "react";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import Button from "@mui/material/Button";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import { useSnackbar, closeSnackbar } from "notistack";
+import alarmAudio from "../../assets/alarm.mp3";
 
 const AlarmAlertContext = createContext();
 
 export const AlarmAlertProvider = ({ children }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
-  const [alarmInfo, setAlarmInfo] = useState({
-    status: false,
-    bnid: -1,
-    user: "",
-  });
-  const [open, setOpen] = useState(false);
+  const [alarmInfo, setAlarmInfo] = useState([]);
   const [audioElement, setAudioElement] = useState(null);
 
   useEffect(() => {
-    const newAudioElement = new Audio("/alarm.mp3");
+    const newAudioElement = new Audio(alarmAudio);
     setAudioElement(newAudioElement);
 
     return () => {
@@ -29,61 +21,83 @@ export const AlarmAlertProvider = ({ children }) => {
     };
   }, []);
 
-  const closeAlert = async () => {
+  const closeAlert = async (snackbarId) => {
     try {
-      await axiosPrivate.post(
-        `/beacon/update/ack?bnid=${alarmInfo.bnid}&ack=false&sos=L`
-      );
+      const beaconToAck = alarmInfo.find((info) => info.bnid === snackbarId);
+      if (beaconToAck) {
+        await axiosPrivate.post(
+          `/beacon/update/ack?bnid=${beaconToAck.bnid}&ack=false&sos=L`
+        );
+        setAlarmInfo((prevAlarmInfo) =>
+          prevAlarmInfo.filter((info) => info.bnid !== snackbarId)
+        );
+      }
+      closeSnackbar(snackbarId);
     } catch (err) {
       console.log(err);
     }
-    setAlarmInfo({ status: false, bnid: -1, user: "" });
   };
 
-  function showAlert(beacon) {
-    setAlarmInfo({ status: true, bnid: beacon.bnid, user: beacon.username });
-  }
+  const action = (snackbarId) => (
+    <>
+      <Button
+        variant="filled"
+        color="inherit"
+        onClick={() => closeAlert(snackbarId)}
+      >
+        OK
+      </Button>
+    </>
+  );
 
   useEffect(() => {
-    if (alarmInfo.status) {
-      setOpen(true);
+    alarmInfo.forEach((info) => {
+      if (info.status) {
+        enqueueSnackbar(
+          `SOS pressed for Beacon ${info.bnid} by ${info.user} under Connect Point ${info.cpid}`,
+          {
+            variant: "error",
+            anchorOrigin: { horizontal: "center", vertical: "bottom" },
+            key: info.bnid, // Use a unique key for each snackbar
+            preventDuplicate: true,
+            persist: true,
+            action,
+          }
+        );
+      }
+    });
+  }, [alarmInfo]);
+
+  const showAlert = (beacon) => {
+    const isAlreadyPresent = alarmInfo.some(
+      (info) => info.bnid === beacon.bnid && info.cpid === beacon.cpid
+    );
+
+    if (!isAlreadyPresent) {
+      setAlarmInfo((prevAlarmInfo) => [
+        ...prevAlarmInfo,
+        {
+          status: true,
+          bnid: beacon.bnid,
+          cpid: beacon.cpid,
+          user: beacon.username,
+        },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    if (alarmInfo.some((info) => info.status)) {
       audioElement.loop = true;
       audioElement.play();
     } else {
-      setOpen(false);
       audioElement?.pause();
     }
-  }, [alarmInfo.status]);
+  }, [alarmInfo]);
 
   return (
     <AlarmAlertContext.Provider value={{ showAlert }}>
       {children}
-      <Snackbar
-        open={open}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity="error"
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              onClick={closeAlert}
-              sx={{ background: "darkred" }}
-            >
-              OK
-            </Button>
-          }
-          sx={{
-            background: "red",
-            boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
-            zIndex: 1,
-            width: "500px",
-          }}
-        >
-          SOS pressed by {alarmInfo.user}
-        </Alert>
-      </Snackbar>
     </AlarmAlertContext.Provider>
   );
 };

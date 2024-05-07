@@ -7,6 +7,8 @@ import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import { useAlarmAlert } from "@/hooks/useAlarmAlert";
+import BeaconDcsDialog from "./BeaconDcsDialog";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 
 function getRandomPoint(coordinates) {
   // Validate input array length
@@ -62,10 +64,18 @@ const BeaconIndicator = ({
   setPrevBeaconPositions,
 }) => {
   const { scale } = useMap();
+  const axiosPrivate = useAxiosPrivate();
   const { showAlert } = useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
+  const sosActive = beacon.sos === "H" && !beacon.isInDcsRoom;
+  const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
+
+  const handleDcsAlertClose = async (bnid) => {
+    await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
+    setDcsAlertOpen(false);
+  };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -93,21 +103,25 @@ const BeaconIndicator = ({
       }));
     }
 
-    if (beacon.sos === "H") showAlert(beacon);
+    if (sosActive) showAlert(beacon);
+
+    if (beacon.isInDcsRoom) {
+      setDcsAlertOpen(true);
+    }
   }, [beacon]);
 
   return (
-    <div
-      key={index}
-      style={{
-        position: "absolute",
-        left: `${prevPosition.x}px`,
-        top: `${prevPosition.y}px`,
-        width: "1.5em",
-        height: "1.5em",
-        borderRadius: "50%",
-        backgroundColor:
-          beacon.sos === "H"
+    <>
+      <div
+        key={index}
+        style={{
+          position: "absolute",
+          left: `${prevPosition.x}px`,
+          top: `${prevPosition.y}px`,
+          width: "1.5em",
+          height: "1.5em",
+          borderRadius: "50%",
+          backgroundColor: sosActive
             ? isBlinking
               ? "red"
               : "white"
@@ -116,64 +130,63 @@ const BeaconIndicator = ({
               ? "orange"
               : "white"
             : beaconColor,
-        boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
-        transform: `scale(${1 / scale})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "white",
-        fontWeight: "bold",
-        transition:
-          "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
-        zIndex: 1,
-      }}
-    >
-      {beacon.sos === "H" && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 30,
-            color: "blue",
-          }}
-        >
-          <Alert
-            variant="filled"
-            severity="error"
-            sx={{
-              background: "red",
-              boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
-              zIndex: 1,
+          boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+          transform: `scale(${1 / scale})`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontWeight: "bold",
+          transition:
+            "left 0.5s ease-out, top 0.5s ease-out, background 0.5s ease-out",
+          zIndex: 1,
+        }}
+      >
+        {sosActive && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 30,
+              color: "blue",
             }}
           >
-            SOS!
-          </Alert>
-        </div>
-      )}
-      {beacon.idle === "H" && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 30,
-            color: "blue",
-          }}
-        >
-          <Alert
-            variant="filled"
-            severity="error"
-            sx={{
-              background: "orange",
-              boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
-              zIndex: 1,
+            <Alert
+              variant="filled"
+              severity="error"
+              sx={{
+                background: "red",
+                boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+                zIndex: 1,
+              }}
+            >
+              SOS!
+            </Alert>
+          </div>
+        )}
+        {beacon.idle === "H" && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 30,
+              color: "blue",
             }}
           >
-            IDLE DETECTION!
-          </Alert>
-        </div>
-      )}
-      <span
-        style={{
-          color:
-            beacon.sos === "H"
+            <Alert
+              variant="filled"
+              severity="error"
+              sx={{
+                background: "orange",
+                boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+                zIndex: 1,
+              }}
+            >
+              IDLE DETECTION!
+            </Alert>
+          </div>
+        )}
+        <span
+          style={{
+            color: sosActive
               ? isBlinking
                 ? "white"
                 : "red"
@@ -182,13 +195,19 @@ const BeaconIndicator = ({
                 ? "white"
                 : "orange"
               : "",
-        }}
-      >
-        <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>
-          <PersonPinIcon />
-        </Tooltip>
-      </span>
-    </div>
+          }}
+        >
+          <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>
+            <PersonPinIcon />
+          </Tooltip>
+        </span>
+      </div>
+      <BeaconDcsDialog
+        dcsAlertOpen={dcsAlertOpen}
+        handleDcsAlertClose={handleDcsAlertClose}
+        beacon={beacon}
+      />
+    </>
   );
 };
 

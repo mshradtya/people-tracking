@@ -34,6 +34,7 @@ const registerBeacon = async (req, res) => {
       sos: "L",
       idle: "L",
       userAck: false,
+      isInDcsRoom: false,
       timestamp: null,
       battery: 10,
       username: "none",
@@ -212,29 +213,52 @@ const updateBeaconUserAck = async (req, res) => {
 
 const updateBeacon = async (req, res) => {
   if (req.query.BNID > 0) {
-    if ("Location" in req.query) {
-      const { Location, BNID, SOS, BATTERY } = req.query;
+    // updating beacon battery and sos when beacon is in DCS room
+    if (
+      "Location" in req.query &&
+      "BNID" in req.query &&
+      "SOS" in req.query &&
+      "BATTERY" in req.query
+    ) {
+      const { BNID, SOS, BATTERY } = req.query;
       try {
-        const beacon = await beaconService.updateBeacon(
-          Location,
-          CPID,
-          BNID,
-          SOS,
-          BATTERY
-        );
+        const beacon = await beaconService.updateBeaconDCS(BNID, SOS, BATTERY);
 
         if (!beacon) {
           return res.status(201).json({
             status: 201,
             success: false,
-            message: `beacon not registered`,
+            message: `no beacon found`,
           });
         }
+        res.status(200).json({ status: 200, success: true, beacon });
       } catch (error) {
         return res
           .status(500)
           .json({ status: 400, success: false, message: error.message });
       }
+
+      // updating the isInDcsRoom flag triggered by closing the popup in frontend
+    } else if ("Location" in req.query && "BNID" in req.query) {
+      const { BNID } = req.query;
+      try {
+        const beacon = await beaconService.updateBeaconIsInDcsFlag(BNID);
+
+        if (!beacon) {
+          return res.status(201).json({
+            status: 201,
+            success: false,
+            message: `no beacon found`,
+          });
+        }
+        res.status(200).json({ status: 200, success: true, beacon });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ status: 400, success: false, message: error.message });
+      }
+
+      // updating the beacon data coming from the devices
     } else {
       const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
 

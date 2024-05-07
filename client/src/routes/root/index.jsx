@@ -9,17 +9,17 @@ export default function Root() {
 
   const logout = useLogout();
 
-  useEffect(() => {
-    const handleBeforeUnload = async (event) => {
-      await logout();
-    };
+  // useEffect(() => {
+  //   const handleBeforeUnload = async (event) => {
+  //     await logout();
+  //   };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []);
 
   return location.pathname === "/login" ? (
     <Outlet />

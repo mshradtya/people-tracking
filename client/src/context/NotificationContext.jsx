@@ -6,9 +6,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const SnackbarContext = createContext();
+const NotificationContext = createContext();
 
-export const SnackbarProvider = ({ children }) => {
+export const NotificationProvider = ({ children }) => {
   const [snackbarState, setSnackbarState] = useState({
     open: false,
     severity: "",
@@ -24,7 +24,7 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   return (
-    <SnackbarContext.Provider value={{ showSnackbar, hideSnackbar }}>
+    <NotificationContext.Provider value={{ showSnackbar, hideSnackbar }}>
       {children}
       <Snackbar
         open={snackbarState.open}
@@ -40,8 +40,8 @@ export const SnackbarProvider = ({ children }) => {
           {snackbarState.message}
         </Alert>
       </Snackbar>
-    </SnackbarContext.Provider>
+    </NotificationContext.Provider>
   );
 };
 
-export default SnackbarContext;
+export default NotificationContext;

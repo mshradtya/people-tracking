@@ -33,13 +33,17 @@ const beaconSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    isInDcsRoom: {
+      type: Boolean,
+      required: true,
+    },
     timestamp: {
       type: String,
     },
     battery: {
       type: Number,
       required: true,
-      min: 10,
+      min: 0,
       max: 100,
     },
     username: {

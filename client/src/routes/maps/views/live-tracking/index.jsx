@@ -76,6 +76,12 @@ function LiveTracking() {
   const [selectedConnectPointForROI, setSelectedConnectPointForROI] =
     useState(null);
   const [prevBeaconPositions, setPrevBeaconPositions] = useState({});
+  const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
+
+  const handleDcsAlertClose = async (bnid) => {
+    await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
+    setDcsAlertOpen(false);
+  };
 
   useEffect(() => {
     connectPoints.map((connectPoint) => {
@@ -111,7 +117,7 @@ function LiveTracking() {
     setCanvasMeasures({ width, height });
 
     const imageToLoad = new window.Image();
-    imageToLoad.src = `${mapName}.jpg`;
+    imageToLoad.src = `/assets/${mapName}.jpg`;
     imageToLoad.width = width;
     imageToLoad.height = height;
     imageToLoad.onload = () => {
@@ -357,7 +363,7 @@ function LiveTracking() {
             if (beacon.timestamp) {
               const minutesDifference = getMinutesDifference(beacon.timestamp);
               // Check if the time difference is less than 2 minutes
-              if (minutesDifference < 2 && beacon.boundingBox.length > 0) {
+              if (minutesDifference < 120 && beacon.boundingBox.length > 0) {
                 return (
                   <BeaconIndicator
                     key={index}
@@ -372,7 +378,6 @@ function LiveTracking() {
               }
             }
           })}
-
           {gateways.map(
             (gateway, index) =>
               gateway.coords.x !== null && (
