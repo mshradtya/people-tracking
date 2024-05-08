@@ -37,6 +37,10 @@ const beaconSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
+    lowBattery: {
+      type: Boolean,
+      required: true,
+    },
     timestamp: {
       type: String,
     },

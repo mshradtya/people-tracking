@@ -7,6 +7,7 @@ const {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeaconUserAck,
+  // updateBeaconBatteryLowFlag,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,
@@ -19,6 +20,7 @@ router.post("/beacon/user/assign", authUser, assignBeaconUser);
 router.get("/beacons", authUser, readAllBeacons);
 router.get("/beacon/users", authUser, readAllBeaconUsers);
 router.post("/beacon/update/ack", authUser, updateBeaconUserAck);
+// router.post("/beacon/update/lowBattery", authUser, updateBeaconBatteryLowFlag);
 router.post("/beacon/update", updateBeacon);
 router.delete("/beacon/delete/:id", authUser, deleteBeacon);
 router.get("/beacon/sos/history", authUser, readAllSosHistory);

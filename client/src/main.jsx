@@ -69,6 +69,9 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
   "&.notistack-MuiContent-error": {
     backgroundColor: "red",
   },
+  "&.notistack-MuiContent-warning": {
+    backgroundColor: "#FF4500",
+  },
 }));
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -79,6 +82,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           hideIconVariant
           Components={{
             error: StyledMaterialDesignContent,
+            warning: StyledMaterialDesignContent,
           }}
         >
           <AlarmAlertProvider>

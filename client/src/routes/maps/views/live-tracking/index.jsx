@@ -95,6 +95,40 @@ function LiveTracking() {
   }, [connectPoints]);
 
   useEffect(() => {
+    const updateBeaconSosAck = async (bnid) => {
+      try {
+        await axiosPrivate.post(
+          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=H&idle=L`
+        );
+      } catch (error) {
+        showSnackbar("error", error.response.data.message);
+      }
+    };
+
+    const updateBeaconIdleAck = async (bnid) => {
+      try {
+        await axiosPrivate.post(
+          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=L&idle=H`
+        );
+      } catch (error) {
+        showSnackbar("error", error.response.data.message);
+      }
+    };
+
+    const handleBeaconUpdates = async () => {
+      for (const beacon of beacons) {
+        if (beacon.sos === "H" && !beacon.userAck) {
+          await updateBeaconSosAck(beacon.bnid);
+        } else if (beacon.idle === "H" && !beacon.userAck) {
+          await updateBeaconIdleAck(beacon.bnid);
+        }
+      }
+    };
+
+    handleBeaconUpdates();
+  }, [beacons]);
+
+  useEffect(() => {
     fetchBeacons();
     const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
     fetchGateways();
@@ -117,7 +151,7 @@ function LiveTracking() {
     setCanvasMeasures({ width, height });
 
     const imageToLoad = new window.Image();
-    imageToLoad.src = `/assets/${mapName}.jpg`;
+    imageToLoad.src = `/${mapName}.jpg`;
     imageToLoad.width = width;
     imageToLoad.height = height;
     imageToLoad.onload = () => {

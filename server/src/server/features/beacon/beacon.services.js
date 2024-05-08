@@ -54,14 +54,23 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
-const updateBeaconUserAck = async (bnid, ack, sos) => {
+const updateBeaconUserAck = async (bnid, ack, sos, idle) => {
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
-    { userAck: ack, sos },
+    { userAck: ack, sos, idle },
     { new: true, runValidators: true }
   );
   return beacon;
 };
+
+// const updateBeaconBatteryLowFlag = async (bnid) => {
+//   const beacon = await Beacon.findOneAndUpdate(
+//     { bnid },
+//     { lowBattery: true },
+//     { new: true, runValidators: true }
+//   );
+//   return beacon;
+// };
 
 const updateBeaconIsInDcsFlag = async (bnid) => {
   const beacon = await Beacon.findOneAndUpdate(
@@ -112,13 +121,14 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   const beacon = await Beacon.findOne({ bnid: BNID });
   let updatedBeacon;
 
-  if (beacon) {
+  if (beacon && !beacon.userAck) {
     updatedBeacon = await Beacon.findOneAndUpdate(
       { bnid: BNID },
       {
-        sos: !beacon.userAck ? SOS : "H",
+        sos: SOS,
         idle: IDLE,
         battery: BATTERY,
+        lowBattery: BATTERY > 30 ? false : true,
         gwid: GWID,
         cpid: CPID,
 
@@ -126,36 +136,35 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
       },
       { new: true, runValidators: true }
     );
-  }
 
-  const updatedGateway = await Gateway.findOneAndUpdate(
-    { gwid: GWID },
-    { sos: SOS, timestamp: lastPacketDateTime },
-    { new: true, runValidators: true }
-  );
+    const updatedGateway = await Gateway.findOneAndUpdate(
+      { gwid: GWID },
+      { sos: SOS, timestamp: lastPacketDateTime },
+      { new: true, runValidators: true }
+    );
 
-  await ConnectPoint.findOneAndUpdate(
-    { cpid: CPID },
-    { gwid: GWID, sos: SOS, timestamp: lastPacketDateTime }
-  );
+    await ConnectPoint.findOneAndUpdate(
+      { cpid: CPID },
+      { gwid: GWID, sos: SOS, timestamp: lastPacketDateTime }
+    );
 
-  if (SOS === "H" || IDLE === "H") {
-    try {
-      const newSosHistory = new SosHistory({
-        bnid: BNID,
-        gwid: GWID,
-        cpid: CPID,
-        type: SOS === "H" ? "SOS" : "IDLE DETECTION",
-        location: updatedGateway.location,
-        timestamp: lastPacketDateTime,
-        username: updatedBeacon.username,
-      });
-      await newSosHistory.save();
-    } catch (err) {
-      console.log(err);
+    if (SOS === "H" || IDLE === "H") {
+      try {
+        const newSosHistory = new SosHistory({
+          bnid: BNID,
+          gwid: GWID,
+          cpid: CPID,
+          type: SOS === "H" ? "SOS" : "IDLE DETECTION",
+          location: updatedGateway.location,
+          timestamp: lastPacketDateTime,
+          username: updatedBeacon.username,
+        });
+        await newSosHistory.save();
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
-
   return updatedBeacon;
 };
 
@@ -173,6 +182,7 @@ module.exports = {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeaconUserAck,
+  // updateBeaconBatteryLowFlag,
   updateBeaconIsInDcsFlag,
   updateBeaconDCS,
   updateBeacon,

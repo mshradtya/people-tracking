@@ -65,12 +65,26 @@ const BeaconIndicator = ({
 }) => {
   const { scale } = useMap();
   const axiosPrivate = useAxiosPrivate();
-  const { showAlert } = useAlarmAlert();
+  const { showAlert, showBatteryAlert, batteryAlarmInfo, alarmInfo } =
+    useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
   const sosActive = beacon.sos === "H" && !beacon.isInDcsRoom;
+  const idleActive = beacon.idle === "H" && !beacon.isInDcsRoom;
+  const [batteryLowBlink, setBatteryLowBlink] = useState([]);
+  const batteryLow = beacon.lowBattery;
   const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
+
+  useEffect(() => {
+    // let arr = [];
+    // batteryAlarmInfo.forEach((info) => {
+    //   arr.push(info.bnid);
+    // });
+    // setBatteryLowBlink(arr);
+    // console.log(arr);
+    console.log(batteryAlarmInfo);
+  }, [batteryAlarmInfo]);
 
   const handleDcsAlertClose = async (bnid) => {
     await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
@@ -103,7 +117,9 @@ const BeaconIndicator = ({
       }));
     }
 
-    if (sosActive) showAlert(beacon);
+    if (sosActive) showAlert(beacon, "sos");
+    if (idleActive) showAlert(beacon, "idle");
+    if (batteryLow) showBatteryAlert(beacon);
 
     if (beacon.isInDcsRoom) {
       setDcsAlertOpen(true);
@@ -125,9 +141,13 @@ const BeaconIndicator = ({
             ? isBlinking
               ? "red"
               : "white"
-            : beacon.idle === "H"
+            : idleActive
             ? isBlinking
-              ? "orange"
+              ? "#FF4500"
+              : "white"
+            : batteryAlarmInfo.some((info) => info.bnid === beacon.bnid)
+            ? isBlinking
+              ? "blue"
               : "white"
             : beaconColor,
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
@@ -163,7 +183,7 @@ const BeaconIndicator = ({
             </Alert>
           </div>
         )}
-        {beacon.idle === "H" && (
+        {idleActive && (
           <div
             style={{
               position: "absolute",
@@ -175,7 +195,7 @@ const BeaconIndicator = ({
               variant="filled"
               severity="error"
               sx={{
-                background: "orange",
+                background: "#FF4500",
                 boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
                 zIndex: 1,
               }}
@@ -190,10 +210,10 @@ const BeaconIndicator = ({
               ? isBlinking
                 ? "white"
                 : "red"
-              : beacon.idle === "H"
+              : idleActive
               ? isBlinking
                 ? "white"
-                : "orange"
+                : "#FF4500"
               : "",
           }}
         >

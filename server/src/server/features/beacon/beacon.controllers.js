@@ -35,6 +35,7 @@ const registerBeacon = async (req, res) => {
       idle: "L",
       userAck: false,
       isInDcsRoom: false,
+      lowBattery: false,
       timestamp: null,
       battery: 10,
       username: "none",
@@ -194,8 +195,13 @@ const updateBeaconUserAck = async (req, res) => {
   }
 
   try {
-    const { bnid, ack, sos } = req.query;
-    const beacon = await beaconService.updateBeaconUserAck(bnid, ack, sos);
+    const { bnid, ack, sos, idle } = req.query;
+    const beacon = await beaconService.updateBeaconUserAck(
+      bnid,
+      ack,
+      sos,
+      idle
+    );
     if (!beacon) {
       return res.status(400).json({
         status: 400,
@@ -210,6 +216,33 @@ const updateBeaconUserAck = async (req, res) => {
       .json({ status: 500, success: false, message: error.message });
   }
 };
+
+// const updateBeaconBatteryLowFlag = async (req, res) => {
+//   if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
+//     return res.status(403).json({
+//       status: 403,
+//       success: false,
+//       message: `You must have SuperAdmin or User privilege to perform this operation.`,
+//     });
+//   }
+
+//   try {
+//     const { bnid } = req.query;
+//     const beacon = await beaconService.updateBeaconBatteryLowFlag(bnid);
+//     if (!beacon) {
+//       return res.status(400).json({
+//         status: 400,
+//         success: false,
+//         message: `beacon not registered`,
+//       });
+//     }
+//     res.status(201).json({ status: 200, success: true, beacon });
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({ status: 500, success: false, message: error.message });
+//   }
+// };
 
 const updateBeacon = async (req, res) => {
   if (req.query.BNID > 0) {
@@ -331,6 +364,7 @@ module.exports = {
   readAllBeacons,
   readAllBeaconUsers,
   updateBeaconUserAck,
+  // updateBeaconBatteryLowFlag,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,
