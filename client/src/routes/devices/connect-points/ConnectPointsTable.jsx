@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,6 +17,36 @@ import CircularProgress from "@mui/material/CircularProgress";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import useAuth from "@/hooks/auth/useAuth";
 import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#ed4354",
+    color: theme.palette.common.white,
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed4354",
+    },
+  },
+});
 
 export default function ConnectPointsTable() {
   const {
@@ -91,107 +123,113 @@ export default function ConnectPointsTable() {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        {isConnectPointsLoading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100px",
-            }}
-          >
-            <CircularProgress />
-          </div>
-        ) : (
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Serial No.
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Connect Point ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Gateway ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Pillars Covered
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Last Packet DateTime
-                </TableCell>
-                {auth?.role === "SuperAdmin" && (
-                  <TableCell align="center" style={{ minWidth: 70 }}>
-                    Action
-                  </TableCell>
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {connectPoints &&
-                connectPoints
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.cpid}
-                      >
-                        <TableCell align="center">
-                          {connectPointsSerialNumber + index}
-                        </TableCell>
-                        <TableCell align="center">{row.cpid}</TableCell>
-                        <TableCell align="center">
-                          {row.gwid ? row.gwid : "--"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {`${row.pillarStart} to ${row.pillarEnd}`}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.timestamp ? row.timestamp : "--"}
-                        </TableCell>
-                        {auth?.role === "SuperAdmin" && (
-                          <TableCell align="center">
-                            <div className="flex justify-center">
-                              <span>
-                                <IconButton
-                                  aria-label="delete"
-                                  sx={{ color: "red" }}
-                                  onClick={() => handleDeleteConnectPoint(row)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </span>
-                            </div>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    );
-                  })}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={connectPoints.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      <ThemeProvider theme={theme}>
+        <TableContainer sx={{ maxHeight: 500 }}>
+          {isConnectPointsLoading ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100px",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          ) : (
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <StyledTableRow>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Serial No.
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Connect Point ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Gateway ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Pillars Covered
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Last Packet DateTime
+                  </StyledTableCell>
+                  {auth?.role === "SuperAdmin" && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      Action
+                    </StyledTableCell>
+                  )}
+                </StyledTableRow>
+              </TableHead>
+              <TableBody>
+                {connectPoints &&
+                  connectPoints
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <StyledTableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={row.cpid}
+                        >
+                          <StyledTableCell align="center">
+                            {connectPointsSerialNumber + index}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.cpid}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.gwid ? row.gwid : "--"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {`${row.pillarStart} to ${row.pillarEnd}`}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.timestamp ? row.timestamp : "--"}
+                          </StyledTableCell>
+                          {auth?.role === "SuperAdmin" && (
+                            <StyledTableCell align="center">
+                              <div className="flex justify-center">
+                                <span>
+                                  <IconButton
+                                    aria-label="delete"
+                                    sx={{ color: "red" }}
+                                    onClick={() =>
+                                      handleDeleteConnectPoint(row)
+                                    }
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </span>
+                              </div>
+                            </StyledTableCell>
+                          )}
+                        </StyledTableRow>
+                      );
+                    })}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={connectPoints.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
 
-      {/* Confirm Delete Modal */}
-      <ConfirmConnectPointDeletionModal
-        open={isConfirmDeleteConnectPointModalOpen}
-        handleClose={handleCloseConfirmDeleteConnectPointModal}
-        handleConfirmDelete={deleteConnectPoint}
-      />
+        {/* Confirm Delete Modal */}
+        <ConfirmConnectPointDeletionModal
+          open={isConfirmDeleteConnectPointModalOpen}
+          handleClose={handleCloseConfirmDeleteConnectPointModal}
+          handleConfirmDelete={deleteConnectPoint}
+        />
+      </ThemeProvider>
     </Paper>
   );
 }

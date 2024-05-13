@@ -14,36 +14,8 @@ import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
 import BeaconIndicator from "./BeaconIndicator";
-
-const getMinutesDifference = (timestamp) => {
-  const [datePart, timePart] = timestamp.split(", ");
-
-  const [date, month, year] = datePart.split("/").map((part) => parseInt(part));
-
-  const [time, period] = timePart.split(" ");
-  const [hours, minutes, seconds] = time
-    .split(":")
-    .map((part) => parseInt(part));
-
-  const fullYear = 2000 + year;
-
-  const adjustedHours = (hours % 12) + (period.toLowerCase() === "pm" ? 12 : 0);
-
-  const beaconTimestamp = new Date(
-    fullYear,
-    month - 1,
-    date,
-    adjustedHours,
-    minutes,
-    seconds
-  );
-
-  const currentTime = new Date();
-  const timeDifference = currentTime - beaconTimestamp;
-  const minutesDifference = timeDifference / (1000 * 60);
-
-  return minutesDifference;
-};
+import { getMinutesDifference } from "@/utils/helpers";
+import BeaconDcsDialog from "../../../../components/modals/BeaconDcsDialog";
 
 function LiveTracking() {
   const {
@@ -77,11 +49,13 @@ function LiveTracking() {
     useState(null);
   const [prevBeaconPositions, setPrevBeaconPositions] = useState({});
   const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
+  const [dcsBeacon, setDcsBeacon] = useState(null);
 
-  const handleDcsAlertClose = async (bnid) => {
-    await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
-    setDcsAlertOpen(false);
-  };
+  // const handleDcsAlertClose = async (bnid) => {
+  //   await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
+  //   setDcsAlertOpen(false);
+  //   setDcsBeacon(null);
+  // };
 
   useEffect(() => {
     connectPoints.map((connectPoint) => {
@@ -94,45 +68,61 @@ function LiveTracking() {
     });
   }, [connectPoints]);
 
-  useEffect(() => {
-    const updateBeaconSosAck = async (bnid) => {
-      try {
-        await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=H&idle=L`
-        );
-      } catch (error) {
-        showSnackbar("error", error.response.data.message);
-      }
-    };
+  // useEffect(() => {
+  //   const updateBeaconSosAck = async (bnid) => {
+  //     try {
+  //       await axiosPrivate.post(
+  //         `/beacon/update/ack?bnid=${bnid}&ack=true&sos=H&idle=L`
+  //       );
+  //     } catch (error) {
+  //       showSnackbar("error", error.response.data.message);
+  //     }
+  //   };
 
-    const updateBeaconIdleAck = async (bnid) => {
-      try {
-        await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=L&idle=H`
-        );
-      } catch (error) {
-        showSnackbar("error", error.response.data.message);
-      }
-    };
+  //   const updateBeaconIdleAck = async (bnid) => {
+  //     try {
+  //       await axiosPrivate.post(
+  //         `/beacon/update/ack?bnid=${bnid}&ack=true&sos=L&idle=H`
+  //       );
+  //     } catch (error) {
+  //       showSnackbar("error", error.response.data.message);
+  //     }
+  //   };
 
-    const handleBeaconUpdates = async () => {
-      for (const beacon of beacons) {
-        if (beacon.sos === "H" && !beacon.userAck) {
-          await updateBeaconSosAck(beacon.bnid);
-        } else if (beacon.idle === "H" && !beacon.userAck) {
-          await updateBeaconIdleAck(beacon.bnid);
-        }
-      }
-    };
+  //   const handleBeaconUpdates = async () => {
+  //     for (const beacon of beacons) {
+  //       if (beacon.sos === "H" && !beacon.userAck && !beacon.isInDcsRoom) {
+  //         await updateBeaconSosAck(beacon.bnid);
+  //       } else if (
+  //         beacon.idle === "H" &&
+  //         !beacon.userAck &&
+  //         !beacon.isInDcsRoom
+  //       ) {
+  //         await updateBeaconIdleAck(beacon.bnid);
+  //       }
+  //     }
+  //   };
 
-    handleBeaconUpdates();
-  }, [beacons]);
+  //   const handleBeaconInDcs = async () => {
+  //     for (const beacon of beacons) {
+  //       if (beacon.isInDcsRoom) {
+  //         setDcsBeacon(beacon);
+  //         setDcsAlertOpen(true);
+  //       }
+  //     }
+  //   };
+
+  //   handleBeaconUpdates();
+  //   handleBeaconInDcs();
+  // }, [beacons]);
 
   useEffect(() => {
     fetchBeacons();
     const fetchBeaconsInterval = setInterval(fetchBeacons, 300);
     fetchGateways();
+    const fetchGatewaysInterval = setInterval(fetchGateways, 300);
     fetchConnectPoints();
+    const fetchConnectPointsInterval = setInterval(fetchConnectPoints, 300);
 
     // Set initial random positions for all beacons
     const initialPositions = beacons.reduce((acc, beacon) => {
@@ -143,6 +133,8 @@ function LiveTracking() {
 
     return () => {
       clearInterval(fetchBeaconsInterval);
+      clearInterval(fetchConnectPointsInterval);
+      clearInterval(fetchGatewaysInterval);
     };
   }, []);
 
@@ -383,7 +375,7 @@ function LiveTracking() {
                         <Line
                           key={connectPointId}
                           points={coordinates}
-                          stroke={"#df7dfa"}
+                          stroke={"purple"}
                           strokeWidth={3}
                           closed
                         />
@@ -397,7 +389,11 @@ function LiveTracking() {
             if (beacon.timestamp) {
               const minutesDifference = getMinutesDifference(beacon.timestamp);
               // Check if the time difference is less than 2 minutes
-              if (minutesDifference < 120 && beacon.boundingBox.length > 0) {
+              if (
+                minutesDifference < 2 &&
+                beacon.boundingBox.length > 0 &&
+                !beacon.isInDcsRoom
+              ) {
                 return (
                   <BeaconIndicator
                     key={index}
@@ -421,6 +417,7 @@ function LiveTracking() {
                     x: gateway.coords.x,
                     y: gateway.coords.y,
                     gatewayId: gateway.gwid,
+                    timestamp: gateway.timestamp,
                   }}
                   removeGatewayFromMap={removeGatewayFromMap}
                 />
@@ -437,6 +434,7 @@ function LiveTracking() {
                     connectPointId: connectPoint.cpid,
                     pillarStart: connectPoint.pillarStart,
                     pillarEnd: connectPoint.pillarEnd,
+                    timestamp: connectPoint.timestamp,
                   }}
                   removeConnectPointFromMap={removeConnectPointFromMap}
                 />
@@ -469,6 +467,11 @@ function LiveTracking() {
           onClose={closeConnectPointROIModal}
         />
       )}
+      {/* <BeaconDcsDialog
+        dcsAlertOpen={dcsAlertOpen}
+        handleDcsAlertClose={handleDcsAlertClose}
+        beacon={dcsBeacon}
+      /> */}
     </div>
   );
 }

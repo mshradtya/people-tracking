@@ -9,7 +9,8 @@ const AlarmAlertContext = createContext();
 export const AlarmAlertProvider = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
-  const [alarmInfo, setAlarmInfo] = useState([]);
+  const [sosAlarmInfo, setSosAlarmInfo] = useState([]);
+  const [idleAlarmInfo, setIdleAlarmInfo] = useState([]);
   const [batteryAlarmInfo, setBatteryAlarmInfo] = useState([]);
   const [audioElement, setAudioElement] = useState(null);
 
@@ -22,14 +23,33 @@ export const AlarmAlertProvider = ({ children }) => {
     };
   }, []);
 
-  const closeAlert = async (snackbarId) => {
+  const closeSosAlert = async (snackbarId) => {
     try {
-      const beaconToAck = alarmInfo.find((info) => info.bnid === snackbarId);
+      const beaconToAck = sosAlarmInfo.find((info) => info.bnid === snackbarId);
       if (beaconToAck) {
         await axiosPrivate.post(
           `/beacon/update/ack?bnid=${beaconToAck.bnid}&ack=false&sos=L&idle=L`
         );
-        setAlarmInfo((prevAlarmInfo) =>
+        setSosAlarmInfo((prevAlarmInfo) =>
+          prevAlarmInfo.filter((info) => info.bnid !== snackbarId)
+        );
+      }
+      closeSnackbar(snackbarId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const closeIdleAlert = async (snackbarId) => {
+    try {
+      const beaconToAck = idleAlarmInfo.find(
+        (info) => info.bnid === snackbarId
+      );
+      if (beaconToAck) {
+        await axiosPrivate.post(
+          `/beacon/update/ack?bnid=${beaconToAck.bnid}&ack=false&sos=L&idle=L`
+        );
+        setIdleAlarmInfo((prevAlarmInfo) =>
           prevAlarmInfo.filter((info) => info.bnid !== snackbarId)
         );
       }
@@ -45,9 +65,6 @@ export const AlarmAlertProvider = ({ children }) => {
         (info) => info.bnid === snackbarId - 100
       );
       if (beaconToAck) {
-        // await axiosPrivate.post(
-        //   `/beacon/update/lowBattery?bnid=${beaconToAck.bnid}`
-        // );
         setBatteryAlarmInfo((prevAlarmInfo) =>
           prevAlarmInfo.filter((info) => info.bnid !== snackbarId - 100)
         );
@@ -58,12 +75,24 @@ export const AlarmAlertProvider = ({ children }) => {
     }
   };
 
-  const alertAction = (snackbarId) => (
+  const sosAlertAction = (snackbarId) => (
     <>
       <Button
         variant="filled"
         color="inherit"
-        onClick={() => closeAlert(snackbarId)}
+        onClick={() => closeSosAlert(snackbarId)}
+      >
+        OK
+      </Button>
+    </>
+  );
+
+  const idleAlertAction = (snackbarId) => (
+    <>
+      <Button
+        variant="filled"
+        color="inherit"
+        onClick={() => closeIdleAlert(snackbarId)}
       >
         OK
       </Button>
@@ -83,34 +112,38 @@ export const AlarmAlertProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    alarmInfo.forEach((info) => {
-      if (info.status && info.type === "sos") {
-        enqueueSnackbar(
-          `SOS By ${info.user} (ID: ${info.bnid}) - Connect Point ${info.cpid}`,
-          {
-            variant: "error",
-            anchorOrigin: { horizontal: "center", vertical: "bottom" },
-            key: info.bnid, // Use a unique key for each snackbar
-            preventDuplicate: true,
-            persist: true,
-            action: alertAction,
-          }
-        );
-      } else if (info.status && info.type === "idle") {
-        enqueueSnackbar(
-          `Unusual Idle Time Detected For ${info.user} (ID: ${info.bnid}) - Connect Point ${info.cpid}`,
-          {
-            variant: "warning",
-            anchorOrigin: { horizontal: "center", vertical: "bottom" },
-            key: info.bnid, // Use a unique key for each snackbar
-            preventDuplicate: true,
-            persist: true,
-            action: alertAction,
-          }
-        );
-      }
+    sosAlarmInfo.forEach((info) => {
+      enqueueSnackbar(
+        `SOS By ${info.user !== "" ? info.user : "NA"} (ID: ${
+          info.bnid
+        }) - Connect Point ${info.cpid}`,
+        {
+          variant: "error",
+          anchorOrigin: { horizontal: "center", vertical: "bottom" },
+          key: info.bnid, // Use a unique key for each snackbar
+          preventDuplicate: true,
+          persist: true,
+          action: sosAlertAction,
+        }
+      );
     });
-  }, [alarmInfo]);
+  }, [sosAlarmInfo]);
+
+  useEffect(() => {
+    idleAlarmInfo.forEach((info) => {
+      enqueueSnackbar(
+        `Unusual Idleness Detected for ${info.user} (ID: ${info.bnid}) - Connect Point ${info.cpid}`,
+        {
+          variant: "warning",
+          anchorOrigin: { horizontal: "center", vertical: "bottom" },
+          key: info.bnid, // Use a unique key for each snackbar
+          preventDuplicate: true,
+          persist: true,
+          action: idleAlertAction,
+        }
+      );
+    });
+  }, [idleAlarmInfo]);
 
   useEffect(() => {
     batteryAlarmInfo.forEach((info) => {
@@ -128,17 +161,34 @@ export const AlarmAlertProvider = ({ children }) => {
     });
   }, [batteryAlarmInfo]);
 
-  const showAlert = (beacon, detectionType) => {
-    const isAlreadyPresent = alarmInfo.some(
+  const showSosAlert = (beacon) => {
+    const isAlreadyPresent = sosAlarmInfo.some(
       (info) => info.bnid === beacon.bnid && info.cpid === beacon.cpid
     );
 
     if (!isAlreadyPresent) {
-      setAlarmInfo((prevAlarmInfo) => [
+      setSosAlarmInfo((prevAlarmInfo) => [
         ...prevAlarmInfo,
         {
           status: true,
-          type: detectionType,
+          bnid: beacon.bnid,
+          cpid: beacon.cpid,
+          user: beacon.username,
+        },
+      ]);
+    }
+  };
+
+  const showIdleAlert = (beacon) => {
+    const isAlreadyPresent = idleAlarmInfo.some(
+      (info) => info.bnid === beacon.bnid && info.cpid === beacon.cpid
+    );
+
+    if (!isAlreadyPresent) {
+      setIdleAlarmInfo((prevAlarmInfo) => [
+        ...prevAlarmInfo,
+        {
+          status: true,
           bnid: beacon.bnid,
           cpid: beacon.cpid,
           user: beacon.username,
@@ -167,17 +217,27 @@ export const AlarmAlertProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (alarmInfo.some((info) => info.status)) {
+    if (
+      sosAlarmInfo.some((info) => info.status) ||
+      idleAlarmInfo.some((info) => info.status)
+    ) {
       audioElement.loop = true;
       audioElement.play();
     } else {
       audioElement?.pause();
     }
-  }, [alarmInfo]);
+  }, [sosAlarmInfo, idleAlarmInfo]);
 
   return (
     <AlarmAlertContext.Provider
-      value={{ showAlert, showBatteryAlert, batteryAlarmInfo, alarmInfo }}
+      value={{
+        showSosAlert,
+        showIdleAlert,
+        showBatteryAlert,
+        sosAlarmInfo,
+        idleAlarmInfo,
+        batteryAlarmInfo,
+      }}
     >
       {children}
     </AlarmAlertContext.Provider>

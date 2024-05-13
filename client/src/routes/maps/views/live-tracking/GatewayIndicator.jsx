@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import useMap from "@/hooks/useMap";
 import Tooltip from "@mui/material/Tooltip";
+import { getMinutesDifference } from "@/utils/helpers";
 
 const GatewayIndicator = ({ index, data, removeGatewayFromMap }) => {
   const { scale } = useMap();
+  const timeDifference = data.timestamp
+    ? getMinutesDifference(data.timestamp)
+    : null;
 
   const handleDoubleClick = (event) => {
     event.preventDefault();
@@ -22,7 +26,12 @@ const GatewayIndicator = ({ index, data, removeGatewayFromMap }) => {
           width: "20px",
           height: "20px",
           borderRadius: "20%",
-          backgroundColor: "blue",
+          backgroundColor:
+            timeDifference === null
+              ? "blue"
+              : timeDifference < 30
+              ? "green"
+              : "red",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",

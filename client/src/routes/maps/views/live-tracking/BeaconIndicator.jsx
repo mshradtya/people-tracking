@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import useMap from "@/hooks/useMap";
 import Tooltip from "@mui/material/Tooltip";
-import PersonIcon from "@mui/icons-material/Person";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
-import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
 import { useAlarmAlert } from "@/hooks/useAlarmAlert";
-import BeaconDcsDialog from "./BeaconDcsDialog";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 
 function getRandomPoint(coordinates) {
@@ -64,32 +60,13 @@ const BeaconIndicator = ({
   setPrevBeaconPositions,
 }) => {
   const { scale } = useMap();
-  const axiosPrivate = useAxiosPrivate();
-  const { showAlert, showBatteryAlert, batteryAlarmInfo, alarmInfo } =
+  const { showBatteryAlert, batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } =
     useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
-  const sosActive = beacon.sos === "H" && !beacon.isInDcsRoom;
-  const idleActive = beacon.idle === "H" && !beacon.isInDcsRoom;
-  const [batteryLowBlink, setBatteryLowBlink] = useState([]);
-  const batteryLow = beacon.lowBattery;
-  const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
-
-  useEffect(() => {
-    // let arr = [];
-    // batteryAlarmInfo.forEach((info) => {
-    //   arr.push(info.bnid);
-    // });
-    // setBatteryLowBlink(arr);
-    // console.log(arr);
-    console.log(batteryAlarmInfo);
-  }, [batteryAlarmInfo]);
-
-  const handleDcsAlertClose = async (bnid) => {
-    await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
-    setDcsAlertOpen(false);
-  };
+  const sosActive = sosAlarmInfo.some((info) => info.bnid === beacon.bnid);
+  const idleActive = idleAlarmInfo.some((info) => info.bnid === beacon.bnid);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -117,12 +94,8 @@ const BeaconIndicator = ({
       }));
     }
 
-    if (sosActive) showAlert(beacon, "sos");
-    if (idleActive) showAlert(beacon, "idle");
-    if (batteryLow) showBatteryAlert(beacon);
-
-    if (beacon.isInDcsRoom) {
-      setDcsAlertOpen(true);
+    if (beacon.battery < 30) {
+      showBatteryAlert(beacon);
     }
   }, [beacon]);
 
@@ -144,10 +117,6 @@ const BeaconIndicator = ({
             : idleActive
             ? isBlinking
               ? "#FF4500"
-              : "white"
-            : batteryAlarmInfo.some((info) => info.bnid === beacon.bnid)
-            ? isBlinking
-              ? "blue"
               : "white"
             : beaconColor,
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
@@ -217,16 +186,15 @@ const BeaconIndicator = ({
               : "",
           }}
         >
-          <Tooltip title={`${beacon.bnid}: ${beacon.username}`}>
+          <Tooltip
+            title={`${beacon.bnid}: ${
+              beacon.username ? beacon.username : "No User Assigned"
+            }`}
+          >
             <PersonPinIcon />
           </Tooltip>
         </span>
       </div>
-      <BeaconDcsDialog
-        dcsAlertOpen={dcsAlertOpen}
-        handleDcsAlertClose={handleDcsAlertClose}
-        beacon={beacon}
-      />
     </>
   );
 };

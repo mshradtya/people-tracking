@@ -1,7 +1,7 @@
 const Beacon = require("./beacon.model");
 const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
-const BeaconUser = require("./beacon-user.model");
+// const BeaconUser = require("./beacon-user.model");
 const SosHistory = require("./beacon-sos-history.model");
 const { formattedDate } = require("../../utils/helper");
 const recentRequests = new Map();
@@ -12,13 +12,19 @@ const registerBeacon = async (beaconData) => {
   return newBeacon;
 };
 
-const registerBeaconUser = async (userData) => {
-  const user = new BeaconUser(userData);
-  const newBeaconUser = await user.save();
-  return newBeaconUser;
-};
+// const registerBeaconUser = async (userData) => {
+//   const user = new BeaconUser(userData);
+//   const newBeaconUser = await user.save();
+//   return newBeaconUser;
+// };
 
 const assignBeaconUser = async (bnid, username) => {
+  const words = username.split(" ");
+  const capitalizedWords = words.map(
+    (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  );
+  username = capitalizedWords.join(" ");
+
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
     { username },
@@ -44,10 +50,10 @@ const readAllBeacons = async () => {
   return allBeacons;
 };
 
-const readAllBeaconUsers = async () => {
-  const allUsers = await BeaconUser.find({});
-  return allUsers;
-};
+// const readAllBeaconUsers = async () => {
+//   const allUsers = await BeaconUser.find({});
+//   return allUsers;
+// };
 
 const readAllSosHistory = async () => {
   const allSosHistory = await SosHistory.find({}).sort({ _id: -1 });
@@ -75,26 +81,40 @@ const updateBeaconUserAck = async (bnid, ack, sos, idle) => {
 const updateBeaconIsInDcsFlag = async (bnid) => {
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
-    { isInDcsRoom: false },
+    { isInDcsRoom: false, sos: "L", idle: "L" },
     { new: true, runValidators: true }
   );
   return beacon;
 };
 
 const updateBeaconDCS = async (BNID, SOS, BATTERY) => {
-  const lastPacketDateTime = formattedDate();
-
   const updatedBeacon = await Beacon.findOneAndUpdate(
     { bnid: BNID },
     {
       isInDcsRoom: true,
       sos: SOS,
       battery: BATTERY,
-      timestamp: lastPacketDateTime,
     },
     { new: true, runValidators: true }
   );
   return updatedBeacon;
+};
+
+const updateGWCPHealth = async (GWID, CPID) => {
+  const lastPacketDateTime = formattedDate();
+
+  const updatedGateway = await Gateway.findOneAndUpdate(
+    { gwid: GWID },
+    { timestamp: lastPacketDateTime },
+    { new: true, runValidators: true }
+  );
+
+  const updatedConnectPoint = await ConnectPoint.findOneAndUpdate(
+    { cpid: CPID },
+    { gwid: GWID, timestamp: lastPacketDateTime }
+  );
+
+  return { updatedGateway, updatedConnectPoint };
 };
 
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
@@ -177,14 +197,15 @@ const deleteBeacon = async (bnid) => {
 
 module.exports = {
   registerBeacon,
-  registerBeaconUser,
+  // registerBeaconUser,
   assignBeaconUser,
   readAllBeacons,
-  readAllBeaconUsers,
+  // readAllBeaconUsers,
   updateBeaconUserAck,
   // updateBeaconBatteryLowFlag,
   updateBeaconIsInDcsFlag,
   updateBeaconDCS,
+  updateGWCPHealth,
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,

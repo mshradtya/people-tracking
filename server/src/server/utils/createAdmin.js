@@ -1,12 +1,12 @@
 var UserModel = require("../features/user/user.model");
-var BeaconUser = require("../features/beacon/beacon-user.model");
+// var BeaconUser = require("../features/beacon/beacon-user.model");
 const { formattedDate } = require("./helper");
 
 // Check if admin user exists, and create admin if not
 const createAdmin = async () => {
   try {
     const admin = await UserModel.findOne({ username: "docketrun" });
-    const beaconUser = await BeaconUser.findOne({ username: "none" });
+    // const beaconUser = await BeaconUser.findOne({ username: "none" });
 
     if (!admin) {
       const adminData = new UserModel({
@@ -24,19 +24,19 @@ const createAdmin = async () => {
       console.log("admin exists");
     }
 
-    if (!beaconUser) {
-      const userData = new BeaconUser({
-        username: "none",
-        name: "None",
-        designation: "none",
-        email: "none@none.com",
-        phone: null,
-        dateRegistered: formattedDate(new Date()),
-      });
+    // if (!beaconUser) {
+    //   const userData = new BeaconUser({
+    //     username: "none",
+    //     name: "None",
+    //     designation: "none",
+    //     email: "none@none.com",
+    //     phone: null,
+    //     dateRegistered: formattedDate(new Date()),
+    //   });
 
-      await userData.save();
-      console.log("default beacon user created");
-    }
+    //   await userData.save();
+    //   console.log("default beacon user created");
+    // }
   } catch (err) {
     console.log("Error creating admin:", err);
   }

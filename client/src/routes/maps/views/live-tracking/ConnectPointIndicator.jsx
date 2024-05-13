@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useMap from "@/hooks/useMap";
 import Tooltip from "@mui/material/Tooltip";
+import { getMinutesDifference } from "@/utils/helpers";
 
 const ConnectPointIndicator = ({
   index,
@@ -18,6 +19,9 @@ const ConnectPointIndicator = ({
   // const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
   const formattedPillarStart = data.pillarStart.toString().padStart(2, "0");
   const formattedPillarEnd = data.pillarEnd.toString().padStart(2, "0");
+  const timeDifference = data.timestamp
+    ? getMinutesDifference(data.timestamp)
+    : null;
 
   return (
     <div>
@@ -54,7 +58,12 @@ const ConnectPointIndicator = ({
             height: "20px",
             borderRadius: "50%",
             // backgroundColor: isSosConnectPoint ? "red" : "purple",
-            backgroundColor: "purple",
+            backgroundColor:
+              timeDifference === null
+                ? "purple"
+                : timeDifference < 30
+                ? "green"
+                : "red",
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             transform: `scale(${1 / scale})`,
             display: "flex",

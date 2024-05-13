@@ -30,6 +30,7 @@ const registerGateway = async (req, res) => {
       coords: { x: null, y: null },
       roiCoords: [],
       sos: "L",
+      timestamp: null,
     };
     const gateway = await gatewayService.registerGateway(gatewayData);
     res.status(201).json({ status: 201, success: true, gateway });

@@ -52,7 +52,7 @@ const beaconSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      match: /^[a-zA-Z0-9]{4,}$/,
+      // match: /^[a-zA-Z0-9]{4,}$/,
     },
     reassigned: {
       type: Boolean,

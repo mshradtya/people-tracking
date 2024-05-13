@@ -1,4 +1,6 @@
 import { useState, useEffect, forwardRef } from "react";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -20,6 +22,36 @@ import useAuth from "@/hooks/auth/useAuth";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import BatteryIcon from "./BatteryIcon";
 import AssignUser from "./AssignUser";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#ed4354",
+    color: theme.palette.common.white,
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed4354",
+    },
+  },
+});
 
 export default function BeaconsTable() {
   const { showSnackbar } = useSnackbar();
@@ -94,147 +126,151 @@ export default function BeaconsTable() {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        {isLoading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100px",
-            }}
-          >
-            <CircularProgress />
-          </div>
-        ) : (
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Serial No.
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Beacon ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Connect Point ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Gateway ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Assigned To
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  SOS
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Last Packet DateTime
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Battery
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {beacons &&
-                beacons
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row._id}
-                      >
-                        <TableCell align="center">
-                          {serialNumber + index}
-                        </TableCell>
-                        <TableCell align="center">{row.bnid}</TableCell>
-                        <TableCell align="center">
-                          {row.cpid ? row.cpid : "--"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.gwid ? row.gwid : "--"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.username === "none" ? "--" : row.username}
-                        </TableCell>
-                        <TableCell align="center">
-                          <span
-                            style={{
-                              // fontWeight: `${row.sos === "L" ? "" : "bold"}`,
-                              color: `${row.sos === "L" ? "green" : "red"}`,
-                              animation: `${
-                                row.sos === "L"
-                                  ? "none"
-                                  : "blink 0.5s linear infinite"
-                              }`,
-                            }}
-                          >
-                            {row.sos === "L" ? "False" : "True"}
-                          </span>
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.timestamp ? row.timestamp : "--"}
-                        </TableCell>
-                        <TableCell align="center">
-                          <span>{row.battery}%</span>
-                          <BatteryIcon battery={row.battery} />
-                        </TableCell>
-                        <TableCell align="center">
-                          <span className="flex justify-center items-center">
-                            <IconButton
-                              aria-label="addUser"
-                              sx={{ color: "rgb(25, 118, 210)" }}
-                              onClick={() => handleOpenAssignUser(row)}
+      <ThemeProvider theme={theme}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          {isLoading ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100px",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          ) : (
+            <Table stickyHeader aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Serial No.
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Beacon ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Connect Point ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Gateway ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Assigned To
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    SOS
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Last Packet DateTime
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Battery
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Action
+                  </StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {beacons &&
+                  beacons
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <StyledTableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={row._id}
+                        >
+                          <StyledTableCell align="center">
+                            {serialNumber + index}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.bnid}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.cpid ? row.cpid : "--"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.gwid ? row.gwid : "--"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.username === "" ? "--" : row.username}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            <span
+                              style={{
+                                // fontWeight: `${row.sos === "L" ? "" : "bold"}`,
+                                color: `${row.sos === "L" ? "green" : "red"}`,
+                                animation: `${
+                                  row.sos === "L"
+                                    ? "none"
+                                    : "blink 0.5s linear infinite"
+                                }`,
+                              }}
                             >
-                              <PersonAddIcon />
-                            </IconButton>
-                            {auth?.role === "SuperAdmin" && (
+                              {row.sos === "L" ? "False" : "True"}
+                            </span>
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.timestamp ? row.timestamp : "--"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            <span>{row.battery}%</span>
+                            <BatteryIcon battery={row.battery} />
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            <span className="flex justify-center items-center">
                               <IconButton
-                                aria-label="delete"
-                                sx={{ color: "red" }}
-                                onClick={() => handleDeleteBeacon(row)}
+                                aria-label="addUser"
+                                sx={{ color: "rgb(25, 118, 210)" }}
+                                onClick={() => handleOpenAssignUser(row)}
                               >
-                                <DeleteIcon />
+                                <PersonAddIcon />
                               </IconButton>
-                            )}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={beacons.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+                              {auth?.role === "SuperAdmin" && (
+                                <IconButton
+                                  aria-label="delete"
+                                  sx={{ color: "red" }}
+                                  onClick={() => handleDeleteBeacon(row)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              )}
+                            </span>
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      );
+                    })}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={beacons.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
 
-      <AssignUser
-        openAssignUser={openAssignUser}
-        handleCloseAssignUser={handleCloseAssignUser}
-        selectedBeacon={selectedBeacon}
-      />
+        <AssignUser
+          openAssignUser={openAssignUser}
+          handleCloseAssignUser={handleCloseAssignUser}
+          selectedBeacon={selectedBeacon}
+        />
 
-      {/* Confirm Delete Modal */}
-      <ConfirmBeaconDeletionModal
-        open={isConfirmDeleteBeaconModalOpen}
-        handleClose={handleCloseConfirmDeleteBeaconModal}
-        handleConfirmDelete={deleteBeacon}
-      />
+        {/* Confirm Delete Modal */}
+        <ConfirmBeaconDeletionModal
+          open={isConfirmDeleteBeaconModalOpen}
+          handleClose={handleCloseConfirmDeleteBeaconModal}
+          handleConfirmDelete={deleteBeacon}
+        />
+      </ThemeProvider>
 
       <style jsx>{`
         @keyframes blink {

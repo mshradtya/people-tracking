@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const {
   registerBeacon,
-  registerBeaconUser,
+  // registerBeaconUser,
   assignBeaconUser,
   readAllBeacons,
-  readAllBeaconUsers,
+  // readAllBeaconUsers,
   updateBeaconUserAck,
   // updateBeaconBatteryLowFlag,
   updateBeacon,
@@ -15,10 +15,10 @@ const {
 const { authUser } = require("../auth/auth.controllers");
 
 router.post("/beacon/register", authUser, registerBeacon);
-router.post("/beacon/user/register", authUser, registerBeaconUser);
+// router.post("/beacon/user/register", authUser, registerBeaconUser);
 router.post("/beacon/user/assign", authUser, assignBeaconUser);
 router.get("/beacons", authUser, readAllBeacons);
-router.get("/beacon/users", authUser, readAllBeaconUsers);
+// router.get("/beacon/users", authUser, readAllBeaconUsers);
 router.post("/beacon/update/ack", authUser, updateBeaconUserAck);
 // router.post("/beacon/update/lowBattery", authUser, updateBeaconBatteryLowFlag);
 router.post("/beacon/update", updateBeacon);

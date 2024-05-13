@@ -1,4 +1,6 @@
 import { useState, useEffect, forwardRef } from "react";
+import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,14 +9,41 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ConfirmGatewayDeletionModal from "@/components/modals/ConfirmGatewayDeletionModal";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import useAuth from "@/hooks/auth/useAuth";
 import { useFetchSosHistory } from "@/hooks/useFetchSosHistory";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#ed4354",
+    color: theme.palette.common.white,
+    textAlign: "center",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+}));
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed4354",
+    },
+  },
+});
 
 export default function SosHistoryTable() {
   const { history, isHistoryLoading, historySerialNumber, fetchSosHistory } =
@@ -86,66 +115,86 @@ export default function SosHistoryTable() {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        {isHistoryLoading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100px",
-            }}
-          >
-            <CircularProgress />
-          </div>
-        ) : (
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Serial No.
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Beacon ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Connect Point ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Gateway ID
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Type
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Location
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Timestamp
-                </TableCell>
-                <TableCell align="center" style={{ minWidth: 70 }}>
-                  Username
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {history &&
-                history
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                        <TableCell align="center">
-                          {historySerialNumber + index}
-                        </TableCell>
-                        <TableCell align="center">{row.bnid}</TableCell>
-                        <TableCell align="center">{row.cpid}</TableCell>
-                        <TableCell align="center">{row.gwid}</TableCell>
-                        <TableCell align="center">{row.type}</TableCell>
-                        <TableCell align="center">{row.location}</TableCell>
-                        <TableCell align="center">{row.timestamp}</TableCell>
-                        <TableCell align="center">{row.username}</TableCell>
-                        {/* {isSuperAdmin && (
+      <ThemeProvider theme={theme}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          {isHistoryLoading ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100px",
+              }}
+            >
+              <CircularProgress />
+            </div>
+          ) : (
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <StyledTableRow>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Serial No.
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Beacon ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Connect Point ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Gateway ID
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Type
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Location
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Timestamp
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    Username
+                  </StyledTableCell>
+                </StyledTableRow>
+              </TableHead>
+              <TableBody>
+                {history &&
+                  history
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <StyledTableRow
+                          hover
+                          role="checkbox"
+                          tabIndex={-1}
+                          key={index}
+                        >
+                          <StyledTableCell align="center">
+                            {historySerialNumber + index}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.bnid}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.cpid}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.gwid}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.type}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.location}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.timestamp}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {row.username}
+                          </StyledTableCell>
+                          {/* {isSuperAdmin && (
                           <TableCell align="center">
                             <IconButton
                               disabled={
@@ -159,22 +208,23 @@ export default function SosHistoryTable() {
                             </IconButton>
                           </TableCell>
                         )} */}
-                      </TableRow>
-                    );
-                  })}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={history.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+                        </StyledTableRow>
+                      );
+                    })}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={history.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </ThemeProvider>
 
       {/* Confirm Delete Modal */}
       {/* <ConfirmGatewayDeletionModal

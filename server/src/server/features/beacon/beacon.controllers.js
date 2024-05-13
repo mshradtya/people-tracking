@@ -38,7 +38,7 @@ const registerBeacon = async (req, res) => {
       lowBattery: false,
       timestamp: null,
       battery: 10,
-      username: "none",
+      username: "",
       reassigned: false,
       boundingBox: [],
     };
@@ -51,53 +51,53 @@ const registerBeacon = async (req, res) => {
   }
 };
 
-const registerBeaconUser = async (req, res) => {
-  // Check user role
-  if (res.body.role !== "SuperAdmin") {
-    return res.status(403).json({
-      status: 403,
-      success: false,
-      message: "You must have SuperAdmin privilege to perform this operation",
-    });
-  }
+// const registerBeaconUser = async (req, res) => {
+//   // Check user role
+//   if (res.body.role !== "SuperAdmin") {
+//     return res.status(403).json({
+//       status: 403,
+//       success: false,
+//       message: "You must have SuperAdmin privilege to perform this operation",
+//     });
+//   }
 
-  if (
-    Object.keys(req.body).length !== 5 ||
-    !(
-      Object.keys(req.body).includes("name") &&
-      Object.keys(req.body).includes("username") &&
-      Object.keys(req.body).includes("designation") &&
-      Object.keys(req.body).includes("email") &&
-      Object.keys(req.body).includes("phone")
-    )
-  ) {
-    return res.status(400).json({
-      status: 400,
-      success: false,
-      message: "name, username, designation, email and phone is required.",
-    });
-  }
-  try {
-    const { name, username, designation, email, phone } = req.body;
+//   if (
+//     Object.keys(req.body).length !== 5 ||
+//     !(
+//       Object.keys(req.body).includes("name") &&
+//       Object.keys(req.body).includes("username") &&
+//       Object.keys(req.body).includes("designation") &&
+//       Object.keys(req.body).includes("email") &&
+//       Object.keys(req.body).includes("phone")
+//     )
+//   ) {
+//     return res.status(400).json({
+//       status: 400,
+//       success: false,
+//       message: "name, username, designation, email and phone is required.",
+//     });
+//   }
+//   try {
+//     const { name, username, designation, email, phone } = req.body;
 
-    const userData = {
-      name,
-      username,
-      designation,
-      email,
-      phone,
-      dateRegistered: formattedDate(new Date()),
-    };
-    const user = await beaconService.registerBeaconUser(userData);
-    return res
-      .status(201)
-      .json({ status: 201, success: true, beaconUser: user });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ status: 400, success: false, message: error.message });
-  }
-};
+//     const userData = {
+//       name,
+//       username,
+//       designation,
+//       email,
+//       phone,
+//       dateRegistered: formattedDate(new Date()),
+//     };
+//     const user = await beaconService.registerBeaconUser(userData);
+//     return res
+//       .status(201)
+//       .json({ status: 201, success: true, beaconUser: user });
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({ status: 400, success: false, message: error.message });
+//   }
+// };
 
 const assignBeaconUser = async (req, res) => {
   // Validate request body
@@ -147,21 +147,21 @@ const readAllBeacons = async (req, res) => {
   }
 };
 
-const readAllBeaconUsers = async (req, res) => {
-  if (res.body.role === "SuperAdmin" || res.body.role === "User") {
-    const allUsers = await beaconService.readAllBeaconUsers();
+// const readAllBeaconUsers = async (req, res) => {
+//   if (res.body.role === "SuperAdmin" || res.body.role === "User") {
+//     const allUsers = await beaconService.readAllBeaconUsers();
 
-    return res
-      .status(200)
-      .json({ status: 200, success: true, allBeaconUsers: allUsers });
-  } else {
-    return res.status(403).json({
-      status: 403,
-      success: false,
-      message: `You must have SuperAdmin or User privilege to perform this operation.`,
-    });
-  }
-};
+//     return res
+//       .status(200)
+//       .json({ status: 200, success: true, allBeaconUsers: allUsers });
+//   } else {
+//     return res.status(403).json({
+//       status: 403,
+//       success: false,
+//       message: `You must have SuperAdmin or User privilege to perform this operation.`,
+//     });
+//   }
+// };
 
 const readAllSosHistory = async (req, res) => {
   // Check user role
@@ -245,7 +245,7 @@ const updateBeaconUserAck = async (req, res) => {
 // };
 
 const updateBeacon = async (req, res) => {
-  if (req.query.BNID > 0) {
+  if (req.query.BNID > 0 || req.query.GWID > 0 || req.query.CPID > 0) {
     // updating beacon battery and sos when beacon is in DCS room
     if (
       "Location" in req.query &&
@@ -270,9 +270,38 @@ const updateBeacon = async (req, res) => {
           .status(500)
           .json({ status: 400, success: false, message: error.message });
       }
+    }
+    // handling data coming every 30 minutes if a Connect Point is inactive to signify that it's still healthy
+    else if (
+      parseInt(req.query.GWID) > 0 &&
+      parseInt(req.query.CPID) > 0 &&
+      parseInt(req.query.BNID) === 0
+    ) {
+      const { GWID, CPID } = req.query;
 
-      // updating the isInDcsRoom flag triggered by closing the popup in frontend
-    } else if ("Location" in req.query && "BNID" in req.query) {
+      try {
+        const { updatedGateway, updatedConnectPoint } =
+          await beaconService.updateGWCPHealth(GWID, CPID);
+
+        if (!updatedGateway || !updatedConnectPoint) {
+          return res.status(201).json({
+            status: 201,
+            success: false,
+            message: `gateway or connect point not found`,
+          });
+        }
+        res.status(200).json({
+          status: 200,
+          success: true,
+          devices: [updatedGateway, updatedConnectPoint],
+        });
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ status: 400, success: false, message: error.message });
+      }
+    } // updating the isInDcsRoom flag triggered by closing the popup in frontend
+    else if ("Location" in req.query && "BNID" in req.query) {
       const { BNID } = req.query;
       try {
         const beacon = await beaconService.updateBeaconIsInDcsFlag(BNID);
@@ -359,10 +388,10 @@ const deleteBeacon = async (req, res) => {
 
 module.exports = {
   registerBeacon,
-  registerBeaconUser,
+  // registerBeaconUser,
   assignBeaconUser,
   readAllBeacons,
-  readAllBeaconUsers,
+  // readAllBeaconUsers,
   updateBeaconUserAck,
   // updateBeaconBatteryLowFlag,
   updateBeacon,

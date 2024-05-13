@@ -3,7 +3,7 @@ import PropTypes from "prop-types"; // Add this import
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Beacons from "./beacons";
 import Gateways from "./gateways";
 import ConnectPoints from "./connect-points";
@@ -37,6 +37,14 @@ function a11yProps(index) {
   };
 }
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#ed4354",
+    },
+  },
+});
+
 export default function Devices() {
   const [value, setValue] = React.useState(0);
 
@@ -54,11 +62,13 @@ export default function Devices() {
               "-1px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
           }}
         >
-          <Tabs value={value} onChange={handleChange} centered>
-            <Tab label="Beacons" {...a11yProps(0)} />
-            <Tab label="Connect Points" {...a11yProps(1)} />
-            <Tab label="Gateways" {...a11yProps(2)} />
-          </Tabs>
+          <ThemeProvider theme={theme}>
+            <Tabs value={value} onChange={handleChange} centered>
+              <Tab label="Beacons" {...a11yProps(0)} />
+              <Tab label="Connect Points" {...a11yProps(1)} />
+              <Tab label="Gateways" {...a11yProps(2)} />
+            </Tabs>
+          </ThemeProvider>
         </div>
       </div>
       <div>

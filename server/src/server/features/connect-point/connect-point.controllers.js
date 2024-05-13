@@ -33,6 +33,7 @@ const registerConnectPoint = async (req, res) => {
       coords: { x: null, y: null },
       roiCoords: [],
       sos: "L",
+      timestamp: null,
     };
     const connectPoint = await connectPointService.registerConnectPoint(
       connectPointData

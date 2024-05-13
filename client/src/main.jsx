@@ -75,23 +75,21 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
 }));
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <MapProvider>
-        <SnackbarProvider
-          hideIconVariant
-          Components={{
-            error: StyledMaterialDesignContent,
-            warning: StyledMaterialDesignContent,
-          }}
-        >
-          <AlarmAlertProvider>
-            <NotificationProvider>
-              <RouterProvider router={router} />
-            </NotificationProvider>
-          </AlarmAlertProvider>
-        </SnackbarProvider>
-      </MapProvider>
-    </AuthProvider>
-  </React.StrictMode>
+  <AuthProvider>
+    <MapProvider>
+      <SnackbarProvider
+        hideIconVariant
+        Components={{
+          error: StyledMaterialDesignContent,
+          warning: StyledMaterialDesignContent,
+        }}
+      >
+        <AlarmAlertProvider>
+          <NotificationProvider>
+            <RouterProvider router={router} />
+          </NotificationProvider>
+        </AlarmAlertProvider>
+      </SnackbarProvider>
+    </MapProvider>
+  </AuthProvider>
 );
