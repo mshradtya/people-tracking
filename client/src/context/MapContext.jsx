@@ -10,7 +10,7 @@ export const MapProvider = ({ children }) => {
   const [addingGateways, setAddingGateways] = useState(false);
   const [addingConnectPoint, setAddingConnectPoint] = useState(false);
   const [addingConnectPointROI, setAddingConnectPointROI] = useState(false);
-  const [showROI, setShowROI] = useState(false);
+  const [showROI, setShowROI] = useState(true);
 
   return (
     <MapContext.Provider

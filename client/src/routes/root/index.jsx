@@ -31,7 +31,7 @@ export default function Root() {
   // }, []);
 
   const handleDcsAlertClose = async (bnid) => {
-    await axiosPrivate.post(`/beacon/update?Location=DCS&BNID=${bnid}`);
+    await axiosPrivate.post(`/beacon/update?LOCATION=DCS&BNID=${bnid}`);
     setDcsAlertOpen(false);
     setDcsBeacon(null);
   };

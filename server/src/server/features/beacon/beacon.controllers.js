@@ -248,7 +248,7 @@ const updateBeacon = async (req, res) => {
   if (req.query.BNID > 0 || req.query.GWID > 0 || req.query.CPID > 0) {
     // updating beacon battery and sos when beacon is in DCS room
     if (
-      "Location" in req.query &&
+      "LOCATION" in req.query &&
       "BNID" in req.query &&
       "SOS" in req.query &&
       "BATTERY" in req.query
@@ -301,7 +301,7 @@ const updateBeacon = async (req, res) => {
           .json({ status: 400, success: false, message: error.message });
       }
     } // updating the isInDcsRoom flag triggered by closing the popup in frontend
-    else if ("Location" in req.query && "BNID" in req.query) {
+    else if ("LOCATION" in req.query && "BNID" in req.query) {
       const { BNID } = req.query;
       try {
         const beacon = await beaconService.updateBeaconIsInDcsFlag(BNID);

@@ -29,7 +29,7 @@ const ConnectPointIndicator = ({
         style={{
           position: "absolute",
           left: `${data.x - 25}px`,
-          top: `${data.connectPointId < 107 ? data.y + 30 : data.y - 40}px`,
+          top: `${data.connectPointId < 109 ? data.y + 30 : data.y - 40}px`,
           // backgroundColor: "purple",
           borderRadius: "20%",
           color: "black",

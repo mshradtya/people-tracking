@@ -1,7 +1,13 @@
 import SosHistoryTable from "./SosHistoryTable";
+import SosHistoryOptions from "./SosHistoryOptions";
 
 function SOSHistory() {
-  return <SosHistoryTable />;
+  return (
+    <>
+      <SosHistoryOptions />
+      <SosHistoryTable />
+    </>
+  );
 }
 
 export default SOSHistory;
