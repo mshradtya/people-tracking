@@ -81,6 +81,11 @@ export const AlarmAlertProvider = ({ children }) => {
         variant="filled"
         color="inherit"
         onClick={() => closeSosAlert(snackbarId)}
+        sx={{
+          // fontWeight: "bold",
+          fontSize: "20px",
+          backgroundColor: "red",
+        }}
       >
         OK
       </Button>
@@ -114,12 +119,12 @@ export const AlarmAlertProvider = ({ children }) => {
   useEffect(() => {
     sosAlarmInfo.forEach((info) => {
       enqueueSnackbar(
-        `SOS By ${info.user !== "" ? info.user : "NA"} (ID: ${
-          info.bnid
-        }) - Connect Point ${info.cpid}`,
+        `SOS By ${info.user !== "" ? info.user : "NA"} (ID: ${info.bnid}) at ${
+          info.timestamp
+        }`,
         {
           variant: "error",
-          anchorOrigin: { horizontal: "center", vertical: "bottom" },
+          anchorOrigin: { horizontal: "center", vertical: "top" },
           key: info.bnid, // Use a unique key for each snackbar
           preventDuplicate: true,
           persist: true,
@@ -132,10 +137,12 @@ export const AlarmAlertProvider = ({ children }) => {
   useEffect(() => {
     idleAlarmInfo.forEach((info) => {
       enqueueSnackbar(
-        `Unusual Idleness Detected for ${info.user} (ID: ${info.bnid}) - Connect Point ${info.cpid}`,
+        `Idle Detection for ${info.user !== "" ? info.user : "NA"} (ID: ${
+          info.bnid
+        }) at ${info.timestamp}`,
         {
           variant: "warning",
-          anchorOrigin: { horizontal: "center", vertical: "bottom" },
+          anchorOrigin: { horizontal: "center", vertical: "top" },
           key: info.bnid, // Use a unique key for each snackbar
           preventDuplicate: true,
           persist: true,
@@ -174,6 +181,7 @@ export const AlarmAlertProvider = ({ children }) => {
           bnid: beacon.bnid,
           cpid: beacon.cpid,
           user: beacon.username,
+          timestamp: beacon.timestamp,
         },
       ]);
     }
@@ -192,6 +200,7 @@ export const AlarmAlertProvider = ({ children }) => {
           bnid: beacon.bnid,
           cpid: beacon.cpid,
           user: beacon.username,
+          timestamp: beacon.timestamp,
         },
       ]);
     }

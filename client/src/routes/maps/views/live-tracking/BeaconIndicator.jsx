@@ -135,7 +135,7 @@ const BeaconIndicator = ({
           <div
             style={{
               position: "absolute",
-              bottom: 30,
+              bottom: 55,
               color: "blue",
             }}
           >
@@ -187,13 +187,30 @@ const BeaconIndicator = ({
           }}
         >
           <Tooltip
-            title={`${beacon.bnid}: ${
-              beacon.username ? beacon.username : "No User Assigned"
-            }`}
+            title={`${beacon.username ? beacon.username : "No User Assigned"}`}
           >
             <PersonPinIcon />
           </Tooltip>
         </span>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "100%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: sosActive ? "red" : beaconColor,
+            boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
+            color: "white",
+            padding: "2px 5px",
+            borderRadius: "3px",
+            marginBottom: "5px",
+            whiteSpace: "nowrap",
+            zIndex: 2,
+            fontSize: "0.8em",
+          }}
+        >
+          {`${beacon.bnid < 10 ? "0" + beacon.bnid : beacon.bnid} `}
+        </div>
       </div>
     </>
   );

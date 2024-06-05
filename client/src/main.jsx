@@ -19,6 +19,7 @@ import { SnackbarProvider, MaterialDesignContent } from "notistack";
 import Test from "./routes/test";
 import Devices from "./routes/devices";
 import SOSHistory from "./routes/history";
+import Trial from "./routes/trial";
 import "./index.css";
 import { Navigate } from "react-router-dom";
 // import Missing from "./pages/Missing";
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
               { path: "devices", element: <Devices /> },
               { path: "users", element: <Users /> },
               { path: "history", element: <SOSHistory /> },
+              { path: "trial", element: <Trial /> },
             ],
           },
           {
@@ -68,9 +70,15 @@ const router = createBrowserRouter([
 const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
   "&.notistack-MuiContent-error": {
     backgroundColor: "red",
+    height: "60px",
+    fontWeight: "500",
+    fontSize: "20px",
   },
   "&.notistack-MuiContent-warning": {
     backgroundColor: "#FF4500",
+    height: "60px",
+    fontWeight: "500",
+    fontSize: "20px",
   },
 }));
 

@@ -3,7 +3,12 @@ import useMap from "@/hooks/useMap";
 import Tooltip from "@mui/material/Tooltip";
 import { getMinutesDifference } from "@/utils/helpers";
 
-const GatewayIndicator = ({ index, data, removeGatewayFromMap }) => {
+const GatewayIndicator = ({
+  index,
+  data,
+  removeGatewayFromMap,
+  notWorkingGateways,
+}) => {
   const { scale } = useMap();
   const timeDifference = data.timestamp
     ? getMinutesDifference(data.timestamp)
@@ -13,6 +18,8 @@ const GatewayIndicator = ({ index, data, removeGatewayFromMap }) => {
     event.preventDefault();
     removeGatewayFromMap(data.gatewayId);
   };
+
+  const isNotWorking = notWorkingGateways.includes(data.gatewayId);
 
   return (
     <Tooltip title={`Gateway ID: ${data.gatewayId}`} placement="top" arrow>
@@ -26,12 +33,7 @@ const GatewayIndicator = ({ index, data, removeGatewayFromMap }) => {
           width: "20px",
           height: "20px",
           borderRadius: "20%",
-          backgroundColor:
-            timeDifference === null
-              ? "blue"
-              : timeDifference < 30
-              ? "green"
-              : "red",
+          backgroundColor: isNotWorking ? "red" : "green",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",

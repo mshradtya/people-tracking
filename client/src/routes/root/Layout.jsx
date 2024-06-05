@@ -20,10 +20,11 @@ import MemoryIcon from "@mui/icons-material/Memory";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HistoryIcon from "@mui/icons-material/History";
-
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import useLogout from "../../hooks/auth/useLogout";
 import useAuth from "../../hooks/auth/useAuth";
+import BeaconUserList from "./BeaconUserList";
+import BeaconColorIndications from "./BeaconColorIndications";
 
 const drawerWidth = 240;
 
@@ -189,6 +190,31 @@ function Layout({ children }) {
             <ListItemText primary="Violations" />
           </ListItemButton>
         </ListItem>
+        <ListItem
+          disablePadding
+          className={pathname === "/trial" ? "text-red-500 bg-red-100" : ""}
+          onClick={() => {
+            navigate("/trial");
+          }}
+        >
+          <ListItemButton>
+            <ListItemIcon
+              sx={{
+                color: `${
+                  "/trial"
+                    ? "rgb(239 68 68 / var(--tw-text-opacity))"
+                    : "rgb(51 65 85)"
+                }`,
+              }}
+            >
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logs" />
+          </ListItemButton>
+        </ListItem>
+        <Divider />
+        <BeaconUserList />
+        <BeaconColorIndications />
       </List>
     </div>
   );
@@ -240,6 +266,7 @@ function Layout({ children }) {
         aria-label="mailbox folders"
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -257,6 +284,7 @@ function Layout({ children }) {
         >
           {drawer}
         </Drawer>
+
         <Drawer
           variant="permanent"
           sx={{

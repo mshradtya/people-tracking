@@ -18,22 +18,26 @@ export default function Root() {
 
   const logout = useLogout();
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = async (event) => {
-  //     await logout();
-  //   };
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      await logout();
+    };
 
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, []);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
-  const handleDcsAlertClose = async (bnid) => {
-    await axiosPrivate.post(`/beacon/update?LOCATION=DCS&BNID=${bnid}`);
-    setDcsAlertOpen(false);
-    setDcsBeacon(null);
+  const handleDcsAlertClose = async (bnid, beaconUser) => {
+    const response = await axiosPrivate.post(
+      `/beacon/update?LOCATION=DCS&BNID=${bnid}&USER=${beaconUser}`
+    );
+    if (response.status === 200) {
+      setDcsAlertOpen(false);
+      setDcsBeacon(null);
+    }
   };
 
   useEffect(() => {
@@ -85,6 +89,7 @@ export default function Root() {
 
     for (const beacon of beacons) {
       if (beacon.sos === "H" && !beacon.isInDcsRoom) {
+        console.log(beacon);
         showSosAlert(beacon);
       } else if (beacon.idle === "H" && !beacon.isInDcsRoom) {
         showIdleAlert(beacon);

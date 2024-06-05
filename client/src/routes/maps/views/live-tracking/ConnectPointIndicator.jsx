@@ -8,6 +8,7 @@ const ConnectPointIndicator = ({
   data,
   removeConnectPointFromMap,
   // connectPointsWithSOS,
+  notWorkingConnectPoints,
 }) => {
   const { scale } = useMap();
 
@@ -16,12 +17,9 @@ const ConnectPointIndicator = ({
     removeConnectPointFromMap(data.connectPointId);
   };
 
-  // const isSosConnectPoint = connectPointsWithSOS.includes(data.connectPointId);
+  const isNotWorking = notWorkingConnectPoints.includes(data.connectPointId);
   const formattedPillarStart = data.pillarStart.toString().padStart(2, "0");
   const formattedPillarEnd = data.pillarEnd.toString().padStart(2, "0");
-  const timeDifference = data.timestamp
-    ? getMinutesDifference(data.timestamp)
-    : null;
 
   return (
     <div>
@@ -29,7 +27,7 @@ const ConnectPointIndicator = ({
         style={{
           position: "absolute",
           left: `${data.x - 25}px`,
-          top: `${data.connectPointId < 109 ? data.y + 30 : data.y - 40}px`,
+          top: `${data.connectPointId < 109 ? data.y - 40 : data.y + 30}px`,
           // backgroundColor: "purple",
           borderRadius: "20%",
           color: "black",
@@ -58,12 +56,7 @@ const ConnectPointIndicator = ({
             height: "20px",
             borderRadius: "50%",
             // backgroundColor: isSosConnectPoint ? "red" : "purple",
-            backgroundColor:
-              timeDifference === null
-                ? "purple"
-                : timeDifference < 30
-                ? "green"
-                : "red",
+            backgroundColor: isNotWorking ? "red" : "green",
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             transform: `scale(${1 / scale})`,
             display: "flex",

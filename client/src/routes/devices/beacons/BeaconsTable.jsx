@@ -58,6 +58,7 @@ export default function BeaconsTable() {
   const axiosPrivate = useAxiosPrivate();
   const { beacons, fetchBeacons, serialNumber, isLoading } = useFetchBeacons();
   const { auth } = useAuth();
+  const isSuperAdmin = auth?.role === "SuperAdmin";
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openAssignUser, setOpenAssignUser] = useState(false);
@@ -149,26 +150,34 @@ export default function BeaconsTable() {
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
                     Beacon ID
                   </StyledTableCell>
+                  {isSuperAdmin && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      Connect Point ID
+                    </StyledTableCell>
+                  )}
+                  {isSuperAdmin && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      Gateway ID
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Connect Point ID
+                    Current Assignee
                   </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Gateway ID
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Assigned To
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    SOS
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Last Packet DateTime
-                  </StyledTableCell>
+                  {isSuperAdmin && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      SOS
+                    </StyledTableCell>
+                  )}
+                  {isSuperAdmin && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      Last Packet DateTime
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
                     Battery
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Action
+                    Assign User
                   </StyledTableCell>
                 </TableRow>
               </TableHead>
@@ -190,33 +199,41 @@ export default function BeaconsTable() {
                           <StyledTableCell align="center">
                             {row.bnid}
                           </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.cpid ? row.cpid : "--"}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.gwid ? row.gwid : "--"}
-                          </StyledTableCell>
+                          {isSuperAdmin && (
+                            <StyledTableCell align="center">
+                              {row.cpid ? row.cpid : "--"}
+                            </StyledTableCell>
+                          )}
+                          {isSuperAdmin && (
+                            <StyledTableCell align="center">
+                              {row.gwid ? row.gwid : "--"}
+                            </StyledTableCell>
+                          )}
                           <StyledTableCell align="center">
                             {row.username === "" ? "--" : row.username}
                           </StyledTableCell>
-                          <StyledTableCell align="center">
-                            <span
-                              style={{
-                                // fontWeight: `${row.sos === "L" ? "" : "bold"}`,
-                                color: `${row.sos === "L" ? "green" : "red"}`,
-                                animation: `${
-                                  row.sos === "L"
-                                    ? "none"
-                                    : "blink 0.5s linear infinite"
-                                }`,
-                              }}
-                            >
-                              {row.sos === "L" ? "False" : "True"}
-                            </span>
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.timestamp ? row.timestamp : "--"}
-                          </StyledTableCell>
+                          {isSuperAdmin && (
+                            <StyledTableCell align="center">
+                              <span
+                                style={{
+                                  // fontWeight: `${row.sos === "L" ? "" : "bold"}`,
+                                  color: `${row.sos === "L" ? "green" : "red"}`,
+                                  animation: `${
+                                    row.sos === "L"
+                                      ? "none"
+                                      : "blink 0.5s linear infinite"
+                                  }`,
+                                }}
+                              >
+                                {row.sos === "L" ? "False" : "True"}
+                              </span>
+                            </StyledTableCell>
+                          )}
+                          {isSuperAdmin && (
+                            <StyledTableCell align="center">
+                              {row.timestamp ? row.timestamp : "--"}
+                            </StyledTableCell>
+                          )}
                           <StyledTableCell align="center">
                             <span>{row.battery}%</span>
                             <BatteryIcon battery={row.battery} />
@@ -230,7 +247,7 @@ export default function BeaconsTable() {
                               >
                                 <PersonAddIcon />
                               </IconButton>
-                              {auth?.role === "SuperAdmin" && (
+                              {isSuperAdmin && (
                                 <IconButton
                                   aria-label="delete"
                                   sx={{ color: "red" }}

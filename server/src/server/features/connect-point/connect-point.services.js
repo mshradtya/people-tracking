@@ -1,4 +1,7 @@
 const ConnectPoint = require("./connect-point.model");
+const Gateway = require("../gateway/gateway.model");
+const { getMinutesDifference } = require("../../utils/helper");
+const { formattedDate } = require("../../utils/helper");
 
 const registerConnectPoint = async (connectPointData) => {
   const connectPoint = new ConnectPoint(connectPointData);
@@ -9,6 +12,20 @@ const registerConnectPoint = async (connectPointData) => {
 const readAllConnectPoints = async () => {
   const allConnectPoints = await ConnectPoint.find({});
   return allConnectPoints;
+};
+
+const connectPointsNotWorking = async () => {
+  const allConnectPoints = await ConnectPoint.find({});
+  let notWorkingConnectPoints = [];
+
+  for (const connectPoint of allConnectPoints) {
+    const timeDifference = getMinutesDifference(connectPoint.timestamp);
+    if (timeDifference > 65) {
+      notWorkingConnectPoints.push(connectPoint.cpid);
+    }
+  }
+
+  return notWorkingConnectPoints;
 };
 
 const updateConnectPointCoords = async (cpid, coords, roiCoords) => {
@@ -55,11 +72,20 @@ const deleteConnectPoint = async (cpid) => {
   return deletedCount;
 };
 
+const refreshConnectPoints = async () => {
+  const currentTime = formattedDate();
+  const update = { timestamp: currentTime };
+  await ConnectPoint.updateMany({}, update);
+  await Gateway.updateMany({}, update);
+};
+
 module.exports = {
   registerConnectPoint,
   readAllConnectPoints,
+  connectPointsNotWorking,
   updateConnectPointCoords,
   updateConnectPointRoiCoords,
   connectPointSosStatus,
   deleteConnectPoint,
+  refreshConnectPoints,
 };

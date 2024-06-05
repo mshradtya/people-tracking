@@ -1,15 +1,37 @@
+import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Box from "@mui/material/Box";
 
 export default function BeaconDcsDialog({
   dcsAlertOpen,
   handleDcsAlertClose,
   beacon,
 }) {
+  const [remainingTime, setRemainingTime] = useState(30);
+
+  useEffect(() => {
+    if (dcsAlertOpen) {
+      setRemainingTime(30); // Reset timer
+      const timer = setTimeout(() => {
+        handleDcsAlertClose(beacon?.bnid);
+      }, 30000); // 30 seconds
+
+      const interval = setInterval(() => {
+        setRemainingTime((prevTime) => prevTime - 1);
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(interval);
+      };
+    }
+  }, [dcsAlertOpen]);
+
   return (
     <>
       <Dialog open={dcsAlertOpen}>
@@ -45,9 +67,31 @@ export default function BeaconDcsDialog({
             >
               {beacon?.sos === "H" ? "WORKING" : "OFF"}
             </span>
+            <br />
+            Username:{" "}
+            <span
+              style={{
+                fontWeight: "bold",
+                color: beacon?.username ? "red" : "green",
+              }}
+            >
+              {beacon?.username ? beacon?.username : "--"}
+            </span>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <Box
+            component="span"
+            sx={{
+              position: "absolute",
+              bottom: 15,
+              left: 22,
+              fontSize: "16px",
+              color: "gray",
+            }}
+          >
+            Closing in {remainingTime}s
+          </Box>
           <Button onClick={() => handleDcsAlertClose(beacon?.bnid)} autoFocus>
             OK
           </Button>

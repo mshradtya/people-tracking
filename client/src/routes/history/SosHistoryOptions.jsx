@@ -1,7 +1,12 @@
 import React from "react";
 import { TextField, MenuItem } from "@mui/material";
 
-const SosHistoryOptions = () => {
+const SosHistoryOptions = ({ onDateChange }) => {
+  const handleDateChange = (event) => {
+    console.log("this ran");
+    onDateChange(event.target.value);
+  };
+
   return (
     <div
       style={{
@@ -17,6 +22,7 @@ const SosHistoryOptions = () => {
         InputLabelProps={{
           shrink: true,
         }}
+        onChange={handleDateChange}
       />
       <TextField
         id="outlined-select-currency"

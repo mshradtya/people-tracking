@@ -56,6 +56,7 @@ export default function ConnectPointsTable() {
     fetchConnectPoints,
   } = useFetchConnectPoints();
   const { auth } = useAuth();
+  const isSuperAdmin = auth?.role === "SuperAdmin";
   const { showSnackbar } = useSnackbar();
   const axiosPrivate = useAxiosPrivate();
   const [page, setPage] = useState(0);
@@ -152,9 +153,11 @@ export default function ConnectPointsTable() {
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
                     Pillars Covered
                   </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Last Packet DateTime
-                  </StyledTableCell>
+                  {isSuperAdmin && (
+                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                      Last Packet DateTime
+                    </StyledTableCell>
+                  )}
                   {auth?.role === "SuperAdmin" && (
                     <StyledTableCell align="center" style={{ minWidth: 70 }}>
                       Action
@@ -186,10 +189,12 @@ export default function ConnectPointsTable() {
                           <StyledTableCell align="center">
                             {`${row.pillarStart} to ${row.pillarEnd}`}
                           </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.timestamp ? row.timestamp : "--"}
-                          </StyledTableCell>
-                          {auth?.role === "SuperAdmin" && (
+                          {isSuperAdmin && (
+                            <StyledTableCell align="center">
+                              {row.timestamp ? row.timestamp : "--"}
+                            </StyledTableCell>
+                          )}
+                          {isSuperAdmin && (
                             <StyledTableCell align="center">
                               <div className="flex justify-center">
                                 <span>

@@ -10,7 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useFetchSosHistory } from "@/hooks/useFetchSosHistory";
+import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -42,13 +42,29 @@ const theme = createTheme({
   },
 });
 
-export default function SosHistoryTable({ selectedDate }) {
-  const { history, isHistoryLoading, historySerialNumber, fetchSosHistory } =
-    useFetchSosHistory();
+export default function PathLogsTable({ selectedDate }) {
+  const axiosPrivate = useAxiosPrivate();
+  const [logs, setLogs] = useState([]);
+  const [isLogsLoading, setIsLogsLoading] = useState(true);
+  const [logsSerialNumber, setLogsSerialNumber] = useState(1);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
+    const fetchSosHistory = async (selectedDate) => {
+      try {
+        const response = await axiosPrivate.get(
+          `/beacon/history?date=${selectedDate}`
+        );
+        console.log(response.data);
+        setLogs(response.data);
+        setIsLogsLoading(false);
+        setLogsSerialNumber(1);
+      } catch (error) {
+        showSnackbar("error", error.response.data.message);
+      }
+    };
+
     fetchSosHistory(selectedDate);
   }, [selectedDate]);
 
@@ -65,7 +81,7 @@ export default function SosHistoryTable({ selectedDate }) {
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <ThemeProvider theme={theme}>
         <TableContainer sx={{ maxHeight: 440 }}>
-          {isHistoryLoading ? (
+          {isLogsLoading ? (
             <div
               style={{
                 display: "flex",
@@ -87,28 +103,13 @@ export default function SosHistoryTable({ selectedDate }) {
                     Beacon ID
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Username
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Location
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Type
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Timestamp
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Connect Point ID
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Gateway ID
+                    Path
                   </StyledTableCell>
                 </StyledTableRow>
               </TableHead>
               <TableBody>
-                {history &&
-                  history
+                {logs &&
+                  logs
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
                       return (
@@ -119,28 +120,13 @@ export default function SosHistoryTable({ selectedDate }) {
                           key={index}
                         >
                           <StyledTableCell align="center">
-                            {historySerialNumber + index}
+                            {logsSerialNumber + index}
                           </StyledTableCell>
                           <StyledTableCell align="center">
                             {row.bnid}
                           </StyledTableCell>
                           <StyledTableCell align="center">
-                            {row.username}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.location}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.type}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.timestamp}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.cpid}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {row.gwid}
+                            {row.cpids.join(" | ")}
                           </StyledTableCell>
                         </StyledTableRow>
                       );

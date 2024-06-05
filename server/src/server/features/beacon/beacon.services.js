@@ -3,6 +3,8 @@ const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
 // const BeaconUser = require("./beacon-user.model");
 const SosHistory = require("./beacon-sos-history.model");
+const BeaconHistory = require("./temp/beacon-history.model");
+const ConnectPointLogs = require("./temp/connect-point-logs.model");
 const { formattedDate } = require("../../utils/helper");
 const recentRequests = new Map();
 
@@ -60,6 +62,27 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
+const readSosHistoryOfDate = async (date) => {
+  if (date) {
+    // Parse the input date (YYYY-MM-DD) to the desired format (DD/MM/YY)
+    const [year, month, day] = date.split("-");
+    const formattedDate = `${day}/${month}/${year.slice(2)}`; // Format to DD/MM/YY
+
+    // Create a regular expression to match the date in the timestamp field
+    const dateRegex = new RegExp(`^${formattedDate.replace(/\//g, "\\/")},`);
+
+    // Query the database for matching timestamps
+    const sosHistoryOfDate = await SosHistory.find({
+      timestamp: { $regex: dateRegex, $options: "i" }, // Case insensitive match
+    }).sort({ _id: -1 });
+
+    return sosHistoryOfDate;
+  } else {
+    const allSosHistory = await SosHistory.find({}).sort({ _id: -1 });
+    return allSosHistory;
+  }
+};
+
 const updateBeaconUserAck = async (bnid, ack, sos, idle) => {
   const beacon = await Beacon.findOneAndUpdate(
     { bnid },
@@ -114,7 +137,65 @@ const updateGWCPHealth = async (GWID, CPID) => {
     { gwid: GWID, timestamp: lastPacketDateTime }
   );
 
+  // to be removed later
+  await saveConnectPointLogs(CPID, lastPacketDateTime);
+
   return { updatedGateway, updatedConnectPoint };
+};
+
+// to be removed later
+const saveConnectPointLogs = async (CPID, lastPacketDateTime) => {
+  const now = new Date();
+
+  // Get the current time in milliseconds and add the IST offset (5 hours 30 minutes) in milliseconds
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffset);
+  // Format the IST date to ISO string and extract the date part
+  const today = istDate.toISOString().split("T")[0];
+
+  let connectPointLog = await ConnectPointLogs.findOne({ date: today });
+
+  if (connectPointLog) {
+    // If there's a log for today, check if there's an entry for the CPID
+    const cpidEntry = connectPointLog.cpids.find(
+      (entry) => entry.cpid === CPID
+    );
+    if (cpidEntry) {
+      // If there's an entry for the CPID, push the new timestamp
+      cpidEntry.timestamps.push(
+        `${lastPacketDateTime.split(" ")[1]} ${
+          lastPacketDateTime.split(" ")[2]
+        }`
+      );
+    } else {
+      // If there's no entry for the CPID, create one
+      connectPointLog.cpids.push({
+        cpid: CPID,
+        timestamps: [
+          `${lastPacketDateTime.split(" ")[1]} ${
+            lastPacketDateTime.split(" ")[2]
+          }`,
+        ],
+      });
+    }
+  } else {
+    // If there's no log for today, create a new one
+    connectPointLog = new ConnectPointLogs({
+      date: today,
+      cpids: [
+        {
+          cpid: CPID,
+          timestamps: [
+            `${lastPacketDateTime.split(" ")[1]} ${
+              lastPacketDateTime.split(" ")[2]
+            }`,
+          ],
+        },
+      ],
+    });
+  }
+
+  await connectPointLog.save();
 };
 
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
@@ -184,8 +265,45 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
         console.log(err);
       }
     }
+
+    // to be remove later
+    await saveBeaconHistory(BNID, CPID);
   }
   return updatedBeacon;
+};
+
+// to be removed later
+const saveBeaconHistory = async (BNID, CPID) => {
+  const now = new Date();
+
+  // Get the current time in milliseconds and add the IST offset (5 hours 30 minutes) in milliseconds
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffset);
+  // Format the IST date to ISO string and extract the date part
+  const today = istDate.toISOString().split("T")[0];
+
+  const beaconHistory = await BeaconHistory.findOne({ date: today });
+
+  if (beaconHistory) {
+    const bnidEntry = beaconHistory.bnids.find((entry) => entry.bnid === BNID);
+    if (bnidEntry) {
+      if (
+        bnidEntry.cpids.length === 0 ||
+        bnidEntry.cpids[bnidEntry.cpids.length - 1] !== CPID
+      ) {
+        bnidEntry.cpids.push(CPID);
+      }
+    } else {
+      beaconHistory.bnids.push({ bnid: BNID, cpids: [CPID] });
+    }
+    await beaconHistory.save();
+  } else {
+    const newBeaconHistory = new BeaconHistory({
+      date: today,
+      bnids: [{ bnid: BNID, cpids: [CPID] }],
+    });
+    await newBeaconHistory.save();
+  }
 };
 
 const deleteBeacon = async (bnid) => {
@@ -209,4 +327,5 @@ module.exports = {
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,
+  readSosHistoryOfDate,
 };

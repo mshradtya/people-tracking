@@ -13,6 +13,8 @@ import { useFetchGateways } from "@/hooks/useFetchGateways";
 import { useFetchConnectPoints } from "@/hooks/useFetchConnectPoints";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useCalculateCanvasMeasures } from "@/hooks/useCalculateCanvasMeasures";
+import { useFetchConnectPointsNotWorking } from "@/hooks/useFetchConnectPointsNotWorking";
+import { useFetchGatewaysNotWorking } from "@/hooks/useFetchGatewaysNotWorking";
 import BeaconIndicator from "./BeaconIndicator";
 import { getMinutesDifference } from "@/utils/helpers";
 
@@ -47,6 +49,10 @@ function LiveTracking() {
   const [selectedConnectPointForROI, setSelectedConnectPointForROI] =
     useState(null);
   const [prevBeaconPositions, setPrevBeaconPositions] = useState({});
+  const { notWorkingConnectPoints, fetchConnectPointsNotWorking } =
+    useFetchConnectPointsNotWorking();
+  const { notWorkingGateways, fetchGatewaysNotWorking } =
+    useFetchGatewaysNotWorking();
 
   useEffect(() => {
     connectPoints.map((connectPoint) => {
@@ -66,6 +72,16 @@ function LiveTracking() {
     // const fetchGatewaysInterval = setInterval(fetchGateways, 300);
     fetchConnectPoints();
     // const fetchConnectPointsInterval = setInterval(fetchConnectPoints, 300);
+    fetchConnectPointsNotWorking();
+    const fetchConnectPointsNotWorkingInterval = setInterval(
+      fetchConnectPointsNotWorking,
+      10000
+    );
+    fetchGatewaysNotWorking();
+    const fetchGatewaysNotWorkingInterval = setInterval(
+      fetchGatewaysNotWorking,
+      10000
+    );
 
     // Set initial random positions for all beacons
     const initialPositions = beacons.reduce((acc, beacon) => {
@@ -76,6 +92,8 @@ function LiveTracking() {
 
     return () => {
       clearInterval(fetchBeaconsInterval);
+      clearInterval(fetchConnectPointsNotWorkingInterval);
+      clearInterval(fetchGatewaysNotWorkingInterval);
       // clearInterval(fetchConnectPointsInterval);
       // clearInterval(fetchGatewaysInterval);
     };
@@ -362,6 +380,7 @@ function LiveTracking() {
                     gatewayId: gateway.gwid,
                     timestamp: gateway.timestamp,
                   }}
+                  notWorkingGateways={notWorkingGateways}
                   removeGatewayFromMap={removeGatewayFromMap}
                 />
               )
@@ -380,6 +399,7 @@ function LiveTracking() {
                     timestamp: connectPoint.timestamp,
                   }}
                   removeConnectPointFromMap={removeConnectPointFromMap}
+                  notWorkingConnectPoints={notWorkingConnectPoints}
                 />
               )
           )}

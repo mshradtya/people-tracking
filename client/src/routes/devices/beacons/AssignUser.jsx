@@ -117,7 +117,7 @@
 
 // export default AssignUser;
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { useSnackbar } from "@/hooks/useSnackbar";
@@ -163,6 +163,29 @@ const AssignUser = ({
     setUsername(event.target.value);
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent form submission on Enter key press
+      handleSubmitAssignUser();
+    }
+  };
+
+  useEffect(() => {
+    const handleDocumentKeyPress = (event) => {
+      if (event.key === "Enter") {
+        handleSubmitAssignUser();
+      }
+    };
+
+    if (openAssignUser) {
+      document.addEventListener("keydown", handleDocumentKeyPress);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleDocumentKeyPress);
+    };
+  }, [openAssignUser]);
+
   return (
     <Modal open={openAssignUser} onClose={handleCloseAssignUser}>
       <Box
@@ -192,7 +215,9 @@ const AssignUser = ({
             fullWidth
             label="Username"
             variant="filled"
+            value={username}
             onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
           />
         </Box>
         <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>

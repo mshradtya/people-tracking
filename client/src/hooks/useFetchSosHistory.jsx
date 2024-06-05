@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "./auth/useAxiosPrivate";
 import { useSnackbar } from "./useSnackbar";
 
@@ -9,9 +9,11 @@ const useFetchSosHistory = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [historySerialNumber, setHistorySerialNumber] = useState(1);
 
-  const fetchSosHistory = async () => {
+  const fetchSosHistory = async (selectedDate) => {
     try {
-      const response = await axiosPrivate.get("/beacon/sos/history");
+      const response = await axiosPrivate.get(
+        `/beacon/sos/history/date?date=${selectedDate}`
+      );
       setHistory(response.data.history);
       setIsHistoryLoading(false);
       setHistorySerialNumber(1);

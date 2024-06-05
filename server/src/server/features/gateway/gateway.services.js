@@ -1,9 +1,24 @@
 const Gateway = require("./gateway.model");
+const { getMinutesDifference } = require("../../utils/helper");
 
 const registerGateway = async (gatewayData) => {
   const gateway = new Gateway(gatewayData);
   const newGateway = await gateway.save();
   return newGateway;
+};
+
+const gatewaysNotWorking = async () => {
+  const allGateways = await Gateway.find({});
+  let notWorkingGateways = [];
+
+  for (const gateway of allGateways) {
+    const timeDifference = getMinutesDifference(gateway.timestamp);
+    if (timeDifference > 65) {
+      notWorkingGateways.push(gateway.gwid);
+    }
+  }
+
+  return notWorkingGateways;
 };
 
 const readAllGateways = async () => {
@@ -57,6 +72,7 @@ const deleteGateway = async (gwid) => {
 module.exports = {
   registerGateway,
   readAllGateways,
+  gatewaysNotWorking,
   updateGatewayCoords,
   updateGatewayRoiCoords,
   gatewaySosStatus,

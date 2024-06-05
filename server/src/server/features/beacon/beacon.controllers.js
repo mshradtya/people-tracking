@@ -163,6 +163,27 @@ const readAllBeacons = async (req, res) => {
 //   }
 // };
 
+const readSosHistoryOfDate = async (req, res) => {
+  // Check user role
+  if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
+    return res.status(403).json({
+      status: 403,
+      success: false,
+      message: `You must have SuperAdmin or User privilege to perform this operation.`,
+    });
+  }
+
+  try {
+    const { date } = req.query;
+    const history = await beaconService.readSosHistoryOfDate(date);
+    return res.status(200).json({ status: 200, success: true, history });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 400, success: false, message: error.message });
+  }
+};
+
 const readAllSosHistory = async (req, res) => {
   // Check user role
   if (res.body.role !== "SuperAdmin" && res.body.role !== "User") {
@@ -308,7 +329,7 @@ const updateBeacon = async (req, res) => {
 
         if (!beacon) {
           return res.status(201).json({
-            status: 201,
+            status: 400,
             success: false,
             message: `no beacon found`,
           });
@@ -397,4 +418,5 @@ module.exports = {
   updateBeacon,
   deleteBeacon,
   readAllSosHistory,
+  readSosHistoryOfDate,
 };
