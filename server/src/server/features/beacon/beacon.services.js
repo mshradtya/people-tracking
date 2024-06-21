@@ -6,7 +6,6 @@ const SosHistory = require("./beacon-sos-history.model");
 const BeaconHistory = require("./temp/beacon-history.model");
 const ConnectPointLogs = require("./temp/connect-point-logs.model");
 const { formattedDate } = require("../../utils/helper");
-const recentRequests = new Map();
 
 const registerBeacon = async (beaconData) => {
   const beacon = new Beacon(beaconData);
@@ -199,40 +198,20 @@ const saveConnectPointLogs = async (CPID, lastPacketDateTime) => {
 };
 
 const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
-  const now = new Date();
   const lastPacketDateTime = formattedDate();
-
-  // Check if there's a recent request with the same BNID
-  const recentRequest = recentRequests.get(BNID);
-  if (recentRequest) {
-    // If there's a recent request, check if the SOS value is different
-    const timeDiff = now - recentRequest.timestamp;
-    if (timeDiff < 10000 && recentRequest.sos === SOS) {
-      // If the SOS value is the same and the request is within the last 5 seconds, ignore the current request
-      return null;
-    }
-    // Update the recent request with the new SOS value and timestamp
-    recentRequest.sos = SOS;
-    recentRequest.timestamp = now;
-  } else {
-    // If there's no recent request, add a new entry in the recentRequests Map
-    recentRequests.set(BNID, { sos: SOS, timestamp: now });
-  }
-
   const beacon = await Beacon.findOne({ bnid: BNID });
   let updatedBeacon;
 
-  if (beacon && !beacon.userAck) {
+  if (beacon && !beacon.isSosActive && !beacon.isIdleActive) {
     updatedBeacon = await Beacon.findOneAndUpdate(
       { bnid: BNID },
       {
-        sos: SOS,
-        idle: IDLE,
+        isSosActive: SOS === "H" ? true : false,
+        isIdleActive: IDLE === "H" ? true : false,
         battery: BATTERY,
-        lowBattery: BATTERY > 30 ? false : true,
+        isBatteryLow: BATTERY > 30 ? false : true,
         gwid: GWID,
         cpid: CPID,
-
         timestamp: lastPacketDateTime,
       },
       { new: true, runValidators: true }
@@ -269,7 +248,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
     // to be remove later
     await saveBeaconHistory(BNID, CPID);
   }
-  return updatedBeacon;
+  return updatedBeacon ? updatedBeacon : beacon;
 };
 
 // to be removed later
