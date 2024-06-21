@@ -20,7 +20,7 @@ const connectPointsNotWorking = async () => {
 
   for (const connectPoint of allConnectPoints) {
     const timeDifference = getMinutesDifference(connectPoint.timestamp);
-    if (timeDifference > 65) {
+    if (timeDifference > 30) {
       notWorkingConnectPoints.push(connectPoint.cpid);
     }
   }

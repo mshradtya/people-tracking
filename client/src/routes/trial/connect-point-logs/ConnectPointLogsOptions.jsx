@@ -10,6 +10,7 @@ const ConnectPointLogsOptions = ({ onDateChange }) => {
   return (
     <div
       style={{
+        marginTop: "-65px",
         marginBottom: "15px",
       }}
     >

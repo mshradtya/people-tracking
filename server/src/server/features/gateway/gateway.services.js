@@ -13,7 +13,7 @@ const gatewaysNotWorking = async () => {
 
   for (const gateway of allGateways) {
     const timeDifference = getMinutesDifference(gateway.timestamp);
-    if (timeDifference > 65) {
+    if (timeDifference > 30) {
       notWorkingGateways.push(gateway.gwid);
     }
   }

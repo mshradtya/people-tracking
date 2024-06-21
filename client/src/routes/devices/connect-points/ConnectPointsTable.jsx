@@ -125,7 +125,7 @@ export default function ConnectPointsTable() {
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <ThemeProvider theme={theme}>
-        <TableContainer sx={{ maxHeight: 500 }}>
+        <TableContainer sx={{ maxHeight: "65vh" }}>
           {isConnectPointsLoading ? (
             <div
               style={{

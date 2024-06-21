@@ -128,7 +128,7 @@ export default function BeaconsTable() {
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <ThemeProvider theme={theme}>
-        <TableContainer sx={{ maxHeight: 440 }}>
+        <TableContainer sx={{ maxHeight: "65vh" }}>
           {isLoading ? (
             <div
               style={{

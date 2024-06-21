@@ -80,6 +80,12 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
     fontWeight: "500",
     fontSize: "20px",
   },
+  "&.notistack-MuiContent-info": {
+    // backgroundColor: "#FF4500",
+    height: "60px",
+    fontWeight: "500",
+    fontSize: "20px",
+  },
 }));
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -90,6 +96,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         Components={{
           error: StyledMaterialDesignContent,
           warning: StyledMaterialDesignContent,
+          info: StyledMaterialDesignContent,
         }}
       >
         <AlarmAlertProvider>

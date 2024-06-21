@@ -21,7 +21,7 @@ export default function Gateways() {
   return (
     <>
       {isSuperAdmin && (
-        <div className="flex flex-row-reverse items-center w-full mb-4">
+        <div className="flex flex-row-reverse items-center w-full mb-4 mt-[-60px]">
           <Button
             variant="outlined"
             startIcon={<AddCircleRoundedIcon />}

@@ -155,10 +155,10 @@ export const AlarmAlertProvider = ({ children }) => {
   useEffect(() => {
     batteryAlarmInfo.forEach((info) => {
       enqueueSnackbar(
-        `User ${info.user}'s Beacon Battery Is Low (ID: ${info.bnid}) - ${info.battery}%`,
+        `${info.user}'s Beacon Battery Is Low (ID: ${info.bnid}) - ${info.battery}% at ${info.timestamp}`,
         {
           variant: "info",
-          anchorOrigin: { horizontal: "center", vertical: "bottom" },
+          anchorOrigin: { horizontal: "center", vertical: "top" },
           key: info.bnid + 100, // adding 100 so it doesn't conflict with sos and idle detection snackbar ids
           preventDuplicate: true,
           persist: true,
@@ -220,6 +220,7 @@ export const AlarmAlertProvider = ({ children }) => {
           cpid: beacon.cpid,
           user: beacon.username,
           battery: beacon.battery,
+          timestamp: beacon.timestamp,
         },
       ]);
     }

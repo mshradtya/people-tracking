@@ -273,6 +273,9 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
 };
 
 // to be removed later
+// Timer logic for beacon history
+let timers = {};
+
 const saveBeaconHistory = async (BNID, CPID) => {
   const now = new Date();
 
@@ -287,23 +290,79 @@ const saveBeaconHistory = async (BNID, CPID) => {
   if (beaconHistory) {
     const bnidEntry = beaconHistory.bnids.find((entry) => entry.bnid === BNID);
     if (bnidEntry) {
-      if (
-        bnidEntry.cpids.length === 0 ||
-        bnidEntry.cpids[bnidEntry.cpids.length - 1] !== CPID
-      ) {
-        bnidEntry.cpids.push(CPID);
+      if (bnidEntry.cpids.length > 0) {
+        const lastCpid = bnidEntry.cpids[bnidEntry.cpids.length - 1];
+        const lastEndTime = new Date(lastCpid.endTime);
+        if (now - lastEndTime > 5 * 60 * 1000) {
+          bnidEntry.cpids.push({
+            startTime: istDate.toISOString(),
+            endTime: istDate.toISOString(),
+            path: [CPID],
+          });
+        } else {
+          lastCpid.endTime = istDate.toISOString();
+          lastCpid.path.push(CPID);
+        }
+      } else {
+        bnidEntry.cpids.push({
+          startTime: istDate.toISOString(),
+          endTime: istDate.toISOString(),
+          path: [CPID],
+        });
       }
     } else {
-      beaconHistory.bnids.push({ bnid: BNID, cpids: [CPID] });
+      beaconHistory.bnids.push({
+        bnid: BNID,
+        cpids: [
+          {
+            startTime: istDate.toISOString(),
+            endTime: istDate.toISOString(),
+            path: [CPID],
+          },
+        ],
+      });
     }
     await beaconHistory.save();
   } else {
     const newBeaconHistory = new BeaconHistory({
       date: today,
-      bnids: [{ bnid: BNID, cpids: [CPID] }],
+      bnids: [
+        {
+          bnid: BNID,
+          cpids: [
+            {
+              startTime: istDate.toISOString(),
+              endTime: istDate.toISOString(),
+              path: [CPID],
+            },
+          ],
+        },
+      ],
     });
     await newBeaconHistory.save();
   }
+
+  if (timers[BNID]) {
+    clearTimeout(timers[BNID]);
+  }
+
+  timers[BNID] = setTimeout(async () => {
+    const updatedBeaconHistory = await BeaconHistory.findOne({ date: today });
+    const updatedBnidEntry = updatedBeaconHistory.bnids.find(
+      (entry) => entry.bnid === BNID
+    );
+
+    if (updatedBnidEntry) {
+      updatedBnidEntry.cpids.push({
+        startTime: istDate.toISOString(),
+        endTime: istDate.toISOString(),
+        path: [CPID],
+      });
+      await updatedBeaconHistory.save();
+    }
+
+    delete timers[BNID];
+  }, 1 * 60 * 1000);
 };
 
 const deleteBeacon = async (bnid) => {
