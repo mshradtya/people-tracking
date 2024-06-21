@@ -165,11 +165,6 @@ export default function BeaconsTable() {
                   </StyledTableCell>
                   {isSuperAdmin && (
                     <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                      SOS
-                    </StyledTableCell>
-                  )}
-                  {isSuperAdmin && (
-                    <StyledTableCell align="center" style={{ minWidth: 70 }}>
                       Last Packet DateTime
                     </StyledTableCell>
                   )}
@@ -212,23 +207,6 @@ export default function BeaconsTable() {
                           <StyledTableCell align="center">
                             {row.username === "" ? "--" : row.username}
                           </StyledTableCell>
-                          {isSuperAdmin && (
-                            <StyledTableCell align="center">
-                              <span
-                                style={{
-                                  // fontWeight: `${row.sos === "L" ? "" : "bold"}`,
-                                  color: `${row.sos === "L" ? "green" : "red"}`,
-                                  animation: `${
-                                    row.sos === "L"
-                                      ? "none"
-                                      : "blink 0.5s linear infinite"
-                                  }`,
-                                }}
-                              >
-                                {row.sos === "L" ? "False" : "True"}
-                              </span>
-                            </StyledTableCell>
-                          )}
                           {isSuperAdmin && (
                             <StyledTableCell align="center">
                               {row.timestamp ? row.timestamp : "--"}
