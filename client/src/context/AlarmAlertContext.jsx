@@ -28,7 +28,7 @@ export const AlarmAlertProvider = ({ children }) => {
       const beaconToAck = sosAlarmInfo.find((info) => info.bnid === snackbarId);
       if (beaconToAck) {
         await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${beaconToAck.bnid}&ack=false&sos=L&idle=L`
+          `/beacon/update/ack?type=sos&bnid=${beaconToAck.bnid}`
         );
         setSosAlarmInfo((prevAlarmInfo) =>
           prevAlarmInfo.filter((info) => info.bnid !== snackbarId)
@@ -47,7 +47,7 @@ export const AlarmAlertProvider = ({ children }) => {
       );
       if (beaconToAck) {
         await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${beaconToAck.bnid}&ack=false&sos=L&idle=L`
+          `/beacon/update/ack?type=idle&bnid=${beaconToAck.bnid}`
         );
         setIdleAlarmInfo((prevAlarmInfo) =>
           prevAlarmInfo.filter((info) => info.bnid !== snackbarId)

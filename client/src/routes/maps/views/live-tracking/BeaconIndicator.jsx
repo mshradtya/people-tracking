@@ -156,7 +156,7 @@ const BeaconIndicator = ({
           <div
             style={{
               position: "absolute",
-              bottom: 30,
+              bottom: 55,
               color: "blue",
             }}
           >
@@ -198,7 +198,11 @@ const BeaconIndicator = ({
             bottom: "100%",
             left: "50%",
             transform: "translateX(-50%)",
-            backgroundColor: sosActive ? "red" : beaconColor,
+            backgroundColor: sosActive
+              ? "red"
+              : idleActive
+              ? "#FF4500"
+              : beaconColor,
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             color: "white",
             padding: "2px 5px",

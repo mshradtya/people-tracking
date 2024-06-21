@@ -82,12 +82,23 @@ const readSosHistoryOfDate = async (date) => {
   }
 };
 
-const updateBeaconUserAck = async (bnid, ack, sos, idle) => {
-  const beacon = await Beacon.findOneAndUpdate(
-    { bnid },
-    { userAck: ack, sos, idle },
-    { new: true, runValidators: true }
-  );
+const updateBeaconUserAck = async (bnid, type) => {
+  let beacon;
+
+  if (type === "sos") {
+    beacon = await Beacon.findOneAndUpdate(
+      { bnid },
+      { isSosActive: false },
+      { new: true, runValidators: true }
+    );
+  } else if (type === "idle") {
+    beacon = await Beacon.findOneAndUpdate(
+      { bnid },
+      { isIdleActive: false },
+      { new: true, runValidators: true }
+    );
+  }
+
   return beacon;
 };
 
