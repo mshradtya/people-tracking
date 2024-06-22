@@ -25,6 +25,9 @@ import useLogout from "../../hooks/auth/useLogout";
 import useAuth from "../../hooks/auth/useAuth";
 import BeaconUserList from "./BeaconUserList";
 import BeaconColorIndications from "./BeaconColorIndications";
+import Button from "@mui/material/Button";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 240;
 
@@ -39,6 +42,12 @@ function Layout({ children }) {
   const signOut = async () => {
     await logout();
     navigate("/login");
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    }
   };
 
   const handleDrawerToggle = () => {
@@ -250,14 +259,27 @@ function Layout({ children }) {
           </Typography>
         </Toolbar>
         <div className="flex gap-3 justify-center items-center">
-          <Typography variant="h6">{`@${auth?.username}`}</Typography>
-          <IconButton
-            aria-label="logout"
-            sx={{ mr: 2, color: "black" }}
+          {/* <Typography variant="h6">{`@${auth?.username}`}</Typography> */}
+          <Tooltip title="Enter FullScreen Mode" arrow>
+            <IconButton
+              variant="outlined"
+              sx={{
+                color: "black",
+                border: "1px solid black",
+              }}
+              onClick={toggleFullScreen}
+            >
+              <FullscreenIcon />
+            </IconButton>
+          </Tooltip>
+          <Button
+            variant="outlined"
+            startIcon={<LogoutIcon />}
+            sx={{ mr: 2, color: "black", border: "1px solid black" }}
             onClick={signOut}
           >
-            <LogoutIcon />
-          </IconButton>
+            Logout
+          </Button>
         </div>
       </AppBar>
       <Box
