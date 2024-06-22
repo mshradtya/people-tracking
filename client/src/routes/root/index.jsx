@@ -61,7 +61,7 @@ export default function Root() {
       } else if (beacon.isBatteryLow && !beacon.isInDcsRoom) {
         if (beacon.lowBattAckTime) {
           const minutesDifference = getMinutesDifference(beacon.lowBattAckTime);
-          if (minutesDifference > 1) {
+          if (minutesDifference > 10) {
             showLowBatteryAlert(beacon);
           }
         } else {

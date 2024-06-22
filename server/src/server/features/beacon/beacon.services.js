@@ -210,7 +210,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
         isSosActive: SOS === "H" ? true : false,
         isIdleActive: IDLE === "H" ? true : false,
         battery: BATTERY,
-        isBatteryLow: BATTERY < 30 && minutesDifference > 1 ? true : false,
+        isBatteryLow: BATTERY < 30 && minutesDifference > 10 ? true : false,
         gwid: GWID,
         cpid: CPID,
         timestamp: lastPacketDateTime,
