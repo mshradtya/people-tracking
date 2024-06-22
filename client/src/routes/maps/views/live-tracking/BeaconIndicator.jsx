@@ -60,13 +60,15 @@ const BeaconIndicator = ({
   setPrevBeaconPositions,
 }) => {
   const { scale } = useMap();
-  const { showBatteryAlert, batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } =
-    useAlarmAlert();
+  const { batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } = useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
   const sosActive = sosAlarmInfo.some((info) => info.bnid === beacon.bnid);
   const idleActive = idleAlarmInfo.some((info) => info.bnid === beacon.bnid);
+  const lowBatteryActive = batteryAlarmInfo.some(
+    (info) => info.bnid === beacon.bnid
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -92,10 +94,6 @@ const BeaconIndicator = ({
           cpid: beacon.cpid,
         },
       }));
-    }
-
-    if (beacon.battery < 30) {
-      showBatteryAlert(beacon);
     }
   }, [beacon]);
 

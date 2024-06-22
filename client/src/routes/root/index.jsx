@@ -6,12 +6,13 @@ import { useAlarmAlert } from "@/hooks/useAlarmAlert";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import BeaconDcsDialog from "@/components/modals/BeaconDcsDialog";
+import { getMinutesDifference } from "@/utils/helpers";
 
 export default function Root() {
   const arr = ["/login", "/unauthorized"];
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
-  const { showSosAlert, showIdleAlert } = useAlarmAlert();
+  const { showSosAlert, showIdleAlert, showLowBatteryAlert } = useAlarmAlert();
   const { beacons, fetchBeacons } = useFetchBeacons();
   const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
   const [dcsBeacon, setDcsBeacon] = useState(null);
@@ -57,6 +58,15 @@ export default function Root() {
         showSosAlert(beacon);
       } else if (beacon.isIdleActive && !beacon.isInDcsRoom) {
         showIdleAlert(beacon);
+      } else if (beacon.isBatteryLow && !beacon.isInDcsRoom) {
+        if (beacon.lowBattAckTime) {
+          const minutesDifference = getMinutesDifference(beacon.lowBattAckTime);
+          if (minutesDifference > 1) {
+            showLowBatteryAlert(beacon);
+          }
+        } else {
+          showLowBatteryAlert(beacon);
+        }
       }
     }
   }, [beacons]);

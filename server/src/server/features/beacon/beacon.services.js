@@ -1,23 +1,16 @@
 const Beacon = require("./beacon.model");
 const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
-// const BeaconUser = require("./beacon-user.model");
 const SosHistory = require("./beacon-sos-history.model");
 const BeaconHistory = require("./temp/beacon-history.model");
 const ConnectPointLogs = require("./temp/connect-point-logs.model");
-const { formattedDate } = require("../../utils/helper");
+const { formattedDate, getMinutesDifference } = require("../../utils/helper");
 
 const registerBeacon = async (beaconData) => {
   const beacon = new Beacon(beaconData);
   const newBeacon = await beacon.save();
   return newBeacon;
 };
-
-// const registerBeaconUser = async (userData) => {
-//   const user = new BeaconUser(userData);
-//   const newBeaconUser = await user.save();
-//   return newBeaconUser;
-// };
 
 const assignBeaconUser = async (bnid, username) => {
   const words = username.split(" ");
@@ -51,11 +44,6 @@ const readAllBeacons = async () => {
   return allBeacons;
 };
 
-// const readAllBeaconUsers = async () => {
-//   const allUsers = await BeaconUser.find({});
-//   return allUsers;
-// };
-
 const readAllSosHistory = async () => {
   const allSosHistory = await SosHistory.find({}).sort({ _id: -1 });
   return allSosHistory;
@@ -83,6 +71,7 @@ const readSosHistoryOfDate = async (date) => {
 };
 
 const updateBeaconUserAck = async (bnid, type) => {
+  const lastPacketDateTime = formattedDate();
   let beacon;
 
   if (type === "sos") {
@@ -97,19 +86,16 @@ const updateBeaconUserAck = async (bnid, type) => {
       { isIdleActive: false },
       { new: true, runValidators: true }
     );
+  } else if (type === "battery") {
+    beacon = await Beacon.findOneAndUpdate(
+      { bnid },
+      { isBatteryLow: false, lowBattAckTime: lastPacketDateTime },
+      { new: true, runValidators: true }
+    );
   }
 
   return beacon;
 };
-
-// const updateBeaconBatteryLowFlag = async (bnid) => {
-//   const beacon = await Beacon.findOneAndUpdate(
-//     { bnid },
-//     { lowBattery: true },
-//     { new: true, runValidators: true }
-//   );
-//   return beacon;
-// };
 
 const updateBeaconIsInDcsFlag = async (bnid) => {
   const beacon = await Beacon.findOneAndUpdate(
@@ -214,13 +200,17 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
   let updatedBeacon;
 
   if (beacon && !beacon.isSosActive && !beacon.isIdleActive) {
+    let minutesDifference;
+    if (beacon.lowBattAckTime) {
+      minutesDifference = getMinutesDifference(beacon.lowBattAckTime);
+    }
     updatedBeacon = await Beacon.findOneAndUpdate(
       { bnid: BNID },
       {
         isSosActive: SOS === "H" ? true : false,
         isIdleActive: IDLE === "H" ? true : false,
         battery: BATTERY,
-        isBatteryLow: BATTERY > 30 ? false : true,
+        isBatteryLow: BATTERY < 30 && minutesDifference > 1 ? true : false,
         gwid: GWID,
         cpid: CPID,
         timestamp: lastPacketDateTime,

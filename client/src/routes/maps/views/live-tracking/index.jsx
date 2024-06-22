@@ -351,7 +351,7 @@ function LiveTracking() {
               const minutesDifference = getMinutesDifference(beacon.timestamp);
               // Check if the time difference is less than 2 minutes
               if (
-                minutesDifference < 2 &&
+                minutesDifference < 1 &&
                 beacon.boundingBox.length > 0 &&
                 !beacon.isInDcsRoom
               ) {

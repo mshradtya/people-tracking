@@ -1,7 +1,7 @@
 const getMinutesDifference = (timestamp) => {
   const [datePart, timePart] = timestamp.split(", ");
 
-  const [date, month, year] = datePart.split("/").map((part) => parseInt(part));
+  const [day, month, year] = datePart.split("/").map((part) => parseInt(part));
 
   const [time, period] = timePart.split(" ");
   const [hours, minutes, seconds] = time
@@ -10,19 +10,29 @@ const getMinutesDifference = (timestamp) => {
 
   const fullYear = 2000 + year;
 
-  const adjustedHours = (hours % 12) + (period.toLowerCase() === "pm" ? 12 : 0);
+  // Adjust the hours to 24-hour format based on the period
+  let adjustedHours = hours % 12;
+  if (period.toLowerCase() === "pm") {
+    adjustedHours += 12;
+  }
 
+  // Create a new Date object for the timestamp
   const beaconTimestamp = new Date(
     fullYear,
     month - 1,
-    date,
+    day,
     adjustedHours,
     minutes,
     seconds
   );
 
+  // Get the current time
   const currentTime = new Date();
+
+  // Calculate the difference in time between the current time and the timestamp in milliseconds
   const timeDifference = currentTime - beaconTimestamp;
+
+  // Convert the time difference to minutes
   const minutesDifference = timeDifference / (1000 * 60);
 
   return minutesDifference;

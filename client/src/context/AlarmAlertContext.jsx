@@ -3,6 +3,7 @@ import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import Button from "@mui/material/Button";
 import { useSnackbar, closeSnackbar } from "notistack";
 import alarmAudio from "/alarm.mp3";
+import lowBatteryAudio from "/battery_low.mp3";
 
 const AlarmAlertContext = createContext();
 
@@ -13,13 +14,17 @@ export const AlarmAlertProvider = ({ children }) => {
   const [idleAlarmInfo, setIdleAlarmInfo] = useState([]);
   const [batteryAlarmInfo, setBatteryAlarmInfo] = useState([]);
   const [audioElement, setAudioElement] = useState(null);
+  const [lowBatteryAudioElement, setLowBatteryAudioElement] = useState(null);
 
   useEffect(() => {
     const newAudioElement = new Audio(alarmAudio);
+    const newLowBatteryAudioElement = new Audio(lowBatteryAudio);
     setAudioElement(newAudioElement);
+    setLowBatteryAudioElement(newLowBatteryAudioElement);
 
     return () => {
       newAudioElement.pause();
+      newLowBatteryAudioElement.pause();
     };
   }, []);
 
@@ -65,6 +70,9 @@ export const AlarmAlertProvider = ({ children }) => {
         (info) => info.bnid === snackbarId - 100
       );
       if (beaconToAck) {
+        await axiosPrivate.post(
+          `/beacon/update/ack?type=battery&bnid=${beaconToAck.bnid}`
+        );
         setBatteryAlarmInfo((prevAlarmInfo) =>
           prevAlarmInfo.filter((info) => info.bnid !== snackbarId - 100)
         );
@@ -206,7 +214,7 @@ export const AlarmAlertProvider = ({ children }) => {
     }
   };
 
-  const showBatteryAlert = (beacon) => {
+  const showLowBatteryAlert = (beacon) => {
     const isAlreadyPresent = batteryAlarmInfo.some(
       (info) => info.bnid === beacon.bnid
     );
@@ -231,19 +239,38 @@ export const AlarmAlertProvider = ({ children }) => {
       sosAlarmInfo.some((info) => info.status) ||
       idleAlarmInfo.some((info) => info.status)
     ) {
-      audioElement.loop = true;
-      audioElement.play();
+      if (!batteryAlarmInfo.some((info) => info.status)) {
+        audioElement.loop = true;
+        audioElement.play();
+      } else {
+        lowBatteryAudioElement?.pause();
+        audioElement.loop = true;
+        audioElement.play();
+      }
+    } else if (batteryAlarmInfo.some((info) => info.status)) {
+      if (
+        sosAlarmInfo.some((info) => info.status) ||
+        idleAlarmInfo.some((info) => info.status)
+      ) {
+        audioElement.loop = true;
+        audioElement.play();
+      } else {
+        audioElement?.pause();
+        lowBatteryAudioElement.loop = true;
+        lowBatteryAudioElement.play();
+      }
     } else {
       audioElement?.pause();
+      lowBatteryAudioElement?.pause();
     }
-  }, [sosAlarmInfo, idleAlarmInfo]);
+  }, [sosAlarmInfo, idleAlarmInfo, batteryAlarmInfo]);
 
   return (
     <AlarmAlertContext.Provider
       value={{
         showSosAlert,
         showIdleAlert,
-        showBatteryAlert,
+        showLowBatteryAlert,
         sosAlarmInfo,
         idleAlarmInfo,
         batteryAlarmInfo,

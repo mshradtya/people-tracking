@@ -11,15 +11,9 @@ const beaconSchema = new mongoose.Schema(
     },
     gwid: {
       type: Number,
-      unique: true,
-      min: 201,
-      max: 250,
     },
     cpid: {
       type: Number,
-      unique: true,
-      min: 101,
-      max: 200,
     },
     isSosActive: {
       type: Boolean,
@@ -42,6 +36,11 @@ const beaconSchema = new mongoose.Schema(
     isBatteryLow: {
       type: Boolean,
       required: true,
+    },
+    // to show low battery popup on 10 minutes interval
+    // in case user is still on site with low battery beacon
+    lowBattAckTime: {
+      type: String,
     },
     timestamp: {
       type: String,
