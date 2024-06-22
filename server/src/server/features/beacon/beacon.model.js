@@ -11,25 +11,15 @@ const beaconSchema = new mongoose.Schema(
     },
     gwid: {
       type: Number,
-      min: 201,
-      max: 250,
     },
     cpid: {
       type: Number,
-      min: 101,
-      max: 200,
     },
-    sos: {
-      type: String,
-      enum: ["H", "L"],
+    isSosActive: {
+      type: Boolean,
       required: true,
     },
-    idle: {
-      type: String,
-      enum: ["H", "L"],
-      required: true,
-    },
-    userAck: {
+    isIdleActive: {
       type: Boolean,
       required: true,
     },
@@ -37,25 +27,26 @@ const beaconSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    lowBattery: {
-      type: Boolean,
-      required: true,
-    },
-    timestamp: {
-      type: String,
-    },
     battery: {
       type: Number,
       required: true,
       min: 0,
       max: 100,
     },
+    isBatteryLow: {
+      type: Boolean,
+      required: true,
+    },
+    // to show low battery popup on 10 minutes interval
+    // in case user is still on site with low battery beacon
+    lowBattAckTime: {
+      type: String,
+    },
+    timestamp: {
+      type: String,
+    },
     username: {
       type: String,
-      // match: /^[a-zA-Z0-9]{4,}$/,
-    },
-    reassigned: {
-      type: Boolean,
     },
     boundingBox: [{ type: Number }],
   },

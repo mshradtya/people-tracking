@@ -60,13 +60,15 @@ const BeaconIndicator = ({
   setPrevBeaconPositions,
 }) => {
   const { scale } = useMap();
-  const { showBatteryAlert, batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } =
-    useAlarmAlert();
+  const { batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } = useAlarmAlert();
   const [beaconColor, setBeaconColor] = useState("");
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
   const sosActive = sosAlarmInfo.some((info) => info.bnid === beacon.bnid);
   const idleActive = idleAlarmInfo.some((info) => info.bnid === beacon.bnid);
+  const lowBatteryActive = batteryAlarmInfo.some(
+    (info) => info.bnid === beacon.bnid
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -92,10 +94,6 @@ const BeaconIndicator = ({
           cpid: beacon.cpid,
         },
       }));
-    }
-
-    if (beacon.battery < 30) {
-      showBatteryAlert(beacon);
     }
   }, [beacon]);
 
@@ -156,7 +154,7 @@ const BeaconIndicator = ({
           <div
             style={{
               position: "absolute",
-              bottom: 30,
+              bottom: 55,
               color: "blue",
             }}
           >
@@ -198,7 +196,11 @@ const BeaconIndicator = ({
             bottom: "100%",
             left: "50%",
             transform: "translateX(-50%)",
-            backgroundColor: sosActive ? "red" : beaconColor,
+            backgroundColor: sosActive
+              ? "red"
+              : idleActive
+              ? "#FF4500"
+              : beaconColor,
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             color: "white",
             padding: "2px 5px",

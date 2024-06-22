@@ -6,12 +6,13 @@ import { useAlarmAlert } from "@/hooks/useAlarmAlert";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import BeaconDcsDialog from "@/components/modals/BeaconDcsDialog";
+import { getMinutesDifference } from "@/utils/helpers";
 
 export default function Root() {
   const arr = ["/login", "/unauthorized"];
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
-  const { showSosAlert, showIdleAlert } = useAlarmAlert();
+  const { showSosAlert, showIdleAlert, showLowBatteryAlert } = useAlarmAlert();
   const { beacons, fetchBeacons } = useFetchBeacons();
   const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
   const [dcsBeacon, setDcsBeacon] = useState(null);
@@ -41,40 +42,6 @@ export default function Root() {
   };
 
   useEffect(() => {
-    const updateBeaconSosAck = async (bnid) => {
-      try {
-        await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=H&idle=L`
-        );
-      } catch (error) {
-        showSnackbar("error", error.response.data.message);
-      }
-    };
-
-    const updateBeaconIdleAck = async (bnid) => {
-      try {
-        await axiosPrivate.post(
-          `/beacon/update/ack?bnid=${bnid}&ack=true&sos=L&idle=H`
-        );
-      } catch (error) {
-        showSnackbar("error", error.response.data.message);
-      }
-    };
-
-    const handleBeaconUpdates = async () => {
-      for (const beacon of beacons) {
-        if (beacon.sos === "H" && !beacon.userAck && !beacon.isInDcsRoom) {
-          await updateBeaconSosAck(beacon.bnid);
-        } else if (
-          beacon.idle === "H" &&
-          !beacon.userAck &&
-          !beacon.isInDcsRoom
-        ) {
-          await updateBeaconIdleAck(beacon.bnid);
-        }
-      }
-    };
-
     const handleBeaconInDcs = async () => {
       for (const beacon of beacons) {
         if (beacon.isInDcsRoom) {
@@ -84,15 +51,22 @@ export default function Root() {
       }
     };
 
-    handleBeaconUpdates();
     handleBeaconInDcs();
 
     for (const beacon of beacons) {
-      if (beacon.sos === "H" && !beacon.isInDcsRoom) {
-        console.log(beacon);
+      if (beacon.isSosActive && !beacon.isInDcsRoom) {
         showSosAlert(beacon);
-      } else if (beacon.idle === "H" && !beacon.isInDcsRoom) {
+      } else if (beacon.isIdleActive && !beacon.isInDcsRoom) {
         showIdleAlert(beacon);
+      } else if (beacon.isBatteryLow && !beacon.isInDcsRoom) {
+        if (beacon.lowBattAckTime) {
+          const minutesDifference = getMinutesDifference(beacon.lowBattAckTime);
+          if (minutesDifference > 10) {
+            showLowBatteryAlert(beacon);
+          }
+        } else {
+          showLowBatteryAlert(beacon);
+        }
       }
     }
   }, [beacons]);
