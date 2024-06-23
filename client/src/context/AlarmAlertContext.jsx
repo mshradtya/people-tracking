@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
+import BeaconDcsDialog from "@/components/modals/BeaconDcsDialog";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
 import Button from "@mui/material/Button";
 import { useSnackbar, closeSnackbar } from "notistack";
@@ -15,6 +16,8 @@ export const AlarmAlertProvider = ({ children }) => {
   const [batteryAlarmInfo, setBatteryAlarmInfo] = useState([]);
   const [audioElement, setAudioElement] = useState(null);
   const [lowBatteryAudioElement, setLowBatteryAudioElement] = useState(null);
+  const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
+  const [dcsBeacon, setDcsBeacon] = useState(null);
 
   useEffect(() => {
     const newAudioElement = new Audio(alarmAudio);
@@ -83,6 +86,16 @@ export const AlarmAlertProvider = ({ children }) => {
     }
   };
 
+  const handleDcsAlertClose = async (bnid) => {
+    const response = await axiosPrivate.post(
+      `/beacon/update/ack?type=dcs&bnid=${bnid}`
+    );
+    if (response.status === 201) {
+      setDcsAlertOpen(false);
+      setDcsBeacon(null);
+    }
+  };
+
   const sosAlertAction = (snackbarId) => (
     <>
       <Button
@@ -106,6 +119,11 @@ export const AlarmAlertProvider = ({ children }) => {
         variant="filled"
         color="inherit"
         onClick={() => closeIdleAlert(snackbarId)}
+        sx={{
+          // fontWeight: "bold",
+          fontSize: "20px",
+          backgroundColor: "red",
+        }}
       >
         OK
       </Button>
@@ -118,6 +136,11 @@ export const AlarmAlertProvider = ({ children }) => {
         variant="filled"
         color="inherit"
         onClick={() => closeBatteryAlert(snackbarId)}
+        sx={{
+          // fontWeight: "bold",
+          fontSize: "20px",
+          backgroundColor: "red",
+        }}
       >
         OK
       </Button>
@@ -234,6 +257,11 @@ export const AlarmAlertProvider = ({ children }) => {
     }
   };
 
+  const showDCSPopup = (beacon) => {
+    setDcsBeacon(beacon);
+    setDcsAlertOpen(true);
+  };
+
   useEffect(() => {
     if (
       sosAlarmInfo.some((info) => info.status) ||
@@ -271,12 +299,18 @@ export const AlarmAlertProvider = ({ children }) => {
         showSosAlert,
         showIdleAlert,
         showLowBatteryAlert,
+        showDCSPopup,
         sosAlarmInfo,
         idleAlarmInfo,
         batteryAlarmInfo,
       }}
     >
       {children}
+      <BeaconDcsDialog
+        dcsAlertOpen={dcsAlertOpen}
+        handleDcsAlertClose={handleDcsAlertClose}
+        beacon={dcsBeacon}
+      />
     </AlarmAlertContext.Provider>
   );
 };

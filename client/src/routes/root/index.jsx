@@ -5,17 +5,15 @@ import useLogout from "@/hooks/auth/useLogout";
 import { useAlarmAlert } from "@/hooks/useAlarmAlert";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import useAxiosPrivate from "@/hooks/auth/useAxiosPrivate";
-import BeaconDcsDialog from "@/components/modals/BeaconDcsDialog";
 import { getMinutesDifference } from "@/utils/helpers";
 
 export default function Root() {
   const arr = ["/login", "/unauthorized"];
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
-  const { showSosAlert, showIdleAlert, showLowBatteryAlert } = useAlarmAlert();
+  const { showSosAlert, showIdleAlert, showLowBatteryAlert, showDCSPopup } =
+    useAlarmAlert();
   const { beacons, fetchBeacons } = useFetchBeacons();
-  const [dcsAlertOpen, setDcsAlertOpen] = useState(false);
-  const [dcsBeacon, setDcsBeacon] = useState(null);
 
   const logout = useLogout();
 
@@ -31,28 +29,7 @@ export default function Root() {
     };
   }, []);
 
-  const handleDcsAlertClose = async (bnid, beaconUser) => {
-    const response = await axiosPrivate.post(
-      `/beacon/update?LOCATION=DCS&BNID=${bnid}&USER=${beaconUser}`
-    );
-    if (response.status === 200) {
-      setDcsAlertOpen(false);
-      setDcsBeacon(null);
-    }
-  };
-
   useEffect(() => {
-    const handleBeaconInDcs = async () => {
-      for (const beacon of beacons) {
-        if (beacon.isInDcsRoom) {
-          setDcsBeacon(beacon);
-          setDcsAlertOpen(true);
-        }
-      }
-    };
-
-    handleBeaconInDcs();
-
     for (const beacon of beacons) {
       if (beacon.isSosActive && !beacon.isInDcsRoom) {
         showSosAlert(beacon);
@@ -67,6 +44,8 @@ export default function Root() {
         } else {
           showLowBatteryAlert(beacon);
         }
+      } else if (beacon.isInDcsRoom) {
+        showDCSPopup(beacon);
       }
     }
   }, [beacons]);
@@ -85,11 +64,6 @@ export default function Root() {
   ) : (
     <Layout>
       <Outlet />
-      <BeaconDcsDialog
-        dcsAlertOpen={dcsAlertOpen}
-        handleDcsAlertClose={handleDcsAlertClose}
-        beacon={dcsBeacon}
-      />
     </Layout>
   );
 }

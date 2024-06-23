@@ -92,17 +92,14 @@ const updateBeaconUserAck = async (bnid, type) => {
       { isBatteryLow: false, lowBattAckTime: lastPacketDateTime },
       { new: true, runValidators: true }
     );
+  } else if (type === "dcs") {
+    beacon = await Beacon.findOneAndUpdate(
+      { bnid },
+      { isInDcsRoom: false, isSosActive: false },
+      { new: true, runValidators: true }
+    );
   }
 
-  return beacon;
-};
-
-const updateBeaconIsInDcsFlag = async (bnid) => {
-  const beacon = await Beacon.findOneAndUpdate(
-    { bnid },
-    { isInDcsRoom: false, sos: "L", idle: "L" },
-    { new: true, runValidators: true }
-  );
   return beacon;
 };
 
@@ -111,7 +108,7 @@ const updateBeaconDCS = async (BNID, SOS, BATTERY) => {
     { bnid: BNID },
     {
       isInDcsRoom: true,
-      sos: SOS,
+      isSosActive: SOS === "H" ? true : false,
       battery: BATTERY,
     },
     { new: true, runValidators: true }
@@ -342,13 +339,9 @@ const deleteBeacon = async (bnid) => {
 
 module.exports = {
   registerBeacon,
-  // registerBeaconUser,
   assignBeaconUser,
   readAllBeacons,
-  // readAllBeaconUsers,
   updateBeaconUserAck,
-  // updateBeaconBatteryLowFlag,
-  updateBeaconIsInDcsFlag,
   updateBeaconDCS,
   updateGWCPHealth,
   updateBeacon,

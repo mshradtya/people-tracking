@@ -248,27 +248,36 @@ const updateBeacon = async (req, res) => {
     } else {
       const { GWID, CPID, BNID, SOS, IDLE, BATTERY } = req.query;
 
-      try {
-        const beacon = await beaconService.updateBeacon(
-          GWID,
-          CPID,
-          BNID,
-          SOS,
-          IDLE,
-          BATTERY
-        );
-        if (!beacon) {
-          return res.status(400).json({
-            status: 400,
-            success: false,
-            message: `beacon not registered`,
-          });
+      // for dealing with the ghost beacon
+      if (BNID === "1" && BATTERY == "8") {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "ghost beacon ignored",
+        });
+      } else {
+        try {
+          const beacon = await beaconService.updateBeacon(
+            GWID,
+            CPID,
+            BNID,
+            SOS,
+            IDLE,
+            BATTERY
+          );
+          if (!beacon) {
+            return res.status(400).json({
+              status: 400,
+              success: false,
+              message: `beacon not registered`,
+            });
+          }
+          res.status(200).json({ status: 201, success: true, beacon });
+        } catch (error) {
+          return res
+            .status(500)
+            .json({ status: 400, success: false, message: error.message });
         }
-        res.status(200).json({ status: 201, success: true, beacon });
-      } catch (error) {
-        return res
-          .status(500)
-          .json({ status: 400, success: false, message: error.message });
       }
     }
   } else {

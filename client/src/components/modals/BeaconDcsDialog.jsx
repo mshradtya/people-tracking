@@ -62,10 +62,10 @@ export default function BeaconDcsDialog({
             <span
               style={{
                 fontWeight: "bold",
-                color: beacon?.sos === "H" ? "green" : "",
+                color: beacon?.isSosActive ? "green" : "",
               }}
             >
-              {beacon?.sos === "H" ? "WORKING" : "OFF"}
+              {beacon?.isSosActive ? "WORKING" : "OFF"}
             </span>
             <br />
             Username:{" "}
