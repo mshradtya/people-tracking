@@ -20,7 +20,7 @@ import { useSnackbar } from "@/hooks/useSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import useAuth from "@/hooks/auth/useAuth";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
-import BatteryIcon from "./BatteryIcon";
+import BatteryIcon from "@/components/shared/BatteryIcon";
 import AssignUser from "./AssignUser";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({

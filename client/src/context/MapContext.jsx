@@ -11,6 +11,7 @@ export const MapProvider = ({ children }) => {
   const [addingConnectPoint, setAddingConnectPoint] = useState(false);
   const [addingConnectPointROI, setAddingConnectPointROI] = useState(false);
   const [showROI, setShowROI] = useState(false);
+  const [beaconColors, setBeaconColors] = useState({});
 
   return (
     <MapContext.Provider
@@ -31,6 +32,8 @@ export const MapProvider = ({ children }) => {
         setAddingConnectPointROI,
         showROI,
         setShowROI,
+        beaconColors,
+        setBeaconColors,
       }}
     >
       {children}

@@ -14,7 +14,7 @@ const {
   readSosHistoryOfDate,
 } = require("./beacon.controllers");
 const { authUser } = require("../auth/auth.controllers");
-const BeaconHistory = require("./temp/beacon-history.model");
+const PathLogs = require("./temp/path-logs.model");
 const ConnectPointLogs = require("./temp/connect-point-logs.model");
 
 router.post("/beacon/register", authUser, registerBeacon);
@@ -30,17 +30,17 @@ router.get("/beacon/sos/history", authUser, readAllSosHistory);
 router.get("/beacon/sos/history/date", authUser, readSosHistoryOfDate);
 
 // to be removed later
-const fetchBeaconHistory = async (req, res) => {
+const fetchBeaconPath = async (req, res) => {
   try {
     const { date } = req.query;
-    const [logs] = await BeaconHistory.find({ date });
+    const [logs] = await PathLogs.find({ date });
     res.status(200).json(logs ? logs.bnids : []);
   } catch (error) {
     res.status(500).json({ message: "Error fetching beacon history", error });
   }
 };
 
-router.get("/beacon/history", fetchBeaconHistory);
+router.get("/beacon/history", fetchBeaconPath);
 
 // to be removed later
 

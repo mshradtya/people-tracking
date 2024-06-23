@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
 import { useFetchBeacons } from "@/hooks/useFetchBeacons";
 import { getMinutesDifference } from "@/utils/helpers";
+import BatteryIcon from "@/components/shared/BatteryIcon";
+import useMap from "@/hooks/useMap";
+import { useAlarmAlert } from "@/hooks/useAlarmAlert";
 
 function BeaconUserList() {
+  const { beaconColors } = useMap();
   const { beacons, fetchBeacons } = useFetchBeacons();
+  const { sosAlarmInfo, idleAlarmInfo } = useAlarmAlert();
 
   useEffect(() => {
     fetchBeacons();
@@ -19,22 +24,70 @@ function BeaconUserList() {
       {beacons.map((beacon, index) => {
         if (beacon.timestamp) {
           const minutesDifference = getMinutesDifference(beacon.timestamp);
-          // Check if the time difference is less than 2 minutes
           if (
             minutesDifference < 1 &&
             beacon.boundingBox.length > 0 &&
             !beacon.isInDcsRoom
           ) {
             return (
-              <div key={index} className="beacon-card">
-                <span className="beacon-bnid">
+              <div
+                key={index}
+                className="beacon-card"
+                style={{
+                  border: sosAlarmInfo.some((info) => info.bnid === beacon.bnid)
+                    ? "5px solid red"
+                    : idleAlarmInfo.some((info) => info.bnid === beacon.bnid)
+                    ? "5px solid #FF4500"
+                    : `5px solid ${beaconColors[beacon.bnid]}`,
+                }}
+              >
+                <span
+                  className="beacon-bnid"
+                  style={{
+                    color: sosAlarmInfo.some(
+                      (info) => info.bnid === beacon.bnid
+                    )
+                      ? "red"
+                      : idleAlarmInfo.some((info) => info.bnid === beacon.bnid)
+                      ? "#FF4500"
+                      : `${beaconColors[beacon.bnid]}`,
+                  }}
+                >
                   {beacon.bnid < 10 ? "0" + beacon.bnid : beacon.bnid}
                 </span>
                 <span
                   className="beacon-username"
-                  style={{ color: beacon.username ? "" : "red" }}
+                  style={{
+                    color: beacon.username
+                      ? sosAlarmInfo.some((info) => info.bnid === beacon.bnid)
+                        ? "red"
+                        : idleAlarmInfo.some(
+                            (info) => info.bnid === beacon.bnid
+                          )
+                        ? "#FF4500"
+                        : `${beaconColors[beacon.bnid]}`
+                      : "red",
+                  }}
                 >
                   {beacon.username ? beacon.username : "Unassigned"}
+                </span>
+                <span
+                  className="beacon-battery"
+                  style={{
+                    color: beacon.battery
+                      ? sosAlarmInfo.some((info) => info.bnid === beacon.bnid)
+                        ? "red"
+                        : idleAlarmInfo.some(
+                            (info) => info.bnid === beacon.bnid
+                          )
+                        ? "#FF4500"
+                        : `${beaconColors[beacon.bnid]}`
+                      : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {beacon.battery ? `${beacon.battery}%` : "-"}
+                  <BatteryIcon battery={beacon.battery} />
                 </span>
               </div>
             );
@@ -51,7 +104,6 @@ function BeaconUserList() {
           padding: 10px;
         }
         .beacon-card {
-          background-color: #f9f9f9;
           border: 1px solid #e0e0e0;
           border-radius: 8px;
           padding: 10px;
@@ -60,13 +112,26 @@ function BeaconUserList() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 5px; /* Add some space between items */
         }
         .beacon-bnid {
-          //   font-weight: bold;
-          color: #333;
+          font-weight: bold;
+          white-space: nowrap; /* Prevent line breaks */
         }
         .beacon-username {
-          color: #555;
+          font-weight: bold;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap; /* Prevent line breaks */
+          flex: 1; /* Allow this item to grow and take up remaining space */
+          max-width: 100px; /* Set a maximum width */
+        }
+        .beacon-battery {
+          font-weight: bold;
+          white-space: nowrap; /* Prevent line breaks */
+          display: flex;
+          align-items: center;
+          gap: 2px; /* Add space between text and battery icon */
         }
         /* Custom scrollbar styles for WebKit browsers */
         .beacon-container::-webkit-scrollbar {

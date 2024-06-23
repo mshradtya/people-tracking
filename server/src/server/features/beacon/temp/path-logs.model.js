@@ -28,7 +28,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const beaconHistorySchema = new Schema({
+const pathLogsSchema = new Schema({
   date: {
     type: String,
     required: true,
@@ -61,5 +61,5 @@ const beaconHistorySchema = new Schema({
   ],
 });
 
-const BeaconHistory = mongoose.model("BeaconHistory", beaconHistorySchema);
-module.exports = BeaconHistory;
+const PathLogs = mongoose.model("PathLogs", pathLogsSchema);
+module.exports = PathLogs;

@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect } from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import { tableCellClasses } from "@mui/material/TableCell";
 import Paper from "@mui/material/Paper";
@@ -97,10 +97,13 @@ export default function PathLogsTable({ selectedDate }) {
               <TableHead>
                 <StyledTableRow>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Serial No.
+                    Beacon ID
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Beacon ID
+                    Start Time
+                  </StyledTableCell>
+                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
+                    End Time
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
                     Path
@@ -111,26 +114,29 @@ export default function PathLogsTable({ selectedDate }) {
                 {logs &&
                   logs
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) => {
-                      return (
+                    .map((row, index) =>
+                      row.cpids.map((cpid, cpidIndex) => (
                         <StyledTableRow
                           hover
                           role="checkbox"
                           tabIndex={-1}
-                          key={index}
+                          key={`${index}-${cpidIndex}`}
                         >
-                          <StyledTableCell align="center">
-                            {logsSerialNumber + index}
-                          </StyledTableCell>
                           <StyledTableCell align="center">
                             {row.bnid}
                           </StyledTableCell>
                           <StyledTableCell align="center">
-                            {row.cpids.join(" | ")}
+                            {cpid.startTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {cpid.endTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {cpid.path.join(" | ")}
                           </StyledTableCell>
                         </StyledTableRow>
-                      );
-                    })}
+                      ))
+                    )}
               </TableBody>
             </Table>
           )}
@@ -138,7 +144,7 @@ export default function PathLogsTable({ selectedDate }) {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={history.length}
+          count={logs.reduce((acc, row) => acc + row.cpids.length, 0)}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

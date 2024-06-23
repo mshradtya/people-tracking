@@ -59,16 +59,12 @@ const BeaconIndicator = ({
   prevBeaconPositions,
   setPrevBeaconPositions,
 }) => {
-  const { scale } = useMap();
-  const { batteryAlarmInfo, sosAlarmInfo, idleAlarmInfo } = useAlarmAlert();
-  const [beaconColor, setBeaconColor] = useState("");
+  const { scale, beaconColors, setBeaconColors } = useMap();
+  const { sosAlarmInfo, idleAlarmInfo } = useAlarmAlert();
   const prevPosition = prevBeaconPositions[beacon.bnid] || { x: 0, y: 0 };
   const [isBlinking, setIsBlinking] = useState(true);
   const sosActive = sosAlarmInfo.some((info) => info.bnid === beacon.bnid);
   const idleActive = idleAlarmInfo.some((info) => info.bnid === beacon.bnid);
-  const lowBatteryActive = batteryAlarmInfo.some(
-    (info) => info.bnid === beacon.bnid
-  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -79,8 +75,14 @@ const BeaconIndicator = ({
   }, []);
 
   useEffect(() => {
-    setBeaconColor(getRandomColor());
-  }, []);
+    if (!beaconColors[beacon.bnid]) {
+      const color = getRandomColor();
+      setBeaconColors((prevColors) => ({
+        ...prevColors,
+        [beacon.bnid]: color,
+      }));
+    }
+  }, [beacon, beaconColors, setBeaconColors]);
 
   useEffect(() => {
     // Update position only if cpid is different from the previous value
@@ -116,7 +118,7 @@ const BeaconIndicator = ({
             ? isBlinking
               ? "#FF4500"
               : "white"
-            : beaconColor,
+            : beaconColors[beacon.bnid] || "",
           boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
           transform: `scale(${1 / scale})`,
           display: "flex",
@@ -200,7 +202,7 @@ const BeaconIndicator = ({
               ? "red"
               : idleActive
               ? "#FF4500"
-              : beaconColor,
+              : beaconColors[beacon.bnid] || "",
             boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.5)",
             color: "white",
             padding: "2px 5px",

@@ -2,7 +2,7 @@ const Beacon = require("./beacon.model");
 const Gateway = require("../gateway/gateway.model");
 const ConnectPoint = require("../connect-point/connect-point.model");
 const SosHistory = require("./beacon-sos-history.model");
-const BeaconHistory = require("./temp/beacon-history.model");
+const PathLogs = require("./temp/path-logs.model");
 const ConnectPointLogs = require("./temp/connect-point-logs.model");
 const { formattedDate, getMinutesDifference } = require("../../utils/helper");
 
@@ -247,102 +247,90 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
     }
 
     // to be remove later
-    await saveBeaconHistory(BNID, CPID);
+    await logPath(BNID, CPID);
   }
   return updatedBeacon ? updatedBeacon : beacon;
 };
 
 // to be removed later
-// Timer logic for beacon history
-let timers = {};
+const lastReceivedTimes = {};
 
-const saveBeaconHistory = async (BNID, CPID) => {
+const formattedDate2 = () => {
   const now = new Date();
+  const options = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  };
+  return now.toLocaleString("en-US", options);
+};
 
-  // Get the current time in milliseconds and add the IST offset (5 hours 30 minutes) in milliseconds
+const logPath = async (BNID, CPID) => {
+  const now = new Date();
   const istOffset = 5.5 * 60 * 60 * 1000;
   const istDate = new Date(now.getTime() + istOffset);
-  // Format the IST date to ISO string and extract the date part
   const today = istDate.toISOString().split("T")[0];
 
-  const beaconHistory = await BeaconHistory.findOne({ date: today });
+  const lastPacketDateTime = formattedDate2();
+  const currentTime = new Date();
 
-  if (beaconHistory) {
-    const bnidEntry = beaconHistory.bnids.find((entry) => entry.bnid === BNID);
-    if (bnidEntry) {
-      if (bnidEntry.cpids.length > 0) {
-        const lastCpid = bnidEntry.cpids[bnidEntry.cpids.length - 1];
-        const lastEndTime = new Date(lastCpid.endTime);
-        if (now - lastEndTime > 5 * 60 * 1000) {
-          bnidEntry.cpids.push({
-            startTime: istDate.toISOString(),
-            endTime: istDate.toISOString(),
-            path: [CPID],
-          });
-        } else {
-          lastCpid.endTime = istDate.toISOString();
-          lastCpid.path.push(CPID);
-        }
-      } else {
-        bnidEntry.cpids.push({
-          startTime: istDate.toISOString(),
-          endTime: istDate.toISOString(),
-          path: [CPID],
-        });
-      }
-    } else {
-      beaconHistory.bnids.push({
-        bnid: BNID,
-        cpids: [
-          {
-            startTime: istDate.toISOString(),
-            endTime: istDate.toISOString(),
-            path: [CPID],
-          },
-        ],
-      });
-    }
-    await beaconHistory.save();
-  } else {
-    const newBeaconHistory = new BeaconHistory({
+  let pathLog = await PathLogs.findOne({ date: today });
+
+  if (!pathLog) {
+    // If no path log exists for today, create a new one
+    pathLog = new PathLogs({
       date: today,
-      bnids: [
-        {
-          bnid: BNID,
-          cpids: [
-            {
-              startTime: istDate.toISOString(),
-              endTime: istDate.toISOString(),
-              path: [CPID],
-            },
-          ],
-        },
-      ],
+      bnids: [],
     });
-    await newBeaconHistory.save();
   }
 
-  if (timers[BNID]) {
-    clearTimeout(timers[BNID]);
+  let bnidEntry = pathLog.bnids.find((entry) => entry.bnid === BNID);
+
+  if (!bnidEntry) {
+    // If no entry exists for the BNID, create a new one
+    bnidEntry = {
+      bnid: BNID,
+      cpids: [],
+    };
+    pathLog.bnids.push(bnidEntry);
   }
 
-  timers[BNID] = setTimeout(async () => {
-    const updatedBeaconHistory = await BeaconHistory.findOne({ date: today });
-    const updatedBnidEntry = updatedBeaconHistory.bnids.find(
-      (entry) => entry.bnid === BNID
-    );
-
-    if (updatedBnidEntry) {
-      updatedBnidEntry.cpids.push({
-        startTime: istDate.toISOString(),
-        endTime: istDate.toISOString(),
-        path: [CPID],
-      });
-      await updatedBeaconHistory.save();
+  let createNewEntry = true;
+  if (lastReceivedTimes[BNID]) {
+    const timeDifference = (currentTime - lastReceivedTimes[BNID]) / 1000 / 60; // difference in minutes
+    if (timeDifference <= 5) {
+      // If received within 5 minutes, update the last CPID entry
+      let lastCpidEntry = bnidEntry.cpids[bnidEntry.cpids.length - 1];
+      if (lastCpidEntry) {
+        // Update the endTime of the last CPID entry
+        lastCpidEntry.endTime = lastPacketDateTime.split(", ")[1];
+        // Check if the last CPID in the path array is different from the new CPID
+        if (lastCpidEntry.path[lastCpidEntry.path.length - 1] !== CPID) {
+          // Push the new CPID into the path array of the last CPID entry
+          lastCpidEntry.path.push(CPID);
+        }
+        createNewEntry = false;
+      }
     }
+  }
 
-    delete timers[BNID];
-  }, 1 * 60 * 1000);
+  if (createNewEntry) {
+    // If no recent data or no last entry, create a new entry
+    bnidEntry.cpids.push({
+      startTime: lastPacketDateTime.split(", ")[1],
+      endTime: lastPacketDateTime.split(", ")[1],
+      path: [CPID],
+    });
+  }
+
+  // Update the last received time for the BNID
+  lastReceivedTimes[BNID] = currentTime;
+
+  await pathLog.save();
 };
 
 const deleteBeacon = async (bnid) => {

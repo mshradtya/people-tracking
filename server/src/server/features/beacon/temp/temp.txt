@@ -1,0 +1,92 @@
+// to be removed later
+// Timer logic for beacon history
+let timers = {};
+
+const logPath = async (BNID, CPID) => {
+  const now = new Date();
+
+  // Get the current time in milliseconds and add the IST offset (5 hours 30 minutes) in milliseconds
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffset);
+  // Format the IST date to ISO string and extract the date part
+  const today = istDate.toISOString().split("T")[0];
+
+  const pathLog = await PathLogs.findOne({ date: today });
+
+  if (pathLog) {
+    const bnidEntry = pathLog.bnids.find((entry) => entry.bnid === BNID);
+    if (bnidEntry) {
+      if (bnidEntry.cpids.length > 0) {
+        const lastCpid = bnidEntry.cpids[bnidEntry.cpids.length - 1];
+        const lastEndTime = new Date(lastCpid.endTime);
+        if (now - lastEndTime > 5 * 60 * 1000) {
+          bnidEntry.cpids.push({
+            startTime: istDate.toISOString(),
+            endTime: istDate.toISOString(),
+            path: [CPID],
+          });
+        } else {
+          lastCpid.endTime = istDate.toISOString();
+          lastCpid.path.push(CPID);
+        }
+      } else {
+        bnidEntry.cpids.push({
+          startTime: istDate.toISOString(),
+          endTime: istDate.toISOString(),
+          path: [CPID],
+        });
+      }
+    } else {
+      pathLog.bnids.push({
+        bnid: BNID,
+        cpids: [
+          {
+            startTime: istDate.toISOString(),
+            endTime: istDate.toISOString(),
+            path: [CPID],
+          },
+        ],
+      });
+    }
+    await pathLog.save();
+  } else {
+    const newPathLog = new PathLogs({
+      date: today,
+      bnids: [
+        {
+          bnid: BNID,
+          cpids: [
+            {
+              startTime: istDate.toISOString(),
+              endTime: istDate.toISOString(),
+              path: [CPID],
+            },
+          ],
+        },
+      ],
+    });
+    await newPathLog.save();
+  }
+
+  if (timers[BNID]) {
+    clearTimeout(timers[BNID]);
+  }
+
+  timers[BNID] = setTimeout(async () => {
+    const updatedPathLog = await PathLogs.findOne({ date: today });
+    const updatedBnidEntry = updatedPathLog.bnids.find(
+      (entry) => entry.bnid === BNID
+    );
+
+    if (updatedBnidEntry) {
+      updatedBnidEntry.cpids.push({
+        startTime: istDate.toISOString(),
+        endTime: istDate.toISOString(),
+        path: [CPID],
+      });
+      await updatedPathLog.save();
+    }
+
+    delete timers[BNID];
+  }, 1 * 60 * 1000);
+};
