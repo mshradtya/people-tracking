@@ -49,18 +49,40 @@ const readAllSosHistory = async () => {
   return allSosHistory;
 };
 
-const readSosHistoryOfDate = async (date) => {
-  if (date) {
-    // Parse the input date (YYYY-MM-DD) to the desired format (DD/MM/YY)
-    const [year, month, day] = date.split("-");
-    const formattedDate = `${day}/${month}/${year.slice(2)}`; // Format to DD/MM/YY
+const readSosHistoryOfDate = async (date, shift) => {
+  if (date && shift) {
+    const startDate = new Date(date);
+    let startTime, endTime;
 
-    // Create a regular expression to match the date in the timestamp field
-    const dateRegex = new RegExp(`^${formattedDate.replace(/\//g, "\\/")},`);
+    if (shift === "fullDay") {
+      startTime = new Date(startDate);
+      startTime.setHours(6, 0, 0, 0);
+      endTime = new Date(startDate);
+      endTime.setDate(endTime.getDate() + 1);
+      endTime.setHours(5, 59, 59, 999);
+    } else if (shift === "shiftA") {
+      startTime = new Date(startDate);
+      startTime.setHours(6, 0, 0, 0);
+      endTime = new Date(startDate);
+      endTime.setHours(13, 59, 59, 999);
+    } else if (shift === "shiftB") {
+      startTime = new Date(startDate);
+      startTime.setHours(14, 0, 0, 0);
+      endTime = new Date(startDate);
+      endTime.setHours(21, 59, 59, 999);
+    } else if (shift === "shiftC") {
+      startTime = new Date(startDate);
+      startTime.setHours(22, 0, 0, 0);
+      endTime = new Date(startDate);
+      endTime.setDate(endTime.getDate() + 1);
+      endTime.setHours(5, 59, 59, 999);
+    }
 
-    // Query the database for matching timestamps
     const sosHistoryOfDate = await SosHistory.find({
-      timestamp: { $regex: dateRegex, $options: "i" }, // Case insensitive match
+      timestamp: {
+        $gte: startTime.toISOString(),
+        $lt: endTime.toISOString(),
+      },
     }).sort({ _id: -1 });
 
     return sosHistoryOfDate;
@@ -234,7 +256,7 @@ const updateBeacon = async (GWID, CPID, BNID, SOS, IDLE, BATTERY) => {
           cpid: CPID,
           type: SOS === "H" ? "SOS" : "IDLE DETECTION",
           location: updatedGateway.location,
-          timestamp: lastPacketDateTime,
+          timestamp: new Date().toISOString(),
           username: updatedBeacon.username,
         });
         await newSosHistory.save();

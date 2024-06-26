@@ -1,10 +1,13 @@
 import React from "react";
 import { TextField, MenuItem } from "@mui/material";
 
-const SosHistoryOptions = ({ onDateChange }) => {
+const SosHistoryOptions = ({ onDateChange, onShiftChange }) => {
   const handleDateChange = (event) => {
-    console.log("this ran");
     onDateChange(event.target.value);
+  };
+
+  const handleShiftChange = (event) => {
+    onShiftChange(event.target.value);
   };
 
   return (
@@ -25,15 +28,16 @@ const SosHistoryOptions = ({ onDateChange }) => {
         onChange={handleDateChange}
       />
       <TextField
-        id="outlined-select-currency"
         select
-        label="Select"
-        defaultValue="fullDay"
+        label="Select Shift"
+        defaultValue=""
+        onChange={handleShiftChange}
+        sx={{ width: "130px" }}
       >
         <MenuItem value="fullDay">Full Day</MenuItem>
-        <MenuItem value="option1">Shift A</MenuItem>
-        <MenuItem value="option2">Shift B</MenuItem>
-        <MenuItem value="option3">Shift C</MenuItem>
+        <MenuItem value="shiftA">Shift A</MenuItem>
+        <MenuItem value="shiftB">Shift B</MenuItem>
+        <MenuItem value="shiftC">Shift C</MenuItem>
       </TextField>
     </div>
   );

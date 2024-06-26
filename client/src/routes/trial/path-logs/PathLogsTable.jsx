@@ -42,31 +42,33 @@ const theme = createTheme({
   },
 });
 
-export default function PathLogsTable({ selectedDate }) {
+export default function PathLogsTable({ selectedDate, selectedBnid }) {
   const axiosPrivate = useAxiosPrivate();
   const [logs, setLogs] = useState([]);
   const [isLogsLoading, setIsLogsLoading] = useState(true);
-  const [logsSerialNumber, setLogsSerialNumber] = useState(1);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    const fetchSosHistory = async (selectedDate) => {
+    const fetchSosHistory = async (date, bnid) => {
       try {
         const response = await axiosPrivate.get(
-          `/beacon/history?date=${selectedDate}`
+          `/beacon/history?date=${date}&bnid=${bnid}`
         );
-        console.log(response.data);
-        setLogs(response.data);
-        setIsLogsLoading(false);
-        setLogsSerialNumber(1);
+        if (response.status === 200) {
+          console.log("this ran");
+          setLogs(response.data.cpids || []);
+          setIsLogsLoading(false);
+        }
       } catch (error) {
+        // Assuming you have a snackbar component to show errors
         showSnackbar("error", error.response.data.message);
+        setIsLogsLoading(false);
       }
     };
 
-    fetchSosHistory(selectedDate);
-  }, [selectedDate]);
+    fetchSosHistory(selectedDate, selectedBnid);
+  }, [selectedDate, selectedBnid]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -97,9 +99,6 @@ export default function PathLogsTable({ selectedDate }) {
               <TableHead>
                 <StyledTableRow>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
-                    Beacon ID
-                  </StyledTableCell>
-                  <StyledTableCell align="center" style={{ minWidth: 70 }}>
                     Start Time
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ minWidth: 70 }}>
@@ -111,32 +110,26 @@ export default function PathLogsTable({ selectedDate }) {
                 </StyledTableRow>
               </TableHead>
               <TableBody>
-                {logs &&
-                  logs
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) =>
-                      row.cpids.map((cpid, cpidIndex) => (
-                        <StyledTableRow
-                          hover
-                          role="checkbox"
-                          tabIndex={-1}
-                          key={`${index}-${cpidIndex}`}
-                        >
-                          <StyledTableCell align="center">
-                            {row.bnid}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {cpid.startTime}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {cpid.endTime}
-                          </StyledTableCell>
-                          <StyledTableCell align="center">
-                            {cpid.path.join(" | ")}
-                          </StyledTableCell>
-                        </StyledTableRow>
-                      ))
-                    )}
+                {logs
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((cpid, cpidIndex) => (
+                    <StyledTableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={cpid._id}
+                    >
+                      <StyledTableCell align="center">
+                        {cpid.startTime}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {cpid.endTime}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {cpid.path.join(" | ")}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
               </TableBody>
             </Table>
           )}
@@ -144,7 +137,7 @@ export default function PathLogsTable({ selectedDate }) {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={logs.reduce((acc, row) => acc + row.cpids.length, 0)}
+          count={logs.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

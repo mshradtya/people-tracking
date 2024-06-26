@@ -9,10 +9,10 @@ const useFetchSosHistory = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
   const [historySerialNumber, setHistorySerialNumber] = useState(1);
 
-  const fetchSosHistory = async (selectedDate) => {
+  const fetchSosHistory = async (selectedDate, selectedShift) => {
     try {
       const response = await axiosPrivate.get(
-        `/beacon/sos/history/date?date=${selectedDate}`
+        `/beacon/sos/history/date?date=${selectedDate}&shift=${selectedShift}`
       );
       setHistory(response.data.history);
       setIsHistoryLoading(false);

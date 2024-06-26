@@ -109,8 +109,8 @@ const readSosHistoryOfDate = async (req, res) => {
   }
 
   try {
-    const { date } = req.query;
-    const history = await beaconService.readSosHistoryOfDate(date);
+    const { date, shift } = req.query;
+    const history = await beaconService.readSosHistoryOfDate(date, shift);
     return res.status(200).json({ status: 200, success: true, history });
   } catch (error) {
     return res

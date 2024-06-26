@@ -11,6 +11,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useFetchSosHistory } from "@/hooks/useFetchSosHistory";
+import { formattedDate } from "@/utils/helpers";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -42,15 +43,15 @@ const theme = createTheme({
   },
 });
 
-export default function SosHistoryTable({ selectedDate }) {
+export default function SosHistoryTable({ selectedDate, selectedShift }) {
   const { history, isHistoryLoading, historySerialNumber, fetchSosHistory } =
     useFetchSosHistory();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    fetchSosHistory(selectedDate);
-  }, [selectedDate]);
+    fetchSosHistory(selectedDate, selectedShift);
+  }, [selectedDate, selectedShift]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -134,7 +135,7 @@ export default function SosHistoryTable({ selectedDate }) {
                             {row.type}
                           </StyledTableCell>
                           <StyledTableCell align="center">
-                            {row.timestamp}
+                            {formattedDate(row.timestamp)}
                           </StyledTableCell>
                           <StyledTableCell align="center">
                             {row.cpid}

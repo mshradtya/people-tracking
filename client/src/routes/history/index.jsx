@@ -4,19 +4,27 @@ import SosHistoryOptions from "./SosHistoryOptions";
 
 function SOSHistory() {
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedShift, setSelectedShift] = useState("");
 
   const handleDateChange = (date) => {
+    console.log(date);
     setSelectedDate(date);
   };
 
-  useEffect(() => {
-    console.log(selectedDate);
-  }, [selectedDate]);
+  const handleShiftChange = (shift) => {
+    setSelectedShift(shift);
+  };
 
   return (
     <>
-      <SosHistoryOptions onDateChange={handleDateChange} />
-      <SosHistoryTable selectedDate={selectedDate} />
+      <SosHistoryOptions
+        onDateChange={handleDateChange}
+        onShiftChange={handleShiftChange}
+      />
+      <SosHistoryTable
+        selectedDate={selectedDate}
+        selectedShift={selectedShift}
+      />
     </>
   );
 }

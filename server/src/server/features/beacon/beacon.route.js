@@ -32,9 +32,22 @@ router.get("/beacon/sos/history/date", authUser, readSosHistoryOfDate);
 // to be removed later
 const fetchBeaconPath = async (req, res) => {
   try {
-    const { date } = req.query;
-    const [logs] = await PathLogs.find({ date });
-    res.status(200).json(logs ? logs.bnids : []);
+    const { date, bnid } = req.query;
+
+    if (!date || !bnid) {
+      return res.status(200).json([]);
+    }
+
+    const [log] = await PathLogs.find(
+      { date, "bnids.bnid": bnid },
+      { "bnids.$": 1 }
+    );
+
+    if (!log || log.bnids.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(log.bnids[0]);
   } catch (error) {
     res.status(500).json({ message: "Error fetching beacon history", error });
   }
