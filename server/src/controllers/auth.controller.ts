@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Controller } from '../decorators/controller';
 import { Route } from '../decorators/route';
 import { Validate } from '../decorators/validate';
@@ -71,16 +71,23 @@ class AuthController {
         }
     }
 
-    @Route('post', '/refresh')
+    @Route('post', '/logout')
+    async logout(req: Request, res: Response, next: NextFunction) {
+        const cookies = req.cookies;
+        if (!cookies?.jwt) {
+            return res.sendStatus(204);
+        }
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+        res.json({ message: 'Cookie cleared' });
+    }
+
+    @Route('get', '/refresh')
     async refresh(req: Request, res: Response, next: NextFunction) {
         try {
             const cookies = req.cookies;
-            console.log(req.cookies);
-
             if (!cookies?.jwt) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
-
             const refreshToken = cookies.jwt;
 
             jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err: any, decoded: any) => {

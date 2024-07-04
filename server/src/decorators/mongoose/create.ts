@@ -11,19 +11,14 @@ export function MongoCreate(model: Model<any>) {
                     _id: new mongoose.Types.ObjectId(),
                     ...req.body
                 });
-
                 await document.save();
-
                 req.mongoCreate = document;
             } catch (error) {
                 logging.error(error);
-
                 return res.status(400).json(error);
             }
-
             return originalMethod.call(this, req, res, next);
         };
-
         return descriptor;
     };
 }

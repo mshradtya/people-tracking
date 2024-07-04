@@ -3,6 +3,7 @@ import express from 'express';
 import './config/logging';
 import 'reflect-metadata';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 
 import { loggingHandler } from './middleware/loggingHandler';
 import { corsHandler } from './middleware/corsHandler';
@@ -48,6 +49,7 @@ export const Main = async () => {
     application.use(declareHandler);
     application.use(loggingHandler);
     application.use(corsHandler);
+    application.use(cookieParser());
 
     logging.info('-------------------------------------------------------------');
     logging.info('Define Controller Routing');
