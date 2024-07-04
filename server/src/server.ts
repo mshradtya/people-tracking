@@ -9,9 +9,13 @@ import { corsHandler } from './middleware/corsHandler';
 import { routeNotFound } from './middleware/routeNotFound';
 import { SERVER_HOSTNAME, SERVER_PORT, mongo } from './config/config';
 import { defineRoutes } from './modules/routes';
-import MainController from './controllers/main';
 import { declareHandler } from './middleware/declareHandler';
-import BookController from './controllers/book';
+
+// controllers
+import MainController from './controllers/main.controller';
+import BookController from './controllers/book.controller';
+import UserController from './controllers/user.controller';
+import AuthController from './controllers/auth.controller';
 
 export const application = express();
 export let httpServer: ReturnType<typeof http.createServer>;
@@ -48,7 +52,7 @@ export const Main = async () => {
     logging.info('-------------------------------------------------------------');
     logging.info('Define Controller Routing');
     logging.info('-------------------------------------------------------------');
-    defineRoutes([MainController, BookController], application);
+    defineRoutes([MainController, BookController, UserController, AuthController], application);
 
     logging.info('-------------------------------------------------------------');
     logging.info('Define Routing Error');

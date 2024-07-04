@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Controller } from '../decorators/controller';
 import { Route } from '../decorators/route';
 import { MongoGet } from '../decorators/mongoose/get';
-import { Book } from '../models/book';
+import { Book } from '../models/book.model';
 import { MongoGetAll } from '../decorators/mongoose/getAll';
 import { MongoDelete } from '../decorators/mongoose/delete';
 import { MongoQuery } from '../decorators/mongoose/query';

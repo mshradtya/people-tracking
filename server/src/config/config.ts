@@ -15,6 +15,9 @@ export const MONGO_OPTIONS: mongoose.ConnectOptions = { retryWrites: true, w: 'm
 export const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || 'localhost';
 export const SERVER_PORT = process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : 12345;
 
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || '';
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || '';
+
 export const mongo = {
     MONGO_USER,
     MONGO_PASSWORD,
@@ -28,4 +31,9 @@ export const mongo = {
 export const server = {
     SERVER_HOSTNAME,
     SERVER_PORT
+};
+
+export const secrets = {
+    ACCESS_TOKEN_SECRET,
+    REFRESH_TOKEN_SECRET
 };

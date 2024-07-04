@@ -1,18 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Controller } from '../decorators/controller';
 import { Route } from '../decorators/route';
-import Joi from 'joi';
 import { Validate } from '../decorators/validate';
-
-type validation = {
-    name: string;
-    email?: string;
-};
-
-const postHealthCheckValidation = Joi.object<validation>({
-    name: Joi.string().required(),
-    email: Joi.string().email()
-});
+import { postHealthCheckValidation } from '../validations/main.validation';
 
 @Controller()
 class MainController {
